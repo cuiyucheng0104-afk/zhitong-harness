@@ -1,0 +1,39 @@
+# 工程量清单生成金标片段（WS11 QTY-02，issue #763；决策 D7）。
+#
+# ⚠ 状态：草稿，**未经造价员签字，不作为上线门槛**（D7：金标须经造价员签字后生效）。
+# 只收做法原文片段（通用构造做法描述，没有客户信息）—— tests/ 会随镜像 COPY，入仓前须脱敏（C19）。
+#
+# 字段：text 原文；ctx 上下文（类别 / 部位 / 做法名）；role 期望角色；code 期望基码（role=main 时）；
+#       linear=true 表示线性部位（踢脚、线条等），计量单位必须是 m。
+# 门槛（D7 默认）：基码 top-1 准确率 ≥ 85%；线性部位单位一致率 100%；误降级率 ≤ 10%。
+# 跑法（会消耗 token，须用户同意；镜像里没有 scripts/，在本机执行）：
+#   cd engine-service && DEEPSEEK_MODEL=<与生产一致> python scripts/eval_quantity.py \
+#       --golden tests/fixtures/quantity/golden_segments.yaml
+signed_off: false
+segments:
+  - {text: "10厚防滑地砖面层", ctx: "楼地面 卫生间 楼面2", role: main, code: "011102003"}
+  - {text: "20厚1:3干硬性水泥砂浆结合层", ctx: "楼地面 卫生间 楼面2", role: aux}
+  - {text: "1.5厚聚氨酯防水涂料，四周上翻300高", ctx: "楼地面 卫生间 楼面2", role: main, code: "Z010904002"}
+  - {text: "20厚1:3水泥砂浆找平层", ctx: "楼地面 卫生间 楼面2", role: main, code: "Z011101006"}
+  - {text: "钢筋混凝土楼板", ctx: "楼地面 卫生间 楼面2", role: base}
+  - {text: "20厚C25细石混凝土面层，随打随抹光", ctx: "楼地面 地下汽车库 地面1", role: main, code: "011101002"}
+  - {text: "素水泥浆一道（内掺建筑胶）", ctx: "楼地面 地下汽车库 地面1", role: aux}
+  - {text: "150厚C20混凝土垫层", ctx: "楼地面 地下汽车库 地面1", role: main, code: "010501002"}
+  - {text: "素土夯实", ctx: "楼地面 地下汽车库 地面1", role: base}
+  - {text: "10厚1:2水泥砂浆罩面压实赶光", ctx: "踢脚 地下汽车库", role: main, code: "011105001", linear: true}
+  - {text: "12厚1:3水泥砂浆打底扫毛", ctx: "踢脚 地下汽车库", role: aux}
+  - {text: "8厚地砖踢脚，高150", ctx: "踢脚 门厅", role: main, code: "011105003", linear: true}
+  - {text: "刷白色乳胶漆两遍", ctx: "顶棚 地下汽车库", role: main, code: "011404002"}
+  - {text: "满刮腻子两遍", ctx: "顶棚 地下汽车库", role: aux}
+  - {text: "9.5厚纸面石膏板", ctx: "顶棚 办公室 顶棚1 纸面石膏板吊顶", role: main, code: "Z011302001"}
+  - {text: "U型轻钢龙骨中距600", ctx: "顶棚 办公室 顶棚1 纸面石膏板吊顶", role: aux}
+  - {text: "40厚C20细石混凝土保护层", ctx: "屋面 屋面1 不上人屋面", role: main, code: "Z010902004"}
+  - {text: "10厚低标号砂浆隔离层", ctx: "屋面 屋面1 不上人屋面", role: main, code: "Z010902003"}
+  - {text: "3厚SBS改性沥青防水卷材", ctx: "屋面 屋面1 不上人屋面", role: main, code: "Z010902001"}
+  - {text: "60厚挤塑聚苯板保温层", ctx: "屋面 屋面1 不上人屋面", role: main, code: "011001001"}
+  - {text: "钢筋混凝土屋面板", ctx: "屋面 屋面1 不上人屋面", role: base}
+  - {text: "4厚SBS改性沥青防水卷材", ctx: "基础 底板 地下室底板", role: main, code: "Z010905001"}
+  - {text: "刷乳胶漆两遍", ctx: "墙面 内墙1 乳胶漆墙面", role: main, code: "011404001"}
+  - {text: "10厚1:1:6混合砂浆打底", ctx: "墙面 内墙1 乳胶漆墙面", role: aux}
+  - {text: "5厚釉面砖面层", ctx: "墙面 卫生间墙面 内墙3", role: main, code: "011203003"}
+  - {text: "C30钢筋混凝土挡土墙", ctx: "室外工程", role: main, code: "010502026"}
