@@ -6,7 +6,11 @@
 # (see bin/README.md).
 #
 # Usage: sh scripts/build-dwg2dxf.sh [work-directory]
-# Needs: curl, a C compiler, make, shasum or sha256sum.
+# Needs: curl, a C compiler, make, shasum or sha256sum. The release tarball ships
+# a generated ./configure, so autotools are not needed. On macOS the Xcode
+# Command Line Tools provide all of them (xcode-select --install); the result
+# must link only system libraries (checked with otool) and gets an ad-hoc
+# signature so Apple Silicon can execute it.
 set -eu
 
 VERSION=0.14
@@ -41,18 +45,29 @@ if [ "$actual" != "$SHA256" ]; then
 fi
 tar -xJf "libredwg-$VERSION.tar.xz"
 cd "libredwg-$VERSION"
-./configure --disable-bindings --disable-shared
+./configure --disable-bindings --disable-python --disable-docs --disable-shared
 make -j"$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)"
 
 mkdir -p "$dest"
 cp programs/dwg2dxf "$dest/dwg2dxf"
 strip "$dest/dwg2dxf"
+if [ "$platform" = darwin ]; then
+  # Homebrew or MacPorts libraries would make the installer depend on the build machine.
+  foreign=$(otool -L "$dest/dwg2dxf" | tail -n +2 | awk '{print $1}' | grep -v -E '^(/usr/lib/|/System/)' || true)
+  if [ -n "$foreign" ]; then
+    echo "dwg2dxf links non-system libraries:" >&2
+    echo "$foreign" >&2
+    exit 1
+  fi
+  # strip invalidates the linker signature; arm64 macOS refuses unsigned executables.
+  codesign --force --sign - "$dest/dwg2dxf"
+fi
 cp COPYING "$dest/COPYING"
 {
   echo "LibreDWG dwg2dxf $VERSION"
   echo "source: $URL"
   echo "source sha256: $SHA256"
-  echo "build: ./configure --disable-bindings --disable-shared; make; strip"
+  echo "build: ./configure --disable-bindings --disable-python --disable-docs --disable-shared; make; strip"
   echo "built: $(date -u +%Y-%m-%dT%H:%M:%SZ) on $(uname -sm)"
 } > "$dest/VERSION.txt"
 cp "$here/bin/SOURCE-OFFER.txt" "$dest/SOURCE-OFFER.txt"

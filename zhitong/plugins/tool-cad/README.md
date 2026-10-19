@@ -58,7 +58,8 @@
 
 - LibreDWG 是 GPLv3，只作为独立可执行文件经 `ctx.subprocess` 启动（argv + 临时文件 + 退出码），不链接、不嵌入；禁止引入 `@mlightcad/libredwg-web` 等链接式封装。删掉二进制只失去 DWG 能力。
 - 每次转换：`mkdtemp` 临时目录，输入拷成 ASCII 名 `in.dwg`（官方 win64 版用 ANSI `fopen`，中文路径打不开），`dwg2dxf -y -o out.dxf in.dwg`，工作目录与库路径设为可执行文件所在目录，超时终止，体积超限拒收，结束后删除临时目录。
-- 二进制按 [`bin/README.md`](bin/README.md) 放进 `bin/<platform>-<arch>/`，同目录随附 `COPYING`（GPLv3）、`VERSION.txt`、`SOURCE-OFFER.txt`；仓库只提交说明，不提交二进制。Linux/macOS 用 `sh scripts/build-dwg2dxf.sh` 从钉死 sha256 的 0.14 源码包静态构建；Windows 用官方 0.14 win64 zip（sha256 见 `bin/README.md`）。
+- 二进制按 [`bin/README.md`](bin/README.md) 放进 `bin/<platform>-<arch>/`，同目录随附 `COPYING`（GPLv3）、`VERSION.txt`、`SOURCE-OFFER.txt`；仓库只提交说明，不提交二进制。Linux/macOS 用 `sh scripts/build-dwg2dxf.sh` 从钉死 sha256 的 0.14 源码包静态构建；Windows 用 `scripts/fetch-dwg2dxf-win64.ps1` 取官方 0.14 win64 zip（sha256 见 `bin/README.md`）。
+- 桌面安装包：插件以 `lib/index.js`（`pnpm run build`，tsdown 打包 `src/`）进入 `app.asar/dsh`；`bin/` 与 `assets/` 由 asarUnpack 解到 `app.asar.unpacked/`，`config.ts` 的 `physicalPath` 把包内的 `bin/`、字体路径换成 asar 外的路径，子进程与 canvas 字体加载都读真实文件。
 - 其余第三方声明见 [`THIRD_PARTY_NOTICES.txt`](THIRD_PARTY_NOTICES.txt)。进程边界是否足以隔离 GPL 仍需 IP 律师在发布前确认。
 
 ## 已知盲区
