@@ -7,8 +7,9 @@
 # - zhitong-config-import：导入客户配置包（格式见 zhitong/CONFIG-PACKAGE.md）。
 # - zhitong-skills：宿主层的 skill-filesystem 行，只挂 zhitong/skills；宿主层 provider 注册到
 #   skill 注册表的全局层，所有预设的 agent 都能看到。路径由 @zhitong/bundle/skills-dir.cjs 算出：
-#   安装包里是本包内的 skills/（asar 外的 app.asar.unpacked 路径），仓库里是 zhitong/skills；
-#   bundle 必须能从 profile 解析到（link: 安装或桌面安装包自带，INSTALL.md）。
+#   安装包里是本包内的 skills/（asar 外的 app.asar.unpacked 路径），仓库里是 zhitong/skills。
+#   本包先从 profile 目录解析（link: 安装，INSTALL.md 第一部分），再从 dsh 安装解析（桌面安装包自带；
+#   运行时解析表不收录 bundle 层自身，所以要用 profileContext.installAnchor 作为第二个锚点）。
 # - agent-default-model：固定 DeepSeek V4.1 Flash（上游目录 id deepseek-flash）；设置页另选的模型仍优先。
 # - preset-zhitong：默认预设。插件列表照抄 packages/bundle/web-app/presets/standard.patch.yml，
 #   只把人设换成造价人设；合入上游后需要对照 standard 预设同步。
@@ -52,7 +53,7 @@
       config:
         providerName: zhitong
         includeDefaultRoots: false
-        bundledSkillDir: !!js process.getBuiltinModule('node:module').createRequire(baseUrl)('@zhitong/bundle/skills-dir.cjs').skillsDir()
+        bundledSkillDir: !!js "(() => { const { createRequire } = process.getBuiltinModule('node:module'); for (const anchor of [baseUrl, ctx.get('profileContext')?.installAnchor]) { if (!anchor) continue; try { return createRequire(anchor)('@zhitong/bundle/skills-dir.cjs').skillsDir() } catch (error) { if (error?.code !== 'MODULE_NOT_FOUND') throw error } } throw new Error('@zhitong/bundle: 从 profile 与 dsh 安装都解析不到本包，找不到 skill 目录') })()"
 
 - id: agent-preset-registry
   config:
