@@ -31,6 +31,12 @@
       config:
         backend: tos
 
+# zhitong-tool-cad：DWG/DXF 结构化读取与按需出图（zhitong/plugins/tool-cad/README.md）。
+# 注入 subprocess（dsh-base 已挂 dsh-subprocess-local）。
+- insert:
+    - id: zhitong-tool-cad
+      name: '@zhitong/tool-cad'
+
     - id: zhitong-config-import
       name: '@zhitong/config-import'
 

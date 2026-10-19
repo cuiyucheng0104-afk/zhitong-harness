@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@zhitong/config-import": "workspace:*",
+    "@zhitong/tool-cad": "workspace:*",
     "@zhitong/tool-tos": "workspace:*"
   },
   "peerDependencies": {

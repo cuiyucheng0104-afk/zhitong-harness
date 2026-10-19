@@ -11,7 +11,7 @@
 | W2 zt-reconcile / zt-indicator / zt-tk | 已合入 | `3e20dfe15` `b51172531` | costsheet 263 通过 3 跳过、code_registry 41、amounts 36、reconcile 51、indicator 66、tk 139 |
 | W3 zt-report | 已合入 | `e0eac1bd1` `7d45cc22c` | report 544 通过 |
 | W4 zt-quantity / zt-estimate | 已合入 | `652d8f79a` `2e41a1fec` `0f8dae5e0` | quantity 647 通过 5 跳过；estimate 548 通过 12 跳过 |
-| W5 tool-cad / zt-cad | 后台进行中，未合入 | 分支 `worktree-agent-a0a84268168cc18fa`（4 个提交） | 未在本分支验收 |
+| W5 tool-cad / zt-cad | 已合入（合并提交 `10f0b7b92`，bundle 已挂 `zhitong-tool-cad`） | `d06cac451` `ff978197f` `c8d8bac78` `81fd41991` | 合并后在主树复跑：tool-cad vitest 44 通过；`tsc --noEmit` 退出码 0；真实 DWG 用例依赖本机 `bin/linux-x64/dwg2dxf`（已构建，gitignore 排除） |
 | W6 zt-knowledge | 已合入 | `82c7d030c` | `check_knowledge.py --root knowledge-seed`：12 个目录、16 条、0 违规 |
 | W7 zt-volc | 已合入 | `e7f584cb0` | volc 102 通过（`ve` 输出为合成夹具） |
 | W8 迁移 | 未开始 | — | `zhitong/migration/` 不存在 |
