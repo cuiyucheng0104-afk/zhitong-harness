@@ -1,0 +1,150 @@
+{
+  "description": "gsyz_v1_template.xlsx 5.工程建设其他费用 I 列 WPS DISPIMG 内嵌图提取映射",
+  "count": 16,
+  "images": [
+    {
+      "image": "image1.png",
+      "dispimg_id": "ID_62B8062AD4674B308CF07115098E9CA0",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I6",
+      "fee_row": 6,
+      "fee_name": "项目建设管理费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image2.png",
+      "dispimg_id": "ID_353356DCA9BF4818ADEE8EF7E4CAC740",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I9",
+      "fee_row": 9,
+      "fee_name": "建设管理其他费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image3.png",
+      "dispimg_id": "ID_D84FC358A2F64DDE804D53059B1E6AE9",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I14",
+      "fee_row": 14,
+      "fee_name": "工程监理费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image4.png",
+      "dispimg_id": "ID_F3F56E83FAF245A4904EEE4309A32062",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I16",
+      "fee_row": 16,
+      "fee_name": "可行性研究费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image5.png",
+      "dispimg_id": "ID_684596C7535E4F96BC0010F8FBD83BAE",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I17",
+      "fee_row": 17,
+      "fee_name": "勘察设计费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image6.png",
+      "dispimg_id": "ID_BE15CF6B8D374EFCBFA349ACF35114F0",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I18",
+      "fee_row": 18,
+      "fee_name": "环境影响评价费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image7.png",
+      "dispimg_id": "ID_E6F3E89C98494E08A8F0FD3908047746",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I19",
+      "fee_row": 19,
+      "fee_name": "节能评估费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image8.png",
+      "dispimg_id": "ID_46EBB496AAB04C80B00328B58B21CD5E",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I20",
+      "fee_row": 20,
+      "fee_name": "场地准备及临时设施费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image9.png",
+      "dispimg_id": "ID_BEBE3001711943D8AF784F6561D5932D",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I22",
+      "fee_row": 22,
+      "fee_name": "市政基础设施配套费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image10.png",
+      "dispimg_id": "ID_AEEA97D9156A4804AF567F76F3047D94",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I23",
+      "fee_row": 23,
+      "fee_name": "高可靠性供电费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image11.png",
+      "dispimg_id": "ID_D0615DA30E6B4FDBB8896E561388EEA1",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I21",
+      "fee_row": 21,
+      "fee_name": "工程保险费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image12.png",
+      "dispimg_id": "ID_947E9ED54A1C4897A716650557E3577C",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I30",
+      "fee_row": 30,
+      "fee_name": "生产准备及开办费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image13.png",
+      "dispimg_id": "ID_FA10EBB06CF14B70A36511F24BE2C0CE",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I29",
+      "fee_row": 29,
+      "fee_name": "专利及专有技术使用费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image14.png",
+      "dispimg_id": "ID_8EED7AD017BD4446994A41FDDD30B228",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I28",
+      "fee_row": 28,
+      "fee_name": "联合试运转费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image15.png",
+      "dispimg_id": "ID_BE8100AAD6C546B1BE1B6EDC5A9999CC",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I12",
+      "fee_row": 12,
+      "fee_name": "工程造价咨询费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    },
+    {
+      "image": "image16.png",
+      "dispimg_id": "ID_E011E42960CA49FC9CAA585277B222A4",
+      "sheet": "5.工程建设其他费用",
+      "cell": "I11",
+      "fee_row": 11,
+      "fee_name": "工程招标代理费",
+      "source": "《浙江省建设工程其他费用定额（2018版）》扫描页（公开出版物，不含客户信息）"
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+ "_note": "知识库「清单编码类」结构化资料 K0–K9 的登记清单（11 个 md；K4 按章拆成 K4a/K4b）。build_all.py 按 pins 固定生成时间重建，并逐文件核对这里的 sha256。上传状态、实体 id、落盘路径等运维信息不入仓。",
+ "baseline_commit": "33601ca8",
+ "pins": {
+  "gen_zj2025.py": "2026-10-01T01:45:08+08:00",
+  "gen_rules.py+gen_map.py SOURCE_DATE_EPOCH": 1790789693,
+  "gen_2013.py": "2026-10-01T15:16:30+08:00",
+  "gen_k0.py": "2026-10-01T15:16:40+08:00"
+ },
+ "sources": {
+  "zj2025_yaml": {
+   "path": "engine-service/app/engine/data/gb50854_zj2025.yaml",
+   "commit": "33601ca8",
+   "sha256": "6a61c6d196c8b420ec675b73323395cc0eec91ffa02872181ac83fc8f041e730"
+  },
+  "quantity_rules_yaml": {
+   "path": "engine-service/app/engine/data/quantity_rules.yaml",
+   "commit": "33601ca8",
+   "sha256": "f15101cd5d924a48a7bf174c5d554de74529332d784bc17257cfe7b41f859a80"
+  },
+  "gb50854_2013_md": {
+   "original_md5": "26504c410ebb4c458f53d8db3377103e",
+   "original_sha256": "6803ace116d14c5cab04a0b25245ceb964822345c1eda620bb187fdc3fa84ab4",
+   "repo_copy": "sources/GB50854-2013.md",
+   "repo_copy_sha256": "2b8bdc7f1afcc96b3aeb2956df74bc8092081b3d128c59ebbcb69007253a3cff",
+   "repo_copy_diff": "只把第 43 行版权页「定价：<数字>元」改成「定价：（略）」"
+  },
+  "skill_md": {
+   "sha256": "5795fe9f96d26101b8a9abc95b616f64f7bd102aa05fe4ca382b82717b6f236d",
+   "lines": "105-155",
+   "via": "sources/k7_sources_snapshot.json",
+   "lines_note": "映射表第 105–155 行（表头、分隔行和 49 个数据行）；快照另存第 156 行空行作表尾边界"
+  },
+  "clause_llm_py": {
+   "sha256": "efbfb032832e1ccf28327e8c321fc421963df6609170c4be62b39284b6254217",
+   "only": "_MAPPING_REF",
+   "lines": [
+    9,
+    24
+   ],
+   "via": "sources/k7_sources_snapshot.json"
+  },
+  "kb_plan_md": {
+   "sha256": "74cce567be8866095b179280f5aef09c2e7935224cc4e21666f8bd8c51bc9a13",
+   "note": "执行方案，含生产环境信息，不入仓；只在 K0 文件头引用其 sha256"
+  }
+ },
+ "categories": {
+  "K0": "清单",
+  "其余": "清单/房屋建筑",
+  "note": "只记类目名；类目 id 各租户、各环境不同（运行时生成的雪花 id），不入仓，上传前用 check_kb.py --categories 指向本地配置"
+ },
+ "files": [
+  {
+   "id": "K0",
+   "name": "【清单】清单编码类资料版本与使用说明.md",
+   "sha256": "f903832972c793bbd1fcf43ce463dd5816c05622f888d01a5c4139666126feff",
+   "bytes": 8624,
+   "chars": 4300,
+   "lines": 37,
+   "headings": 4,
+   "table_rows": 11,
+   "category": "清单"
+  },
+  {
+   "id": "K1",
+   "name": "【清单·房屋建筑】浙江2025清单编码表-土石方地基桩基砌筑（0101-0104）.md",
+   "sha256": "212860e6e7961f26cb0d277c592579aa2f29065fb8bea8e9f47e35f644d2eb50",
+   "bytes": 17627,
+   "chars": 10587,
+   "lines": 111,
+   "headings": 5,
+   "table_rows": 82,
+   "category": "清单/房屋建筑"
+  },
+  {
+   "id": "K2",
+   "name": "【清单·房屋建筑】浙江2025清单编码表-混凝土金属木结构（0105-0107）.md",
+   "sha256": "2a27028f79173eacb854d2c8fbf8448c623554c07d9edfba1ceffd8f496d6e6f",
+   "bytes": 24879,
+   "chars": 15826,
+   "lines": 164,
+   "headings": 4,
+   "table_rows": 140,
+   "category": "清单/房屋建筑"
+  },
+  {
+   "id": "K3",
+   "name": "【清单·房屋建筑】浙江2025清单编码表-门窗屋面防水保温（0108-0110）.md",
+   "sha256": "b8a5d4facdf09c936ddbb0059d12b09de0f7f67bbd5236fb1ae254d5a71e025a",
+   "bytes": 21830,
+   "chars": 12864,
+   "lines": 122,
+   "headings": 4,
+   "table_rows": 98,
+   "category": "清单/房屋建筑"
+  },
+  {
+   "id": "K4a",
+   "name": "【清单·房屋建筑】浙江2025清单编码表-楼地面装饰（0111）.md",
+   "sha256": "248b307f52eb89ffcc9239fb805b75171e2ed79d4f21948df14ec7dd3061b933",
+   "bytes": 13976,
+   "chars": 7473,
+   "lines": 60,
+   "headings": 2,
+   "table_rows": 46,
+   "category": "清单/房屋建筑"
+  },
+  {
+   "id": "K4b",
+   "name": "【清单·房屋建筑】浙江2025清单编码表-墙柱面隔断幕墙、天棚、油漆涂料裱糊及其他装饰（0112-0115）.md",
+   "sha256": "b52d424344a2ad576b41cf66879ed3b3833b9012fbf68b275ca458e1420d3c5d",
+   "bytes": 20033,
+   "chars": 11497,
+   "lines": 112,
+   "headings": 5,
+   "table_rows": 83,
+   "category": "清单/房屋建筑"
+  },
+  {
+   "id": "K5",
+   "name": "【清单·房屋建筑】浙江2025清单编码表-拆除与措施项目（0116、0118）.md",
+   "sha256": "bde49a8d096892937dce2c17c44dea817671e245fdeb7b33a920022dcaf20a89",
+   "bytes": 7981,
+   "chars": 5114,
+   "lines": 60,
+   "headings": 3,
+   "table_rows": 41,
+   "category": "清单/房屋建筑"
+  },
+  {
+   "id": "K6",
+   "name": "【清单·房屋建筑】浙江2025清单易混淆编码与列项校核规则（系统口径）.md",
+   "sha256": "8bb63875d95408aeff3d67913ac075d913a15fdc408d10038c70b17a0a3cec87",
+   "bytes": 14306,
+   "chars": 7749,
+   "lines": 51,
+   "headings": 4,
+   "table_rows": 25,
+   "category": "清单/房屋建筑"
+  },
+  {
+   "id": "K7",
+   "name": "【清单·房屋建筑】设计做法对应浙江2025清单编码参考表（待造价员签核）.md",
+   "sha256": "ae4cdf92ecd91caa3262dc0b5be687a5f4833f9714f84d7ab153e7c5258c09fe",
+   "bytes": 17239,
+   "chars": 10163,
+   "lines": 86,
+   "headings": 3,
+   "table_rows": 67,
+   "category": "清单/房屋建筑"
+  },
+  {
+   "id": "K8",
+   "name": "【清单·房屋建筑】GB50854-2013工程量计算规范全文（国标2013·编码与浙江2025不通用）.md",
+   "sha256": "f79eaa26d79cf836aa6fb97f9bbff749bc8f7cfd3d32c856ff4646e5894ecc48",
+   "bytes": 248969,
+   "chars": 113267,
+   "lines": 2624,
+   "headings": 162,
+   "table_rows": 575,
+   "category": "清单/房屋建筑"
+  },
+  {
+   "id": "K9",
+   "name": "【清单·房屋建筑】国标2013与浙江2025清单同码异名对照表.md",
+   "sha256": "09625ccb78dbd021a9e2ef8bbe458eb9348a33cda2ebd69e010096df4a2cd580",
+   "bytes": 51955,
+   "chars": 38956,
+   "lines": 357,
+   "headings": 3,
+   "table_rows": 330,
+   "category": "清单/房屋建筑"
+  }
+ ]
+}
