@@ -1,0 +1,806 @@
+{
+ "_about": "WS13 分类金标夹具(issue #720)。脱敏:项目名/地名/公司名/人名一律替换为 某/XX,只保留目录结构与文档类型词(D7)。来源:spec WS13 各问题的复现表与 QA 缺陷索引里写明的判例;QA 原始 ground_truth_sample60.json / census_verdicts.json 本机不可得,未入仓(见 PR「没做到的部分」)。expect 的类目是清单口径(经 category_vocab.canonical 折算后比较);cost_stage 缺省=不断言阶段。baseline_d25a4637 = origin/dev d25a4637 上旧引擎的实际输出(旧 tag.py 只传直属父目录 = ancestors[0]),由 PR 作者在修改前的源码快照上跑出,只作对照与附录 B 使用,不参与判定。",
+ "rows": [
+  {
+   "file_name": "施工图预算书.xlsx",
+   "file_ext": "xlsx",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "施工图预算",
+    "cost_stage": "概算"
+   },
+   "source": "WS13-P01 复现表",
+   "baseline_d25a4637": {
+    "disposition": "archive",
+    "doc_category": "施工图",
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "给排水施工图预算.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "施工图预算",
+    "cost_stage": "概算"
+   },
+   "source": "WS13-P05 生产探针同形",
+   "baseline_d25a4637": {
+    "disposition": "archive",
+    "doc_category": "给排水图纸",
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "某某建筑工程结算书.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "结算价文件",
+    "cost_stage": "结算"
+   },
+   "source": "WS13-P01 复现表",
+   "baseline_d25a4637": {
+    "disposition": "archive",
+    "doc_category": null,
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "XX市政道路工程控制价.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "招标控制价",
+    "cost_stage": "招标控制价"
+   },
+   "source": "WS13-P01 PDF 控制价被「市政」截",
+   "baseline_d25a4637": {
+    "disposition": "archive",
+    "doc_category": null,
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "XX建筑工程审定单.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "审定单",
+    "cost_stage": "审定"
+   },
+   "source": "WS13-P01 PDF 审定单被「建筑」截",
+   "baseline_d25a4637": {
+    "disposition": "archive",
+    "doc_category": null,
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "建筑做法参考.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": null
+   },
+   "source": "WS13-P01 只命中无类目专业词",
+   "baseline_d25a4637": {
+    "disposition": "archive",
+    "doc_category": null,
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "定级表及报价单.docx",
+   "file_ext": "docx",
+   "ancestors": [],
+   "expect": {
+    "doc_category": null
+   },
+   "source": "WS13-P01 前期咨询报价被「报价」截",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "投标报价书",
+    "cost_stage": "招标控制价",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "前期咨询报价单.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": null
+   },
+   "source": "WS13-P01",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "投标报价书",
+    "cost_stage": "招标控制价",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "招标代理合同.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "咨询服务合同"
+   },
+   "source": "WS13-P01 招标代理合同被「招标」截",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "招标文件",
+    "cost_stage": "招标控制价",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "验工计价建议书.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "进度款支付",
+    "cost_stage": "施工过程"
+   },
+   "source": "WS13-P01 验工计价被「计价」截",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "造价综合文件",
+    "cost_stage": null,
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "桩基检测费用签证单.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "变更签证费用",
+    "cost_stage": "施工过程"
+   },
+   "source": "WS13-P01 黑名单「检测」误杀",
+   "baseline_d25a4637": {
+    "disposition": "skip",
+    "doc_category": null,
+    "cost_stage": null,
+    "confidence": 0.9,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "专业分包工程合同.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": null
+   },
+   "source": "WS13-P01 黑名单「分包」确定跳过(QA 本机复现)",
+   "baseline_d25a4637": {
+    "disposition": "skip",
+    "doc_category": null,
+    "cost_stage": null,
+    "confidence": 0.9,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "勘察外业见证合同.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "勘察合同"
+   },
+   "source": "WS13-P04/P13 QA R5 同形",
+   "baseline_d25a4637": {
+    "disposition": "skip",
+    "doc_category": null,
+    "cost_stage": null,
+    "confidence": 0.9,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "桩基检测报价单.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": null
+   },
+   "source": "WS13-P01 黑名单+疑词",
+   "baseline_d25a4637": {
+    "disposition": "skip",
+    "doc_category": null,
+    "cost_stage": null,
+    "confidence": 0.9,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "见证取样费.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": null
+   },
+   "source": "WS13-P01 黑名单+疑词",
+   "baseline_d25a4637": {
+    "disposition": "skip",
+    "doc_category": null,
+    "cost_stage": null,
+    "confidence": 0.9,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "(10月进度款)XX工程.清单审计",
+   "file_ext": "清单审计",
+   "ancestors": [
+    "22 进度款审核及付款建议"
+   ],
+   "expect": {
+    "doc_category": "进度款支付",
+    "cost_stage": "施工过程"
+   },
+   "source": "WS13-P10 复现表",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "工程量清单",
+    "cost_stage": "招标控制价",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "X.SSQ6",
+   "file_ext": "ssq6",
+   "ancestors": [],
+   "expect": {
+    "doc_category": null
+   },
+   "source": "WS13-P10",
+   "baseline_d25a4637": {
+    "disposition": "skip",
+    "doc_category": null,
+    "cost_stage": null,
+    "confidence": 0.0,
+    "needs_manual": true
+   }
+  },
+  {
+   "file_name": "X.yss",
+   "file_ext": "yss",
+   "ancestors": [
+    "5 投标文件"
+   ],
+   "expect": {
+    "doc_category": "投标文件",
+    "cost_stage": "招标控制价"
+   },
+   "source": "WS13-P10",
+   "baseline_d25a4637": {
+    "disposition": "pending_export",
+    "doc_category": null,
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "某广场03.xlsx",
+   "file_ext": "xlsx",
+   "ancestors": [
+    "某广场03.zip.解压",
+    "某广场计价报告整理（第1-18期）",
+    "22 进度款审核及付款建议"
+   ],
+   "expect": {
+    "doc_category": "进度款支付",
+    "cost_stage": "施工过程"
+   },
+   "source": "WS13-P02 三层深",
+   "baseline_d25a4637": {
+    "disposition": "skip",
+    "doc_category": null,
+    "cost_stage": null,
+    "confidence": 0.0,
+    "needs_manual": true
+   }
+  },
+  {
+   "file_name": "说明.pdf",
+   "file_ext": "pdf",
+   "ancestors": [
+    "4 招标文件及清单(控制价)"
+   ],
+   "expect": {
+    "doc_category": "招标文件",
+    "cost_stage": "招标控制价"
+   },
+   "source": "WS13-P02 同一段里招标文件先于控制价",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "招标控制价",
+    "cost_stage": "招标控制价",
+    "confidence": 0.7,
+    "needs_manual": true
+   }
+  },
+  {
+   "file_name": "补遗书二.pdf",
+   "file_ext": "pdf",
+   "ancestors": [
+    "4 招标文件及清单(控制价)"
+   ],
+   "expect": {
+    "doc_category": "答疑补遗",
+    "cost_stage": "招标控制价"
+   },
+   "source": "WS13-P02 补遗书被继承成招标控制价",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "招标控制价",
+    "cost_stage": "招标控制价",
+    "confidence": 0.7,
+    "needs_manual": true
+   }
+  },
+  {
+   "file_name": "保电费用联系单.pdf",
+   "file_ext": "pdf",
+   "ancestors": [
+    "11 工程联系单及工程签证"
+   ],
+   "expect": {
+    "doc_category": "变更签证费用",
+    "cost_stage": "施工过程"
+   },
+   "source": "WS13-P02",
+   "baseline_d25a4637": {
+    "disposition": "skip",
+    "doc_category": null,
+    "cost_stage": null,
+    "confidence": 0.0,
+    "needs_manual": true
+   }
+  },
+  {
+   "file_name": "工程量清单.xlsx",
+   "file_ext": "xlsx",
+   "ancestors": [
+    "22 进度款审核及付款建议"
+   ],
+   "expect": {
+    "doc_category": "进度款支付",
+    "cost_stage": "施工过程"
+   },
+   "source": "WS13-P13 QA A15 同形:进度款目录下的清单不是 42005",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "工程量清单",
+    "cost_stage": "招标控制价",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "计日工单价表.xlsx",
+   "file_ext": "xlsx",
+   "ancestors": [
+    "4 招标文件及清单(控制价)"
+   ],
+   "expect": {
+    "doc_category": "招标文件",
+    "cost_stage": "招标控制价"
+   },
+   "source": "WS13-P13 QA P3 同形:招标清单里的计日工表不是签证",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "变更签证费用",
+    "cost_stage": "施工过程",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "验工计价审核对比汇总表第10期.xlsx",
+   "file_ext": "xlsx",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "进度款支付",
+    "cost_stage": "施工过程"
+   },
+   "source": "WS13-P09 复现表",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "价款对比分析",
+    "cost_stage": "审定",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "第3期审核汇总表.xlsx",
+   "file_ext": "xlsx",
+   "ancestors": [
+    "22 进度款审核及付款建议"
+   ],
+   "expect": {
+    "doc_category": "进度款支付",
+    "cost_stage": "施工过程"
+   },
+   "source": "WS13-P09",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "汇总表",
+    "cost_stage": "审定",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "商务标封面.pdf",
+   "file_ext": "pdf",
+   "ancestors": [
+    "5 投标文件"
+   ],
+   "expect": {
+    "doc_category": "封面",
+    "cost_stage": "招标控制价"
+   },
+   "source": "WS13-P09",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "封面",
+    "cost_stage": "审定",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "第5期工程款支付审核报告.docx",
+   "file_ext": "docx",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "进度款支付",
+    "cost_stage": "施工过程"
+   },
+   "source": "WS13-P09",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "审核报告",
+    "cost_stage": "审定",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "结算审核报告.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "审核报告",
+    "cost_stage": "审定"
+   },
+   "source": "WS13-P09 #210 不回退",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "审核报告",
+    "cost_stage": "审定",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "勘察费用预算表.xlsx",
+   "file_ext": "xlsx",
+   "ancestors": [],
+   "expect": {
+    "doc_category": null
+   },
+   "source": "WS13-P09",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "施工图预算",
+    "cost_stage": "概算",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "建筑施工图.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "施工图"
+   },
+   "source": "WS13-P14",
+   "baseline_d25a4637": {
+    "disposition": "archive",
+    "doc_category": "建筑图纸",
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "结构施工图.dwg",
+   "file_ext": "dwg",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "施工图"
+   },
+   "source": "WS13-P14",
+   "baseline_d25a4637": {
+    "disposition": "archive",
+    "doc_category": "结构图纸",
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "XX项目施工图.dwg",
+   "file_ext": "dwg",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "施工图"
+   },
+   "source": "WS13-P14",
+   "baseline_d25a4637": {
+    "disposition": "archive",
+    "doc_category": "设计图纸",
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "一层平面图.dwg",
+   "file_ext": "dwg",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "施工图"
+   },
+   "source": "WS13-P14",
+   "baseline_d25a4637": {
+    "disposition": "archive",
+    "doc_category": "建筑平面图",
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "结算审定书.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "审定单",
+    "cost_stage": "审定"
+   },
+   "source": "WS13-P14",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "结算审定稿",
+    "cost_stage": "审定",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "结算审计报告.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "审核报告",
+    "cost_stage": "审定"
+   },
+   "source": "WS13-P14",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "审计/复审稿",
+    "cost_stage": "审定",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "结算定案表.xlsx",
+   "file_ext": "xlsx",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "审定单",
+    "cost_stage": "审定"
+   },
+   "source": "WS13-P14",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "结算价文件",
+    "cost_stage": "结算",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "初步设计概算批复.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "项目立项",
+    "cost_stage": "概算"
+   },
+   "source": "WS13-P14",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "设计概算书",
+    "cost_stage": "概算",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "可研批复.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "项目立项",
+    "cost_stage": "概算"
+   },
+   "source": "WS13-P01/P14",
+   "baseline_d25a4637": {
+    "disposition": "archive",
+    "doc_category": "可行性研究",
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "规划审定意见书.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": null
+   },
+   "source": "WS13-P15 误标文件改写项目阶段",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "结算审定书",
+    "cost_stage": "审定",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "投标人须知.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "招标文件",
+    "cost_stage": "招标控制价"
+   },
+   "source": "裸词「投标」判成投标文件,必须待复核",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "投标文件",
+    "cost_stage": "招标控制价",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "关于调整预算的请示.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": null
+   },
+   "source": "裸词「预算」必须待复核",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "施工图预算",
+    "cost_stage": "概算",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "施工日志.docx",
+   "file_ext": "docx",
+   "ancestors": [],
+   "expect": {
+    "doc_category": null
+   },
+   "source": "回归:纯黑名单",
+   "baseline_d25a4637": {
+    "disposition": "skip",
+    "doc_category": null,
+    "cost_stage": null,
+    "confidence": 0.9,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "现场照片001.jpg",
+   "file_ext": "jpg",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "前期现场照片"
+   },
+   "source": "回归",
+   "baseline_d25a4637": {
+    "disposition": "archive",
+    "doc_category": "前期现场照片",
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "建筑工程施工许可证.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "施工许可"
+   },
+   "source": "回归",
+   "baseline_d25a4637": {
+    "disposition": "archive",
+    "doc_category": "施工许可",
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "招标控制价编制说明.docx",
+   "file_ext": "docx",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "招标控制价",
+    "cost_stage": "招标控制价"
+   },
+   "source": "回归",
+   "baseline_d25a4637": {
+    "disposition": "rag",
+    "doc_category": "招标控制价",
+    "cost_stage": "招标控制价",
+    "confidence": 0.85,
+    "needs_manual": false
+   }
+  },
+  {
+   "file_name": "图纸会审及答疑纪要.pdf",
+   "file_ext": "pdf",
+   "ancestors": [],
+   "expect": {
+    "doc_category": "图纸会审"
+   },
+   "source": "回归:答疑不抢会审",
+   "baseline_d25a4637": {
+    "disposition": "archive",
+    "doc_category": "图纸会审",
+    "cost_stage": null,
+    "confidence": 0.95,
+    "needs_manual": false
+   }
+  }
+ ]
+}

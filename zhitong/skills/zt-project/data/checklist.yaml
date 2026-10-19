@@ -1,0 +1,73 @@
+# 资料清单（齐套核查 / 资料盘点用）
+#
+# 来源：/home/user/zhitong-cost-ai/后端/sql/tenant-init/tenant-seed-template.sql 第 6 节
+#       cfg_checklist_stage（5 行）与 cfg_checklist_item（36 行：通用 ALL 20 行、结算审核 20002 12 行、
+#       招标控制价编制 20003 4 行）。逐列照搬，只把 requirement_level 1/2/3 译成 required/important/optional
+#       （旧系统 AuditCheckInputBuilder 同口径），把 aliases 的 JSON 字符串译成列表。
+#
+# 签核状态：本文件整体【待签核】。逐条见 signoff 字段：
+#   seed         旧系统出厂种子（签核状态在旧仓里没有记录，按待签核对待）
+#   provisional  业务方口头拍板，注明「暂定、后面可改」（见各条 note）
+#   unconfirmed  旧系统实施整改时给的默认值，客户未确认
+#   没有任何一条被标成「客户已确认」；改成已确认之前不得改动本字段。
+#
+# 用法（zt.inventory.checklist）：
+#   - 阶段口径累计：选「X」= X 及其之前各阶段（sort 不大于 X）的清单项；不选阶段 = 全部阶段，须用户显式要求。
+#   - 咨询类型：有专属清单（20002、20003）就用专属的，没有（20001 全过程）才退回 ALL。
+#   - requirement_level：required 进分母，important 缺了只提示，optional 不报。
+#   - doc_category / aliases 是清单口径类目；分类器类目经 doc_category_map.yaml 折算后再比对。
+#
+# 改本文件 = 改核查口径。保持 item_id 稳定；增删条目要同步 tests/inventory 的条目数断言。
+
+consulting_types:
+  - {"code": "20001", "name": "全过程造价咨询"}
+  - {"code": "20002", "name": "结算审核"}
+  - {"code": "20003", "name": "招标控制价编制"}
+
+stages:
+  - {"stage_code": "概算", "stage_name": "概算阶段", "sort": 1}
+  - {"stage_code": "招标控制价", "stage_name": "招标控制价阶段", "sort": 2}
+  - {"stage_code": "施工过程", "stage_name": "施工过程阶段", "sort": 3}
+  - {"stage_code": "结算", "stage_name": "结算阶段", "sort": 4}
+  - {"stage_code": "审定", "stage_name": "审定阶段", "sort": 5}
+
+items:
+  # —— consulting_type = ALL ——
+  - {"item_id": "42001", "consulting_type": "ALL", "stage_code": "概算", "doc_category": "项目立项", "item_name": "项目立项批复", "requirement_level": "required", "aliases": [], "signoff": "seed"}
+  - {"item_id": "42002", "consulting_type": "ALL", "stage_code": "概算", "doc_category": "可行性研究", "item_name": "可行性研究报告", "requirement_level": "important", "aliases": [], "signoff": "seed"}
+  - {"item_id": "42003", "consulting_type": "ALL", "stage_code": "概算", "doc_category": "初步设计图", "item_name": "初步设计图纸", "requirement_level": "important", "aliases": [], "signoff": "seed"}
+  - {"item_id": "42004", "consulting_type": "ALL", "stage_code": "招标控制价", "doc_category": "招标控制价", "item_name": "招标控制价文件", "requirement_level": "required", "aliases": ["招标文件"], "signoff": "seed"}
+  - {"item_id": "42005", "consulting_type": "ALL", "stage_code": "招标控制价", "doc_category": "工程量清单", "item_name": "工程量清单", "requirement_level": "required", "aliases": [], "signoff": "seed"}
+  - {"item_id": "42006", "consulting_type": "ALL", "stage_code": "招标控制价", "doc_category": "投标报价书", "item_name": "投标报价文件", "requirement_level": "important", "aliases": [], "signoff": "seed"}
+  - {"item_id": "42007", "consulting_type": "ALL", "stage_code": "施工过程", "doc_category": "合同价款约定", "item_name": "合同价款约定", "requirement_level": "important", "aliases": [], "signoff": "provisional", "note": "issue #319：合同价款约定归「施工过程」、可选项；用户授权、后面可改"}
+  - {"item_id": "42008", "consulting_type": "ALL", "stage_code": "施工过程", "doc_category": "施工合同及补充协议", "item_name": "施工合同及补充协议", "requirement_level": "required", "aliases": [], "signoff": "seed"}
+  - {"item_id": "42009", "consulting_type": "ALL", "stage_code": "施工过程", "doc_category": "施工图", "item_name": "施工图纸", "requirement_level": "required", "aliases": ["施工图"], "signoff": "seed"}
+  - {"item_id": "42010", "consulting_type": "ALL", "stage_code": "施工过程", "doc_category": "图纸会审", "item_name": "图纸会审记录", "requirement_level": "important", "aliases": [], "signoff": "seed"}
+  - {"item_id": "42011", "consulting_type": "ALL", "stage_code": "施工过程", "doc_category": "变更签证费用", "item_name": "变更签证费用", "requirement_level": "required", "aliases": [], "signoff": "seed"}
+  - {"item_id": "42012", "consulting_type": "ALL", "stage_code": "施工过程", "doc_category": "进度款支付", "item_name": "进度款支付审核", "requirement_level": "required", "aliases": [], "signoff": "seed"}
+  - {"item_id": "42013", "consulting_type": "ALL", "stage_code": "施工过程", "doc_category": "材料调差", "item_name": "材料价格调差", "requirement_level": "optional", "aliases": [], "signoff": "seed"}
+  - {"item_id": "42014", "consulting_type": "ALL", "stage_code": "施工过程", "doc_category": "投资控制月报", "item_name": "投资控制月报", "requirement_level": "important", "aliases": [], "signoff": "seed"}
+  - {"item_id": "42015", "consulting_type": "ALL", "stage_code": "审定", "doc_category": "审核报告", "item_name": "结算审核报告", "requirement_level": "required", "aliases": ["审核报告"], "signoff": "provisional", "note": "issue #210：结算审核报告业务上归「审定」阶段；用户拍板、暂定、后面可再改"}
+  - {"item_id": "42016", "consulting_type": "ALL", "stage_code": "结算", "doc_category": "竣工图", "item_name": "竣工图纸", "requirement_level": "important", "aliases": ["竣工图"], "signoff": "seed"}
+  - {"item_id": "42017", "consulting_type": "ALL", "stage_code": "审定", "doc_category": "审定单", "item_name": "结算审定单", "requirement_level": "required", "aliases": ["审定单"], "signoff": "seed"}
+  - {"item_id": "42018", "consulting_type": "ALL", "stage_code": "审定", "doc_category": "汇总表", "item_name": "审核汇总表", "requirement_level": "required", "aliases": ["汇总表"], "signoff": "seed"}
+  - {"item_id": "42019", "consulting_type": "ALL", "stage_code": "审定", "doc_category": "造价指标", "item_name": "造价指标分析", "requirement_level": "optional", "aliases": ["造价指标"], "signoff": "seed"}
+  - {"item_id": "42020", "consulting_type": "ALL", "stage_code": "结算", "doc_category": "结算送审书", "item_name": "结算送审书", "requirement_level": "required", "aliases": [], "signoff": "provisional", "note": "WS13-B 决策 D63：结算阶段新增必备项（结算审核项目的核心输入件）；业务方暂定，可改"}
+  # —— consulting_type = 20003 ——
+  - {"item_id": "42101", "consulting_type": "20003", "stage_code": "招标控制价", "doc_category": "施工图", "item_name": "施工图纸", "requirement_level": "required", "aliases": ["施工图"], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  - {"item_id": "42102", "consulting_type": "20003", "stage_code": "招标控制价", "doc_category": "招标控制价", "item_name": "招标控制价文件", "requirement_level": "required", "aliases": ["招标文件"], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  - {"item_id": "42103", "consulting_type": "20003", "stage_code": "招标控制价", "doc_category": "工程量清单", "item_name": "工程量清单", "requirement_level": "required", "aliases": [], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  - {"item_id": "42104", "consulting_type": "20003", "stage_code": "概算", "doc_category": "项目立项", "item_name": "项目立项批复", "requirement_level": "important", "aliases": [], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  # —— consulting_type = 20002 ——
+  - {"item_id": "42201", "consulting_type": "20002", "stage_code": "施工过程", "doc_category": "施工合同及补充协议", "item_name": "施工合同及补充协议", "requirement_level": "required", "aliases": [], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  - {"item_id": "42202", "consulting_type": "20002", "stage_code": "结算", "doc_category": "竣工图", "item_name": "竣工图纸", "requirement_level": "required", "aliases": ["竣工图"], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  - {"item_id": "42203", "consulting_type": "20002", "stage_code": "施工过程", "doc_category": "变更签证费用", "item_name": "变更签证费用", "requirement_level": "required", "aliases": [], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  - {"item_id": "42204", "consulting_type": "20002", "stage_code": "结算", "doc_category": "结算送审书", "item_name": "结算送审书", "requirement_level": "required", "aliases": [], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  - {"item_id": "42205", "consulting_type": "20002", "stage_code": "审定", "doc_category": "审核报告", "item_name": "结算审核报告", "requirement_level": "required", "aliases": ["审核报告"], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  - {"item_id": "42206", "consulting_type": "20002", "stage_code": "审定", "doc_category": "审定单", "item_name": "结算审定单", "requirement_level": "required", "aliases": ["审定单"], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  - {"item_id": "42207", "consulting_type": "20002", "stage_code": "审定", "doc_category": "汇总表", "item_name": "审核汇总表", "requirement_level": "required", "aliases": ["汇总表"], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  - {"item_id": "42208", "consulting_type": "20002", "stage_code": "施工过程", "doc_category": "施工图", "item_name": "施工图纸", "requirement_level": "important", "aliases": ["施工图"], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  - {"item_id": "42209", "consulting_type": "20002", "stage_code": "招标控制价", "doc_category": "招标控制价", "item_name": "招标控制价文件", "requirement_level": "important", "aliases": ["招标文件"], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  - {"item_id": "42210", "consulting_type": "20002", "stage_code": "招标控制价", "doc_category": "工程量清单", "item_name": "工程量清单", "requirement_level": "important", "aliases": [], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  - {"item_id": "42211", "consulting_type": "20002", "stage_code": "招标控制价", "doc_category": "投标报价书", "item_name": "投标报价文件", "requirement_level": "important", "aliases": [], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}
+  - {"item_id": "42212", "consulting_type": "20002", "stage_code": "审定", "doc_category": "造价指标", "item_name": "造价指标分析", "requirement_level": "optional", "aliases": ["造价指标"], "signoff": "unconfirmed", "note": "WS23-h 默认值 A：按咨询类型分套的专属清单，内容照抄通用清单同类目行，未经客户确认，可改"}

@@ -1,0 +1,68 @@
+{
+  "_readme": [
+    "WS13-P13（issue #759）核查回归夹具：按 spec「P13 问题」一节逐条写明的 5 例假存在合成的项目快照。",
+    "来源：spec WS13-齐套核查与资料标注.md 的 P13/P15/P18 问题描述（A15 金义、A12 北苑、A21 龙芯、P3 施工过程 / 投标报价）。",
+    "不是 QA 的 qa/audit/inputs 与 gt/GT_*.json 原件（本机没有那批文件，D7 的脱敏入仓没做）。",
+    "项目名、公司名全部虚构；目录结构与文档类型词按 spec 原文保留。",
+    "files[].legacy = 生产 R1–R5 那批标签的形态（旧引擎给的类目、没有 evidence 列）；",
+    "gt = 人工口径：present / missing。清单项 id 对应种子 tenant-seed-template.sql §6。"
+  ],
+  "cases": [
+    {
+      "name": "A15 金义形态：控制价阶段的清单命中全在「22 进度款…」下",
+      "files": [
+        {"file_name": "(10月进度款)某工程.清单审计", "dirs": ["某某工程项目", "22 进度款审核及付款建议", "第10期"],
+         "legacy": {"doc_category": "工程量清单", "cost_stage": "招标控制价", "source": "rule"}},
+        {"file_name": "(11月进度款)某工程.清单审计", "dirs": ["某某工程项目", "22 进度款审核及付款建议", "第11期"],
+         "legacy": {"doc_category": "工程量清单", "cost_stage": "招标控制价", "source": "rule"}},
+        {"file_name": "某工程投标报价清单.xlsx", "dirs": ["某某工程项目", "22 进度款审核及付款建议", "套价"],
+         "legacy": {"doc_category": "工程量清单", "cost_stage": "招标控制价", "source": "rule"}},
+        {"file_name": "施工合同.pdf", "dirs": ["某某工程项目", "4 合同及协议"],
+         "legacy": {"doc_category": "施工合同及补充协议", "cost_stage": "施工过程", "source": "rule"}}
+      ],
+      "gt": {"42004": "missing", "42005": "missing", "42008": "present"}
+    },
+    {
+      "name": "A12 北苑形态：结算审核项目，没交施工合同，规划审定意见书冒充审定单",
+      "files": [
+        {"file_name": "结算审核报告.pdf", "dirs": ["某某苑结算审核项目", "3 咨询成果"],
+         "legacy": {"doc_category": "审核报告", "cost_stage": "审定", "source": "rule"}},
+        {"file_name": "规划审定意见书.pdf", "dirs": ["某某苑结算审核项目", "1 前期资料"],
+         "legacy": {"doc_category": "结算审定书", "cost_stage": "审定", "source": "rule"}},
+        {"file_name": "工程结算书(送审).pdf", "dirs": ["某某苑结算审核项目", "2 送审资料"],
+         "legacy": {"doc_category": "结算送审书", "cost_stage": "结算", "source": "rule"}}
+      ],
+      "gt": {"42008": "missing", "42015": "present", "42017": "missing", "42016": "missing", "42020": "present"}
+    },
+    {
+      "name": "A21 龙芯形态：扫描件施工合同是真证据；施工图预算回复不是施工图",
+      "files": [
+        {"file_name": "施工合同.pdf", "dirs": ["某芯片厂房项目", "4 合同"], "scanned": true,
+         "legacy": {"doc_category": "施工合同及补充协议", "cost_stage": "施工过程", "source": "rule", "needs_manual": true}},
+        {"file_name": "关于施工图预算问题的回复.docx", "dirs": ["某芯片厂房项目", "9 往来函件"],
+         "legacy": {"doc_category": "施工图", "cost_stage": null, "source": "rule"}}
+      ],
+      "gt": {"42008": "present", "42009": "missing", "42016": "missing"}
+    },
+    {
+      "name": "P3 施工过程形态：施工合同只被 LLM 错标的勘察见证合同命中；变更签证只被招标清单目录里的计日工表命中",
+      "files": [
+        {"file_name": "勘察外业见证合同.docx", "dirs": ["某道路工程", "5 合同"],
+         "legacy": {"doc_category": "施工合同及补充协议", "cost_stage": null, "source": "llm"}},
+        {"file_name": "计日工表.xlsx", "dirs": ["某道路工程", "4 招标文件及清单(控制价)"],
+         "legacy": {"doc_category": "变更签证费用", "cost_stage": "施工过程", "source": "rule"}}
+      ],
+      "gt": {"42008": "missing", "42011": "missing"}
+    },
+    {
+      "name": "P3 投标报价形态：11 个命中全是前期咨询报价",
+      "files": [
+        {"file_name": "前期咨询报价单.pdf", "dirs": ["某道路工程", "1 前期"],
+         "legacy": {"doc_category": "投标报价书", "cost_stage": "招标控制价", "source": "rule"}},
+        {"file_name": "环评服务报价.pdf", "dirs": ["某道路工程", "1 前期"],
+         "legacy": {"doc_category": "投标报价书", "cost_stage": "招标控制价", "source": "rule"}}
+      ],
+      "gt": {"42006": "missing"}
+    }
+  ]
+}
