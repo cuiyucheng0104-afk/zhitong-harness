@@ -8,7 +8,9 @@
 ``ZT_VOLC_PROFILE``         ``ve --profile`` 的 profile 名；命令行 ``--profile`` 优先
 ``ZT_VOLC_REGION``          ``ve --region``；可选
 ``ZT_VOLC_CONFIG``          配置文件路径（客户配置包 ``zhitong.config.json`` 的 JSON 形态）；只读其中
-                            ``volc.profile``、``volc.region``、``ssh.hosts[].alias``，其余字段（含密钥）不读取
+                            ``volc.profile``、``volc.region``、``ssh.hosts[].alias``，其余字段（含密钥）不读取。
+                            未设置时读 ``config_import`` 写的 ``$DSH_HOME/zhitong/volc.config.json``（存在时；
+                            ``DSH_HOME`` 默认 ``~/.dsh``）；设为空字符串则不读任何配置文件
 ``ZT_SSH_CONFIG``           OpenSSH 配置文件路径；默认 ``~/.ssh/config``，只读 ``Host`` 行的别名
 ``ZT_VE_BIN``               ``ve`` 可执行文件；默认 ``ve``
 ``ZT_SSH_BIN``              ``ssh`` 可执行文件；默认 ``ssh``
@@ -33,6 +35,8 @@ ENV_SSH_CONFIG = "ZT_SSH_CONFIG"
 ENV_VE_BIN = "ZT_VE_BIN"
 ENV_SSH_BIN = "ZT_SSH_BIN"
 ENV_PUBLIC_IP_URL = "ZT_PUBLIC_IP_URL"
+# config_import 写入的名称文件，相对 Harness home（zhitong/plugins/config-import/src/remote.ts）
+IMPORTED_CONFIG = ("zhitong", "volc.config.json")
 
 _ALIAS_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
 _PROFILE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$")
@@ -91,6 +95,8 @@ def load_settings(
     """
     environ = os.environ if env is None else env
     config_path = config or environ.get(ENV_CONFIG)
+    if config_path is None:
+        config_path = _imported_config(environ)
     file_profile, file_region, file_aliases = _read_config_names(Path(config_path)) if config_path else (None, None, ())
     chosen_profile = profile or environ.get(ENV_PROFILE) or file_profile
     chosen_region = region or environ.get(ENV_REGION) or file_region
@@ -108,6 +114,14 @@ def load_settings(
         ssh_aliases=aliases,
         public_ip_url=environ.get(ENV_PUBLIC_IP_URL) or None,
     )
+
+
+def _imported_config(environ: Mapping[str, str]) -> Optional[str]:
+    """``config_import`` 写的名称文件；不存在时 None。"""
+    home = environ.get("DSH_HOME", "").strip()
+    root = Path(os.path.expanduser(home)) if home else Path.home() / ".dsh"
+    path = root.joinpath(*IMPORTED_CONFIG)
+    return str(path) if path.is_file() else None
 
 
 def _read_config_names(path: Path) -> tuple[Optional[str], Optional[str], tuple[str, ...]]:

@@ -51,7 +51,7 @@ def test_env_config_and_ssh_config_aliases_are_merged(tmp_path):
 
 
 def test_missing_profile_is_reported_when_needed(tmp_path):
-    s = load_settings(env={ENV_SSH_CONFIG: str(tmp_path / "none")})
+    s = load_settings(env={ENV_SSH_CONFIG: str(tmp_path / "none"), "DSH_HOME": str(tmp_path)})
     assert s.profile is None
     with pytest.raises(ZtError) as e:
         s.require_profile()
@@ -82,3 +82,15 @@ def test_config_errors(tmp_path):
     with pytest.raises(ZtError) as e:
         load_settings(config=str(bad), env={})
     assert e.value.code == "config_invalid"
+
+
+def test_imported_names_file_is_the_default_config(tmp_path):
+    imported = tmp_path / "zhitong" / "volc.config.json"
+    imported.parent.mkdir()
+    imported.write_text(json.dumps({"format": "zhitong.config/1", "volc": {"profile": "zt-ak", "region": "cn-beijing"},
+                                    "ssh": {"hosts": [{"alias": "zt-prod"}]}}), encoding="utf-8")
+    base = {ENV_SSH_CONFIG: str(tmp_path / "none"), "DSH_HOME": str(tmp_path)}
+    s = load_settings(env=base)
+    assert (s.profile, s.region, s.ssh_aliases) == ("zt-ak", "cn-beijing", ("zt-prod",))
+    # An explicitly empty ZT_VOLC_CONFIG reads no file.
+    assert load_settings(env={**base, ENV_CONFIG: ""}).profile is None

@@ -14,8 +14,8 @@ whenToUse: 用户要看或操作公司的火山引擎资源（ECS 状态、启�
 
 脚本只读取名称，不含也不回显任何密钥：
 
-- profile：`--profile`，或环境变量 `ZT_VOLC_PROFILE`，或 `ZT_VOLC_CONFIG` 指向的配置文件里的 `volc.profile`（region 同理）。没有则报 `volc_profile_missing`，不要猜 profile 名。
-- SSH 主机别名：配置文件的 `ssh.hosts[].alias` 与 `~/.ssh/config`（或 `ZT_SSH_CONFIG`）里的 `Host`。`ssh-hosts` 列出；不在列表里的别名一律拒绝。
+- profile：`--profile`，或环境变量 `ZT_VOLC_PROFILE`，或 `ZT_VOLC_CONFIG` 指向的配置文件里的 `volc.profile`（region 同理）；`ZT_VOLC_CONFIG` 未设置时读 `config_import` 写的 `$DSH_HOME/zhitong/volc.config.json`（只有名称，没有密钥）。没有则报 `volc_profile_missing`，不要猜 profile 名。
+- SSH 主机别名：配置文件的 `ssh.hosts[].alias` 与 `~/.ssh/config`（或 `ZT_SSH_CONFIG`）里的 `Host`；`config_import` 已把配置包里的主机写进 `~/.ssh/config` 开头的受管块，私钥在 `~/.ssh/zhitong/`。`ssh-hosts` 列出；不在列表里的别名一律拒绝。
 - `ve` 的 AK/SK 在 `ve` 自己的 profile 里（用户在自己的终端 `ve configure set --profile …` 建立）。不要让用户把密钥贴进对话，不要自己执行 `ve configure set`。
 - 先跑 `whoami` 验证 profile 可用；`ve_not_found` 时告诉用户安装官方 CLI（`npm i -g @volcengine/cli`）。
 
