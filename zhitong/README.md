@@ -115,7 +115,7 @@ tos://<bucket>/<公司前缀>/
 | 插件 | 工具 | 说明 |
 |---|---|---|
 | `tool-tos` | `tos_ls`, `tos_stat`, `tos_pull`, `tos_push` | 火山 TOS Node SDK；凭据来自 harness 凭据存储；pull 以 sha256 去重进缓存；push 回读校验；图纸类扩展名不自动拉 |
-| `tool-cad` | `cad_open`, `cad_frames`, `cad_render_frame`, `cad_texts`, `cad_rooms` | 移植 tiangong-cad-viewer：dwg2dxf 子进程转换（GPL 边界）、dxf 解析、图框识别、按图框栅格化 PNG 供 `read_image`、受控词表文字抽取、房间面积。细节待 CAD 勘察报告 |
+| `tool-cad` | 第一批：`cad_open`, `cad_frames`, `cad_text_search`, `cad_render`, `cad_blocks`；第二批：`cad_set_unit`, `cad_rooms`, `cad_table`, `cad_layers`, `cad_diff` | 移植 tiangong-cad-viewer（[勘察](survey/05-cad-viewer.md)）：解析与算量逻辑是纯函数可直接在 Node 跑；dwg2dxf 子进程转换（GPL 进程边界、官方 0.14 钉死 sha256、Windows 中文路径先拷成 ASCII 临时名、`mkdtemp` + 超时）；仓库没有无头栅格化，需新写 `cad_render`（`@napi-rs/canvas`，SHX 笔画字体 + 内置 OFL 中文字体回退，按图框或矩形出 PNG 切片并返回世界坐标元数据供 `read_image`）；macOS 无官方 dwg2dxf 二进制，要在 CI 静态构建；单位门禁（`$INSUNITS` 缺失时量纲类工具拒绝执行） |
 | `config-import` | `config_import` | 校验 `zhitong.config.json`，写凭据存储与 profile patch；不回显密钥 |
 
 其余全是 skill。

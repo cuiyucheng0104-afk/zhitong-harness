@@ -49,11 +49,14 @@
 
 ## W5 插件：tool-cad 与 skill zt-cad
 
-依赖：W0、CAD 勘察报告（`survey/05-cad-viewer.md`）。读：README §7。
+依赖：W0。读：README §7；`survey/05-cad-viewer.md` 全文（§8 是推荐设计，按它做）。
 
-- 从 `/home/user/cuiyucheng0104-afk/tiangong-cad-viewer` 移植：dwg2dxf 子进程转换（三平台二进制定位、sha256 钉死、GPL 边界与 THIRD_PARTY_NOTICES）、dxf 解析、图框识别、文字抽取、房间面积；无头栅格化出图框 PNG。
-- 工具：`cad_open`、`cad_frames`、`cad_render_frame`、`cad_texts`、`cad_rooms`；缓存放 `图纸/.cache/`。
-- 夹具 `fixture_t3.dwg` 的测试；SKILL.md 写看图流程与 `read_image` 用法。
+- 从 `/home/user/cuiyucheng0104-afk/tiangong-cad-viewer` 搬 core（`src/engine/*`、`frames.ts`、`roomCheck.ts`、`extract.ts` 去掉 `downloadFile`、`diff.ts`、`shxText.ts`）与 convert（`resolveDwg2dxf`、魔数嗅探、UTF-8/GBK 嗅探、spawn），按 §2.2 补齐：ASCII 临时名、`mkdtemp`、超时与杀进程树、400 MB 上限；经 harness `ctx.subprocess` 调用。
+- 新写 `cad_render`：`@napi-rs/canvas` 为主、纯 JS 光栅化为降级；白底、图层过滤、SHX 笔画字体 + 内置 Noto Sans SC 子集回退；按图框/矩形/点周边出 PNG，大图切片带重叠，返回 `world_rect`、`px_per_unit`、`image_size`；默认拒绝渲染整张大图。
+- 第一批工具 `cad_open`、`cad_frames`、`cad_text_search`、`cad_render`、`cad_blocks`；第二批 `cad_set_unit`、`cad_rooms`、`cad_table`、`cad_layers`、`cad_diff`。判据常量（`GAP`、`MIN_AREA_M2`、`MIN_PTS`、`TXTROOM`、面积范围、`EPS`）进 Config。解析缓存按 `sha256 + SCENE_VERSION` 落在 `图纸/.cache/`。
+- dwg2dxf 分发：`bin/<platform-arch>/`；Windows 官方 0.14 zip + sha256；macOS 在 CI 用 `./configure --disable-bindings --disable-shared` 静态构建；随附 GPLv3 文本、`VERSION.txt`、源码 offer、`THIRD_PARTY_NOTICES`；禁止引入 `@mlightcad/libredwg-web` 等链接式封装。
+- 测试：`fixture_t3.dwg` → `buildScene` 摘要黄金区间；PNG 尺寸与非空白像素比例；中文与空格路径转换；三平台冒烟。沿用 `unit.test.mts` 的合成场景用例。
+- `zt-cad` SKILL.md：先 `cad_open` 看摘要与单位证据，再 `cad_frames`/`cad_text_search` 缩小范围，再 `cad_render` + `read_image` 看图；量纲类操作先确认单位；输出进 `工作/`。
 
 ## W6 skill：zt-knowledge（含初版内容）
 
