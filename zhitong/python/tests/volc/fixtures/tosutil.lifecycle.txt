@@ -1,0 +1,2 @@
+Lifecycle rules: 1
+  id=expire-tmp prefix=tmp/ days=30

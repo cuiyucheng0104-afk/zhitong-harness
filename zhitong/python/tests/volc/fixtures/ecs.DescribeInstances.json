@@ -1,0 +1,24 @@
+{
+  "ResponseMetadata": {"RequestId": "20261019000000000000000000000001", "Action": "DescribeInstances", "Version": "2020-04-01", "Service": "ecs", "Region": "cn-beijing"},
+  "Result": {
+    "TotalCount": 2,
+    "NextToken": "",
+    "Instances": [
+      {
+        "InstanceId": "i-yeaaaaaaaa01",
+        "InstanceName": "zt-prod",
+        "Status": "RUNNING",
+        "ZoneId": "cn-beijing-a",
+        "EipAddress": {"AllocationId": "eip-aaaaaaaa01", "IpAddress": "120.55.10.77"},
+        "NetworkInterfaces": [{"NetworkInterfaceId": "eni-aaaaaaaa01", "PrimaryIpAddress": "10.0.0.8", "SecurityGroupIds": ["sg-aaaaaaaa01"], "SubnetId": "subnet-aaaaaaaa01", "VpcId": "vpc-aaaaaaaa01"}]
+      },
+      {
+        "InstanceId": "i-yebbbbbbbb02",
+        "InstanceName": "zt-batch",
+        "Status": "STOPPED",
+        "ZoneId": "cn-beijing-b",
+        "NetworkInterfaces": [{"NetworkInterfaceId": "eni-bbbbbbbb02", "PrimaryIpAddress": "10.0.1.5", "SecurityGroupIds": ["sg-aaaaaaaa01", "sg-bbbbbbbb02"]}]
+      }
+    ]
+  }
+}

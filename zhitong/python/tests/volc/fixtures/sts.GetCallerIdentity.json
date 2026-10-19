@@ -1,0 +1,1 @@
+{"ResponseMetadata": {"RequestId": "20261019000000000000000000000006", "Action": "GetCallerIdentity", "Version": "2018-01-01", "Service": "sts", "Region": "cn-beijing"}, "Result": {"AccountId": "2100000001", "IdentityType": "User", "Trn": "trn:iam::2100000001:user/ops", "IdentityId": "2100000002"}}

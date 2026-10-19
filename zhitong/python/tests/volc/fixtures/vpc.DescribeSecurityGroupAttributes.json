@@ -1,0 +1,16 @@
+{
+  "ResponseMetadata": {"RequestId": "20261019000000000000000000000002", "Action": "DescribeSecurityGroupAttributes", "Version": "2020-04-01", "Service": "vpc", "Region": "cn-beijing"},
+  "Result": {
+    "SecurityGroupId": "sg-aaaaaaaa01",
+    "SecurityGroupName": "zt-prod-sg",
+    "VpcId": "vpc-aaaaaaaa01",
+    "Status": "Available",
+    "Type": "default",
+    "Permissions": [
+      {"Direction": "ingress", "Protocol": "tcp", "PortStart": 22, "PortEnd": 22, "CidrIp": "120.55.10.9/32", "Policy": "accept", "Priority": 1, "Description": "zt-ssh-sync"},
+      {"Direction": "ingress", "Protocol": "tcp", "PortStart": 22, "PortEnd": 22, "CidrIp": "120.55.10.31/32", "Policy": "accept", "Priority": 1, "Description": "zt-ssh-sync:alice"},
+      {"Direction": "ingress", "Protocol": "tcp", "PortStart": 443, "PortEnd": 443, "CidrIp": "0.0.0.0/0", "Policy": "accept", "Priority": 1, "Description": "web"},
+      {"Direction": "egress", "Protocol": "all", "PortStart": -1, "PortEnd": -1, "CidrIp": "0.0.0.0/0", "Policy": "accept", "Priority": 1, "Description": ""}
+    ]
+  }
+}
