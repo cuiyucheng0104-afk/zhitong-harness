@@ -1,0 +1,4 @@
+node_modules/
+lib/
+# dwg2dxf binaries and their per-platform copies are added by the installer build, not committed.
+bin/*/
