@@ -15,6 +15,7 @@
 """
 from __future__ import annotations
 
+import posixpath
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -143,8 +144,24 @@ def load_files(specs: list[FileSpec], *, max_files: int = MAX_FILES,
         raise ZtError("input_too_large",
                       f"本次送检文件合计 {total / 1024 / 1024:.1f} MB，超过上限 {max_total_mb:g} MB",
                       hint="分批运行")
-    return [SourceFile(path=p, file_name=r.file_name or p.name, file_id=r.file_id or r.path, raw=p.read_bytes())
+    return [SourceFile(path=p, file_name=r.file_name or p.name, file_id=r.file_id or default_file_id(r.path),
+                       raw=p.read_bytes())
             for r, p in zip(refs, paths)]
+
+
+def default_file_id(path: str) -> str:
+    """调用方没给 ``file_id`` 时的缺省标识：路径原文，反斜杠统一成 ``/``，相对路径去掉 ``./`` 与 ``..`` 冗余。
+
+    投控的 ``anomaly_id`` 含 ``file_id``；同一份文件在 Windows 与 Linux、``./资料/a.xlsx`` 与 ``资料/a.xlsx``
+    之间写法不同不应改变身份。绝对路径与相对路径仍然不等价，调用方要跨轮次稳定就始终用同一种写法（或显式给 ``file_id``）。
+
+    :param path: 调用方写的路径。
+    :returns: 规范化后的字符串。
+    """
+    posix = path.replace("\\", "/")
+    if posix.startswith("/") or re.match(r"^[A-Za-z]:/", posix):
+        return posix
+    return posixpath.normpath(posix)
 
 
 def status_of(warning_items: list[dict], file_coverage: list[dict]) -> tuple[ResultStatus, Optional[str]]:

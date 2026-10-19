@@ -112,3 +112,16 @@ def test_invalid_request_field_is_an_error():
         svc.parse_request(reconcile.ReconcileRequest, {"submitted_file": "a.xlsx", "approved_file": "b.xlsx",
                                                        "rel_path": "x"})
     assert exc.value.code == "invalid_request" and "rel_path" in exc.value.message
+
+
+@pytest.mark.parametrize("raw, expected", [
+    ("资料/送审.xlsx", "资料/送审.xlsx"),
+    ("./资料/送审.xlsx", "资料/送审.xlsx"),
+    ("资料\\送审.xlsx", "资料/送审.xlsx"),
+    ("资料/../资料/送审.xlsx", "资料/送审.xlsx"),
+    ("/mnt/p/资料/送审.xlsx", "/mnt/p/资料/送审.xlsx"),
+    ("D:\\p\\资料\\送审.xlsx", "D:/p/资料/送审.xlsx"),
+])
+def test_default_file_id_is_spelling_independent(raw, expected):
+    """缺省 file_id 不随反斜杠与 ./ 写法变化：投控 anomaly_id 含 file_id，换系统或换写法不应换身份。"""
+    assert svc.default_file_id(raw) == expected

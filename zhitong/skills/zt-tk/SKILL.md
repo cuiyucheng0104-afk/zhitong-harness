@@ -25,7 +25,7 @@ whenToUse: 用户要做投控检测、进度款/结算的异常排查、对照�
 ```
 
 - `$ZT_PYTHON` 未设置时用 `python3`；等价写法 `scripts/tk.py detect ...`（相对本 skill 目录）。
-- `--project-id` 用项目编号：它进入每条异常的 `anomaly_id`，同一行清单在不同轮次检测里身份不变。
+- `--project-id` 用项目编号：它进入每条异常的 `anomaly_id`。`anomaly_id` 还含文件标识（缺省是命令行里写的路径，`\` 与 `./` 会规范化）：始终在项目根目录下用同一种相对路径（如 `资料/第5期送审.xlsx`）调用，同一行清单在不同轮次的身份才不变；换了写法（相对改绝对）`anomaly_id` 会变，旧 `复核.jsonl` 对不上。
 - `--basis`：送审文件的期次口径，`auto`（默认）/ `current` / `cumulative` / `contract`。
 - `--rules` 可换用另一份阈值 YAML（用户明确要求调阈值时才用，并在汇报里说明用了哪份）。
 - 完整结果 `<out>/result.json`，底稿 `<out>/投控异常.xlsx`（汇总、异常清单、对不准的行）。退出码 2 是调用错误，按 `error.hint` 修正。
