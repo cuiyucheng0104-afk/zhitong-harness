@@ -26,7 +26,7 @@ whenToUse: 用户要写、生成、起草某个项目的报告、说明、审定
 
 ## 3. 确认程序性事项
 
-把 `claims_to_confirm` 里每条（如「全过程审核」「现场踏勘」「实地丈量」）用 `user-questions` 多选问用户「本项目实际执行过哪些」，一次问完。选中的 key 写进 `W/确认事项.json`（`{"confirmed": [...], "asked": "<日期>"}`），每章 prepare 都传 `--confirmed`。没确认的写进正文会被标【待核】。不替用户勾。`claims_to_confirm` 为空就跳过本步。
+把 `claims_to_confirm` 里每条（如「全过程审核」「现场踏勘」「实地丈量」）用 `user-questions` 多选问用户「本项目实际执行过哪些」，一次问完。选中的 key 写进 `W/确认事项.json`（`{"confirmed": [...], "asked": "<日期>"}`），每章 prepare 都传 `--confirmed <key…>`（用户一条都没选，或 `claims_to_confirm` 为空，就整个不传 `--confirmed`，空参数会报 usage 错）。没确认的写进正文会被标【待核】。不替用户勾。`claims_to_confirm` 为空就跳过本步。
 
 ## 4. 逐章循环（按 seq）
 
@@ -36,7 +36,7 @@ whenToUse: 用户要写、生成、起草某个项目的报告、说明、审定
 2. `status=empty`（本章没有可读资料）：不写，直接第 4 步（不给 `--draft`）。
 3. 读同目录 `prompt.md`，**严格按其中的系统提示词与本章输入写本章正文**，存成 `draft.md`（UTF-8 纯文本）。写作时你就是那个撰写助手，规则见下节。
 4. `scripts/report.py section_finalize --prepare W/章节/<seq>-<code>/result.json --draft W/章节/<seq>-<code>/draft.md --facts W/facts/result.json --out W/章节/<seq>-<code>/final.json`
-5. 向用户转述：章名、`status`、`data.label`、每条 `warning_items` 的 message（原话）。不要删改 finalize 插入的【待核】【待补】；要改就按同一份 `prompt.md` 重写 `draft.md` 再 finalize，只能补资料里有的内容。
+5. 读 `final.json` 向用户转述（stdout 摘要里没有 `data.label`）：章名、`status`、`data.label`、每条 `warning_items` 的 message（原话）。不要删改 finalize 插入的【待核】【待补】；要改就按同一份 `prompt.md` 重写 `draft.md` 再 finalize，只能补资料里有的内容。
 6. 篇幅写不完时停在完整句子，finalize 加 `--truncated`（章末标「未写完」）。
 
 ## 5. 写作规则（系统提示词九条，prompt_version 口径 ws24-6，原文见 `references/prompt.md`）
