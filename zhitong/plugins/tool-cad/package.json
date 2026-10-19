@@ -11,7 +11,24 @@
     "./src/*": "./src/*",
     "./package.json": "./package.json"
   },
+  "publishConfig": {
+    "main": "lib/index.js",
+    "exports": {
+      ".": "./lib/index.js",
+      "./package.json": "./package.json"
+    }
+  },
+  "files": [
+    "lib/index.js",
+    "README.md",
+    "THIRD_PARTY_NOTICES.txt",
+    "assets/**",
+    "bin/README.md",
+    "bin/SOURCE-OFFER.txt",
+    "bin/*/**"
+  ],
   "scripts": {
+    "build": "tsdown",
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },

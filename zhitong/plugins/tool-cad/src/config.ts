@@ -1,6 +1,7 @@
 /** Plugin configuration and its resolution into a runtime spec. @module @zhitong/tool-cad/config */
 
 import { existsSync } from 'node:fs'
+import { sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import z from '@deepseek-ai/schemastery'
 import type { TableKind } from './core/tables.ts'
@@ -12,11 +13,26 @@ export interface TableKindConfig {
   headers: string[]
 }
 
+/**
+ * Map a path inside an Electron `app.asar` archive to its `app.asar.unpacked` twin when that twin exists.
+ * The Desktop installer unpacks this package's `assets/` and `bin/`: the canvas font loader and the
+ * dwg2dxf child process need physical files, and the archive is readable only through Electron's `fs`.
+ * @param path - Absolute path.
+ * @returns The unpacked path, or `path` unchanged outside an archive or without an unpacked twin.
+ */
+export function physicalPath(path: string): string {
+  const marker = `${sep}app.asar${sep}`
+  const index = path.lastIndexOf(marker)
+  if (index < 0) return path
+  const unpacked = `${path.slice(0, index)}${sep}app.asar.unpacked${sep}${path.slice(index + marker.length)}`
+  return existsSync(unpacked) ? unpacked : path
+}
+
 /** Package root (`src/` and the bundled `lib/` both sit one level below it). */
 export const PACKAGE_ROOT = fileURLToPath(new URL('..', import.meta.url))
-const BUNDLED_SHX = fileURLToPath(new URL('../assets/fonts/kst32b.shx', import.meta.url))
-const BUNDLED_FONT = fileURLToPath(new URL('../assets/fonts/NotoSansSC-Regular-GB2312.otf', import.meta.url))
-const BUNDLED_BIN = fileURLToPath(new URL('../bin', import.meta.url))
+const BUNDLED_SHX = physicalPath(fileURLToPath(new URL('../assets/fonts/kst32b.shx', import.meta.url)))
+const BUNDLED_FONT = physicalPath(fileURLToPath(new URL('../assets/fonts/NotoSansSC-Regular-GB2312.otf', import.meta.url)))
+const BUNDLED_BIN = physicalPath(fileURLToPath(new URL('../bin', import.meta.url)))
 
 /** Configuration of the CAD tools. Every criterion of the heuristics is a field so drawings from other design institutes can be tuned without code changes. */
 export interface Config {

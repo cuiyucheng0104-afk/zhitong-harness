@@ -1,3 +1,6 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+# Desktop packaging copies skills/ and python/zt/ into the bundle package only while packing (scripts/pack-desktop.mjs).
+bundle/skills/
+bundle/python/

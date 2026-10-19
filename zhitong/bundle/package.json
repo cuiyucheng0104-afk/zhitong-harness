@@ -6,10 +6,14 @@
   "type": "module",
   "exports": {
     "./cordis.patch.yml": "./cordis.patch.yml",
+    "./skills-dir.cjs": "./skills-dir.cjs",
     "./package.json": "./package.json"
   },
   "files": [
-    "cordis.patch.yml"
+    "cordis.patch.yml",
+    "skills-dir.cjs",
+    "skills/**",
+    "python/zt/**"
   ],
   "dsh": {
     "bundle": {
