@@ -116,7 +116,7 @@ tos://<bucket>/<公司前缀>/
 | 插件 | 工具 | 说明 |
 |---|---|---|
 | `tool-tos` | `tos_ls`, `tos_stat`, `tos_pull`, `tos_push` | 火山 TOS Node SDK；凭据来自 harness 凭据存储；pull 以 sha256 去重进缓存；push 回读校验；图纸类扩展名不自动拉 |
-| `tool-cad` | 第一批：`cad_open`, `cad_frames`, `cad_text_search`, `cad_render`, `cad_blocks`；第二批：`cad_set_unit`, `cad_rooms`, `cad_table`, `cad_layers`, `cad_diff` | 移植 tiangong-cad-viewer（[勘察](survey/05-cad-viewer.md)）：解析与算量逻辑是纯函数可直接在 Node 跑；dwg2dxf 子进程转换（GPL 进程边界、官方 0.14 钉死 sha256、Windows 中文路径先拷成 ASCII 临时名、`mkdtemp` + 超时）；仓库没有无头栅格化，需新写 `cad_render`（`@napi-rs/canvas`，SHX 笔画字体 + 内置 OFL 中文字体回退，按图框或矩形出 PNG 切片并返回世界坐标元数据供 `read_image`）；macOS 无官方 dwg2dxf 二进制，要在 CI 静态构建；单位门禁（`$INSUNITS` 缺失时量纲类工具拒绝执行） |
+| `tool-cad` | 结构化读取为主、按需出图（[路线调研](survey/06-cad-agent-approaches.md)）。第一批：`cad_open`, `cad_layers`, `cad_frames`（含标题栏：图名、图号、比例、楼层）, `cad_text_search`（按图框/图层/正则过滤，紧凑表格，带句柄与坐标）, `cad_blocks`（块与门窗编号计数）, `cad_render`（先每图框一张带网格标签的总览图、文字画空框，再按格子/范围/句柄出局部放大，一次问答 2–4 张）；第二批：`cad_set_unit`, `cad_rooms`, `cad_table`（自动找门窗表/材料表）, `cad_axes`, `cad_diff`。计数与面积一律由代码算。移植 tiangong-cad-viewer（[勘察](survey/05-cad-viewer.md)）：解析与算量逻辑是纯函数可直接在 Node 跑；dwg2dxf 子进程转换（GPL 进程边界、官方 0.14 钉死 sha256、Windows 中文路径先拷成 ASCII 临时名、`mkdtemp` + 超时）；仓库没有无头栅格化，需新写 `cad_render`（`@napi-rs/canvas`，SHX 笔画字体 + 内置 OFL 中文字体回退，按图框或矩形出 PNG 切片并返回世界坐标元数据供 `read_image`）；macOS 无官方 dwg2dxf 二进制，要在 CI 静态构建；单位门禁（`$INSUNITS` 缺失时量纲类工具拒绝执行） |
 | `config-import` | `config_import` | 校验 `zhitong.config.json`，写凭据存储与 profile patch；不回显密钥 |
 
 其余全是 skill。

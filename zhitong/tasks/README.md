@@ -49,7 +49,9 @@
 
 ## W5 插件：tool-cad 与 skill zt-cad
 
-依赖：W0。读：README §7；`survey/05-cad-viewer.md` 全文（§8 是推荐设计，按它做）。
+依赖：W0。读：README §7；`survey/06-cad-agent-approaches.md`（§0 结论与 §6 插件设计是路线，优先级高于 05）；`survey/05-cad-viewer.md`（§2 转换、§4 数据结构、§8 实施细节）。参考实现：U-C4N/Autocad-MCP（MIT，无头 ezdxf 后端、房间检测、门窗表导出、目录 token 压缩）、dongsheng123132/dsh-cad-review（MIT，已是 DeepSeek Harness 插件，看接入方式）。
+
+- 路线：结构化读取为主，默认不出图。出图先每图框一张带网格标签的总览（文字画空框），再按格子/范围/句柄局部放大，图上编号与文字表行对应；一次问答 2–4 张。文字不整表给：按图框、图层、正则过滤后返回紧凑表格。
 
 - 从 `/home/user/cuiyucheng0104-afk/tiangong-cad-viewer` 搬 core（`src/engine/*`、`frames.ts`、`roomCheck.ts`、`extract.ts` 去掉 `downloadFile`、`diff.ts`、`shxText.ts`）与 convert（`resolveDwg2dxf`、魔数嗅探、UTF-8/GBK 嗅探、spawn），按 §2.2 补齐：ASCII 临时名、`mkdtemp`、超时与杀进程树、400 MB 上限；经 harness `ctx.subprocess` 调用。
 - 新写 `cad_render`：`@napi-rs/canvas` 为主、纯 JS 光栅化为降级；白底、图层过滤、SHX 笔画字体 + 内置 Noto Sans SC 子集回退；按图框/矩形/点周边出 PNG，大图切片带重叠，返回 `world_rect`、`px_per_unit`、`image_size`；默认拒绝渲染整张大图。
