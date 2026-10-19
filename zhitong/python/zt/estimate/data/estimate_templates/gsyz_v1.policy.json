@@ -1,0 +1,146 @@
+{
+  "template_code": "gsyz_v1",
+  "policy_version": "gsyz_v1.policy.2026-10-06",
+  "note": "模板级策略（WS10 共同底座，issue #722）。随引擎镜像发布，不进库、不需要迁移。改这里等于改概算口径：每一处改动都要有对应测试钉住（tests/test_estimate_policy.py）。",
+
+  "min_sources_for_prefill": 3,
+  "min_sources_note": "D47：同一语义键下不同来源（concept_indicator_baseline.source）少于 3 个时，建议值只作「单样本参考」，前端不自动预填，须逐条或按组采纳。",
+
+  "block_kinds": {
+    "sheets": ["1.建筑工程费", "2.安装工程费"],
+    "rules": [
+      {"kind": "basement", "label": "地下室", "pattern": "^[A-Z]区地下室工程$"},
+      {"kind": "above_ground", "label": "地上单体", "pattern": "^\\d+#楼工程$"},
+      {"kind": "structure", "label": "构筑物", "pattern": "^构筑物"}
+    ],
+    "note": "只匹配模板自己的单项工程行名（全等正则），不是模糊匹配。块下叶子行的语义键 = {表名}/{block_kind}/{叶子行名}；其余表 = {表名}/{行名}。"
+  },
+
+  "scaling": {
+    "default": "area",
+    "lump_sum": [
+      {"cell": "4.室外及配套工程费!C27", "manual_hint": "按配套合同或报价填（万元）"},
+      {"cell": "4.室外及配套工程费!C28", "manual_hint": "按配套合同或报价填（万元）"},
+      {"cell": "4.室外及配套工程费!C29", "manual_hint": "按配套合同或报价填（万元）"},
+      {"cell": "4.室外及配套工程费!C30", "manual_hint": "按配套合同或报价填（万元）"},
+      {"cell": "4.室外及配套工程费!C31", "manual_hint": "按配套合同或报价填（万元）"},
+      {"cell": "5.工程建设其他费用!C7", "manual_hint": "项目建设管理费小计的费率参考见「工程建设其他费」表中的「项目建设管理费」；按合同或实际拆到本项（万元），引擎不平分"},
+      {"cell": "5.工程建设其他费用!C8", "manual_hint": "项目建设管理费小计的费率参考见「工程建设其他费」表中的「项目建设管理费」；按合同或实际拆到本项（万元），引擎不平分"},
+      {"cell": "5.工程建设其他费用!C10", "manual_hint": "建设管理其他费小计的费率参考见「工程建设其他费」表中的「建设管理其他费」；按合同或实际拆到本项（万元），引擎不平分"},
+      {"cell": "5.工程建设其他费用!C11", "manual_hint": "按招标代理合同填（万元）"},
+      {"cell": "5.工程建设其他费用!C12", "manual_hint": "按造价咨询合同填（万元）"},
+      {"cell": "5.工程建设其他费用!C13", "manual_hint": "建设管理其他费小计的费率参考见「工程建设其他费」表中的「建设管理其他费」；按合同或实际拆到本项（万元），引擎不平分"},
+      {"cell": "5.工程建设其他费用!C14", "manual_hint": "按监理合同填（万元）"},
+      {"cell": "5.工程建设其他费用!C15", "manual_hint": "填出让合同价或挂牌价（万元）；划拨/本概算不计列填 0"},
+      {"cell": "5.工程建设其他费用!C16", "manual_hint": "按可研编制合同填（万元）"},
+      {"cell": "5.工程建设其他费用!C17", "manual_hint": "按勘察、设计合同填（万元）"},
+      {"cell": "5.工程建设其他费用!C18", "manual_hint": "按环评合同填（万元）"},
+      {"cell": "5.工程建设其他费用!C19", "manual_hint": "按节能评估合同填（万元）"},
+      {"cell": "5.工程建设其他费用!C20", "manual_hint": "按场地准备与临时设施实际计列（万元）"},
+      {"cell": "5.工程建设其他费用!C21", "manual_hint": "原定额无数值费率，按保险报价或合同填（万元）"},
+      {"cell": "5.工程建设其他费用!C22", "manual_hint": "按项目所在地配套费文件与缴费通知填（万元）"},
+      {"cell": "5.工程建设其他费用!C23", "manual_hint": "按供电部门缴费通知填（万元）"},
+      {"cell": "5.工程建设其他费用!C24", "manual_hint": "按水土保持方案编制合同或报价填（万元）"},
+      {"cell": "5.工程建设其他费用!C25", "manual_hint": "按检测合同或报价填（万元）"},
+      {"cell": "5.工程建设其他费用!C26", "manual_hint": "按 BIM 服务合同或报价填（万元）"},
+      {"cell": "5.工程建设其他费用!C27", "manual_hint": "按引进合同填（万元）；无引进项目填 0"},
+      {"cell": "5.工程建设其他费用!C28", "manual_hint": "按联合试运转方案计列（万元）；非生产性项目填 0"},
+      {"cell": "5.工程建设其他费用!C29", "manual_hint": "按专利、专有技术使用合同填（万元）；无则填 0"},
+      {"cell": "5.工程建设其他费用!C30", "manual_hint": "按生产准备方案计列（万元）；非生产性项目填 0"}
+    ],
+    "note": "样本里这些格的「单方指标」是样本包干额 ÷ 样本总建筑面积（种子 unit_cost×17 为整数，17 万㎡是样本面积），按本项目面积放大没有意义（WS10-P02）。lump_sum 格不做面积推算：费率规则覆盖的格看 fee[]，其余格按 manual_hint 人工填。"
+  },
+
+  "building_functions": [
+    {"value": "residential", "label": "住宅"},
+    {"value": "office", "label": "办公"},
+    {"value": "commercial", "label": "商业"},
+    {"value": "public_service", "label": "公共服务（学校 / 医院 / 场馆）"},
+    {"value": "warehouse_logistics", "label": "仓储物流",
+     "not_typical": [{"sheet": "1.建筑工程费", "leaf": "幕墙工程"}, {"sheet": "1.建筑工程费", "leaf": "精装修工程"}]},
+    {"value": "industrial_plant", "label": "工业厂房",
+     "not_typical": [{"sheet": "1.建筑工程费", "leaf": "幕墙工程"}, {"sheet": "1.建筑工程费", "leaf": "精装修工程"}]},
+    {"value": "other", "label": "其他"}
+  ],
+  "not_typical_note": "D48 初始口径（待造价员确认）：仓储物流、工业厂房通常不含幕墙与精装修，这些格不出参考值；项目确有时直接填实际值。",
+
+  "slots": [
+    {"cell": "经济技术指标!D7", "kind": "basement"},
+    {"cell": "经济技术指标!D8", "kind": "basement"},
+    {"cell": "经济技术指标!D10", "kind": "above_ground"},
+    {"cell": "经济技术指标!D11", "kind": "above_ground"},
+    {"cell": "经济技术指标!D12", "kind": "above_ground"},
+    {"cell": "经济技术指标!D13", "kind": "structure"}
+  ],
+  "slot_levels": {"underground": "basement", "above_ground": "above_ground", "structure": "structure"},
+  "slot_note": "D46：延续裁决 5 的固定槽位。抽取按出现顺序归位，超出槽位的单体逐个落 unmapped_building，不猜、不合并；由用户在单体归位面板并入某个槽位。",
+
+  "area_gate": {"cell": "经济技术指标!D5", "label": "总建筑面积"},
+
+  "area_reconcile": {
+    "slot_sum_cell": "经济技术指标!D5",
+    "check_key": "gross_building_area",
+    "tolerance": 0.01
+  },
+
+  "footprint_check": {"site_cell": "经济技术指标!D4", "footprint_cell": "经济技术指标!D14",
+                      "outdoor_cell": "经济技术指标!D17"},
+
+  "land_cost_cell": "5.工程建设其他费用!C15",
+
+  "review_thresholds": {
+    "draft_coverage_below": 0.30,
+    "draft_if_sheet_unfilled": ["1.建筑工程费", "2.安装工程费"],
+    "fee_stale_tolerance": 0.005,
+    "note": "WS10-P06 / D50：覆盖率 <30%，或「1.建筑工程费」「2.安装工程费」任一表一格都没填 → 草稿；采纳过参考值 / 仓主放行的费率、面积差额已确认、占地缺失、土地费未填、未申报来源、费率采纳值过期 → 需复核。采纳的费率值与本次重算相差 >0.5% 记 fee_value_stale。"
+  },
+
+  "reference_sheets": [
+    {"sheet": "1.1概算建筑项目清单", "title": "附表（口径参考，本期未编制数量与金额）",
+     "area_cell": "K2", "area_ref": "经济技术指标!D5"},
+    {"sheet": "2.1估概算安装项目清单", "title": "附表（口径参考，本期未编制数量与金额）",
+     "area_cell": "K2", "area_ref": "经济技术指标!D5"}
+  ],
+  "reference_sheets_note": "WS10-P14：两张清单表是样本表的空壳（没有数量与金额），保留作口径参考：A1 标明「附表」，第 2 行「建筑面积：」后引用本概算的总建筑面积，不再是样本私有的空白。",
+
+  "extract_anchors": ["经济技术指标", "技术经济指标", "主要技术指标", "建筑面积", "用地面积", "占地面积",
+                      "基底面积", "地下室", "停车位", "车位", "容积率", "楼号", "栋号", "单体", "子项"],
+  "extract_anchors_note": "WS10-P12：正文超过单次预算（12000 字）时，按这些关键词（另并入各抽取位 / 总量的同义词）取前后各 1200 字的窗口，而不是静默截前 12000 字。WS29-d：加「楼号」「栋号」「单体」「子项」—— 各单体的明细表（楼号表）多半以这几个词开头，表里不一定出现「建筑面积」，落在窗口外模型就列不出单体。",
+
+  "extract_max_tokens": 6000,
+  "extract_max_tokens_note": "WS29-d（D-R119）：抽取单次调用的输出预算。保留无面积单体后，24 个单体加引文约 2300~2700 token；3000 贴线，提到 6000。真触顶仍抛 LLMTruncated → 502，不解析半截 JSON。实际用量看 text_stats[].completion_tokens。",
+
+  "extract_checks": [
+    {"key": "gross_building_area", "label": "总建筑面积", "synonyms": ["总建筑面积", "建筑总面积", "规划总建筑面积"]},
+    {"key": "above_ground_area", "label": "地上建筑面积", "synonyms": ["地上建筑面积", "地上总建筑面积", "计容建筑面积"]},
+    {"key": "underground_area", "label": "地下建筑面积", "synonyms": ["地下建筑面积", "地下总建筑面积", "地下室建筑面积"]},
+    {"key": "footprint_area", "label": "建筑占地面积（基底面积）", "synonyms": ["建筑占地面积", "建筑基底面积", "基底面积", "占地面积"]},
+    {"key": "building_density", "label": "建筑密度", "synonyms": ["建筑密度"], "kind": "percent", "hint_for": "footprint",
+     "prompt_note": "百分数，value 照原文带 % 抄（如 30%）",
+     "note": "WS29-d（D-R118）：只作占地缺失时的提示用，不进任何输入位、不进 check_values。只认「建筑密度 30%」「建筑密度≤30％」这种百分数写法，不带 % 的小数（0.3）不认、不猜。推算值 = 用地面积 × 密度，由代码算，挂在占地那一行「未取到」上，不进候选（铁律 2）。"}
+  ],
+
+  "extract_hints": [
+    {"cell": "经济技术指标!D4", "path": "用地面积", "unit": "㎡",
+     "definition": "项目总用地面积（规划用地 / 建设用地），不是建筑占地面积",
+     "synonyms": ["用地面积", "总用地面积", "规划用地面积", "建设用地面积", "净用地面积"]},
+    {"cell": "经济技术指标!D15", "path": "占地面积 > A区地块", "unit": "㎡",
+     "definition": "A 区（第一个地块）的建筑占地面积（建筑物底层外墙围合的基底面积），不是用地面积",
+     "synonyms": ["建筑占地面积", "建筑基底面积", "基底面积"], "group": "footprint"},
+    {"cell": "经济技术指标!D16", "path": "占地面积 > B区地块", "unit": "㎡",
+     "definition": "B 区（第二个地块）的建筑占地面积；原文不分地块时留空",
+     "synonyms": ["建筑占地面积", "建筑基底面积", "基底面积"], "group": "footprint"},
+    {"cell": "经济技术指标!D19", "path": "机动车停车位 > 地面机动车停车", "unit": "辆",
+     "definition": "地面（地上）机动车停车位数量",
+     "synonyms": ["地面停车位", "地上停车位", "地面机动车停车位"], "group": "parking"},
+    {"cell": "经济技术指标!D20", "path": "机动车停车位 > 地下机动车停车", "unit": "辆",
+     "definition": "地下机动车停车位数量",
+     "synonyms": ["地下停车位", "地下机动车停车位", "地下车位"], "group": "parking"}
+  ],
+  "extract_groups": {
+    "footprint": {"allow_total_only": true, "check_key": "footprint_area"},
+    "parking": {"allow_total_only": false, "check_key": null},
+    "basement": {"allow_total_only": true, "check_key": "underground_area"},
+    "above_ground": {"allow_total_only": true, "check_key": "above_ground_area"}
+  }
+}

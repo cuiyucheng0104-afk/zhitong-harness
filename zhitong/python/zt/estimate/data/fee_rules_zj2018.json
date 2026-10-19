@@ -1,0 +1,677 @@
+{
+  "schema_version": "1.0",
+  "name": "fee_rules_zj2018",
+  "description": "浙江省建设工程其他费用定额（2018版）等来源的 16 项其他费费率规则。形态为建议值+区间（非硬公式）：原概算表 C 列均为造价员经验定值，本规则仅产出建议供其覆盖。",
+  "primary_sources": [
+    "浙江省建设工程其他费用定额（2018版）扫描页（image1~14）",
+    "浙价服〔2009〕84号 浙江省建设工程造价咨询服务基准收费标准（image15）",
+    "计价格〔2002〕1980号 招标代理服务收费标准（image16）"
+  ],
+  "transcribed_by": "llm",
+  "transcription_method": "双遍独立视觉转录：第一遍逐图录入并存盘；第二遍全图 2x 放大重读并逐值 diff（过程与差异记录见 fee_rules_transcription.md）",
+  "transcription_date": "2026-08-29",
+  "requires_human_signoff": true,
+  "signoff_status": "signed",
+  "signoff_kind": "owner_release",
+  "signoff_by": "仓主默认放行（非造价员签署）",
+  "signoff_at": "2026-09-10",
+  "signoff_note": "⚠ 这不是造价员签署。2026-09-10 仓主裁定：先默认放行、先部署，按真实使用反馈再纠偏（issue #159）。393 个转录数值仍未经造价员逐值核对，下方 signoff_checklist 的 5 处语义歧义一条也没解；LLM 双遍视觉转录的原始记录见 fee_rules_transcription.md。本次放行是对铁律 2「未经造价员签署的转录费率不许出建议值」的有意覆盖，代价是用户会倾向直接采纳这些数字而不是当成待核实的参考。造价员真正逐值核完后：把 signoff_kind 改成 cost_engineer、填真实签字人与日期、并逐条填 signoff_checklist[].resolution —— 那时 test_signed_by_cost_engineer_requires_every_checklist_item_resolved 才会开始约束。",
+  "signoff_gate": "两级闸（app/engine/fee_rules.py「签署闸」段）。① 规则集级：signoff_status != \"signed\" 时 suggest_all / suggest_one 的 suggested 恒为 null。② 条目级：即使规则集已签署，band_closure 未声明的分档条目（当前只有「勘察设计费」）仍逐条扣留，unavailable_reason=band_closure_unconfirmed —— 档界处用哪一档费率不可推测，放行等于在档界上编一个金额（铁律 3）。此外 signoff_kind != \"cost_engineer\" 时每次求值另出一条 fee_rules_owner_released 规则集级告警。代码里没有绕过参数。",
+  "signoff_checklist": [
+    {
+      "id": "SC-1",
+      "source_image": "image5",
+      "item_id": "survey_design_fee",
+      "question": "工程设计费档内费率方向：引擎按「规模越大费率越低」取插值锚点（200万→3.8%、3000万→3.0%、1亿→2.59%、6亿→2.15%）。原文只写「①200万~3000万元按3.0%~3.8%计」，未显式说明方向。",
+      "resolution": null,
+      "resolved_by": null
+    },
+    {
+      "id": "SC-2",
+      "source_image": "image7",
+      "item_id": "energy_assessment_fee",
+      "question": "节能评估费范式归类：表头写「分档累进计费基准标准」，spec 归为「③分档单价×规模」。引擎按原文「累进」实现（各档面积×该档单价后累加），与 spec 标签不一致，需拍板。",
+      "resolution": null,
+      "resolved_by": null
+    },
+    {
+      "id": "SC-3",
+      "source_image": "image4",
+      "item_id": "feasibility_study_fee",
+      "question": "可行性研究费档位闭开性：原文未注明，引擎按同类的环评表注1（下限不含、上限包含）同约定处理。",
+      "resolution": null,
+      "resolved_by": null
+    },
+    {
+      "id": "SC-4",
+      "source_image": "image15",
+      "item_id": "cost_consulting_fee",
+      "question": "工程造价咨询费表内 10 个子服务，概算模板 C 列取哪一行原表未说明。引擎默认取行5「工程量清单及预算、招标控制价的编制或审核」，UI 应提供切换（consulting_service 属性）。",
+      "resolution": null,
+      "resolved_by": null
+    },
+    {
+      "id": "SC-5",
+      "source_image": "image16",
+      "item_id": "bidding_agency_fee",
+      "question": "招标代理费档界归属（恰好 100 万归哪档）原文未注明。因差额累进在档界连续，数值上无影响（已由 test_fee_rules_data.py 的连续性测试证明），但仍需造价员确认口径。",
+      "resolution": null,
+      "resolved_by": null
+    }
+  ],
+  "amount_unit": "万元",
+  "items": [
+    {
+      "item_id": "project_management_fee",
+      "fee_name": "项目建设管理费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I6",
+      "fee_row": 6,
+      "source_image": "image1.png",
+      "source_table": "表2-1 浙江省建设项目建设管理费用标准",
+      "source_ref": "财建〔2016〕504号",
+      "paradigm": "progressive_difference",
+      "base": {"name": "工程费用", "unit": "万元"},
+      "rate_unit": "percent",
+      "bands": [
+        {"upper": 1000, "rate": {"value": 2.3, "source_image": "image1.png", "source_cell": "表2-1 费率列 第1档", "raw_text": "2.3"}, "band_label": {"source_cell": "表2-1 工程费用列 第1档", "raw_text": "1 000 以内"}},
+        {"upper": 5000, "rate": {"value": 1.7, "source_image": "image1.png", "source_cell": "表2-1 费率列 第2档", "raw_text": "1.7"}, "band_label": {"source_cell": "表2-1 工程费用列 第2档", "raw_text": "5 000"}},
+        {"upper": 10000, "rate": {"value": 1.4, "source_image": "image1.png", "source_cell": "表2-1 费率列 第3档", "raw_text": "1.4"}, "band_label": {"source_cell": "表2-1 工程费用列 第3档", "raw_text": "10 000"}},
+        {"upper": 50000, "rate": {"value": 1.2, "source_image": "image1.png", "source_cell": "表2-1 费率列 第4档", "raw_text": "1.2"}, "band_label": {"source_cell": "表2-1 工程费用列 第4档", "raw_text": "50 000"}},
+        {"upper": 100000, "rate": {"value": 0.9, "source_image": "image1.png", "source_cell": "表2-1 费率列 第5档", "raw_text": "0.9"}, "band_label": {"source_cell": "表2-1 工程费用列 第5档", "raw_text": "100 000"}},
+        {"upper": null, "rate": {"value": 0.5, "source_image": "image1.png", "source_cell": "表2-1 费率列 第6档", "raw_text": "0.5"}, "band_label": {"source_cell": "表2-1 工程费用列 第6档", "raw_text": "100 000 以上"}}
+      ],
+      "adjustments": [
+        {"id": "whole_process_consulting", "desc": "实行施工阶段全过程造价咨询的项目，项目建设管理费乘以系数0.7", "factor": 0.7, "source_cell": "表2-1 备注 注3"}
+      ],
+      "notes": [
+        "注1：实行总额控制，采用差额分档累进制计算",
+        "注2：实行代建制管理的项目，一般不得同时列支代建管理费和项目建设管理费；确需同时发生的，两项费用之和不得高于本标准费用限额",
+        "注4：采用EPC模式的项目，各项费用仍按本定额规定计算，不单独计列总承包管理费"
+      ]
+    },
+    {
+      "item_id": "management_other_fee",
+      "fee_name": "建设管理其他费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I9",
+      "fee_row": 9,
+      "source_image": "image2.png",
+      "source_table": "表2-1（续） 序号2",
+      "source_ref": "财建〔2016〕504号",
+      "paradigm": "progressive_difference",
+      "base": {"name": "工程费用", "unit": "万元"},
+      "rate_unit": "percent",
+      "bands": [
+        {"upper": 1000, "rate": {"value": 1.8, "source_image": "image2.png", "source_cell": "费率列 第1档", "raw_text": "1.8"}, "band_label": {"source_cell": "工程费用列 第1档", "raw_text": "1 000 以内"}},
+        {"upper": 5000, "rate": {"value": 1.32, "source_image": "image2.png", "source_cell": "费率列 第2档", "raw_text": "1.32"}, "band_label": {"source_cell": "工程费用列 第2档", "raw_text": "5 000"}},
+        {"upper": 10000, "rate": {"value": 0.96, "source_image": "image2.png", "source_cell": "费率列 第3档", "raw_text": "0.96"}, "band_label": {"source_cell": "工程费用列 第3档", "raw_text": "10 000"}},
+        {"upper": 50000, "rate": {"value": 0.6, "source_image": "image2.png", "source_cell": "费率列 第4档", "raw_text": "0.6"}, "band_label": {"source_cell": "工程费用列 第4档", "raw_text": "50 000"}},
+        {"upper": 100000, "rate": {"value": 0.48, "source_image": "image2.png", "source_cell": "费率列 第5档", "raw_text": "0.48"}, "band_label": {"source_cell": "工程费用列 第5档", "raw_text": "100 000"}},
+        {"upper": null, "rate": {"value": 0.24, "source_image": "image2.png", "source_cell": "费率列 第6档", "raw_text": "0.24"}, "band_label": {"source_cell": "工程费用列 第6档", "raw_text": "100 000 以上"}}
+      ],
+      "adjustments": [
+        {"id": "no_whole_process_consulting", "desc": "不实行施工阶段全过程造价咨询的项目，建设管理其他费乘以系数0.75", "factor": 0.75, "source_cell": "备注 注4"}
+      ],
+      "notes": [
+        "注1：建设管理其他费采用差额分档累进制计算",
+        "注2：已包含项目实施管理中必须发生的费用",
+        "注3：含施工阶段全过程造价咨询费用（包括分阶段结算和竣工结算审核费用），政府投资项目不得再计列结算审核基本费和核减追加（绩效）费"
+      ]
+    },
+    {
+      "item_id": "bidding_agency_fee",
+      "fee_name": "工程招标代理费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I11",
+      "fee_row": 11,
+      "source_image": "image16.png",
+      "source_table": "招标代理服务收费标准",
+      "source_ref": "计价格〔2002〕1980号",
+      "paradigm": "progressive_difference",
+      "base": {"name": "中标金额", "unit": "万元"},
+      "rate_unit": "percent",
+      "default_column": "works",
+      "columns": {
+        "works": {
+          "label": "工程招标",
+          "bands": [
+            {"upper": 100, "rate": {"value": 1.0, "source_image": "image16.png", "source_cell": "工程招标列 100万元以下", "raw_text": "1.0%"}},
+            {"upper": 500, "rate": {"value": 0.7, "source_image": "image16.png", "source_cell": "工程招标列 100~500万元", "raw_text": "0.7%"}},
+            {"upper": 1000, "rate": {"value": 0.55, "source_image": "image16.png", "source_cell": "工程招标列 500~1000万元", "raw_text": "0.55%"}},
+            {"upper": 5000, "rate": {"value": 0.35, "source_image": "image16.png", "source_cell": "工程招标列 1000~5000万元", "raw_text": "0.35%"}},
+            {"upper": 10000, "rate": {"value": 0.2, "source_image": "image16.png", "source_cell": "工程招标列 5000万元~1亿元", "raw_text": "0.2%"}},
+            {"upper": 50000, "rate": {"value": 0.05, "source_image": "image16.png", "source_cell": "工程招标列 1~5亿元", "raw_text": "0.05%"}},
+            {"upper": 100000, "rate": {"value": 0.035, "source_image": "image16.png", "source_cell": "工程招标列 5~10亿元", "raw_text": "0.035%"}},
+            {"upper": 500000, "rate": {"value": 0.008, "source_image": "image16.png", "source_cell": "工程招标列 10~50亿元", "raw_text": "0.008%"}},
+            {"upper": 1000000, "rate": {"value": 0.006, "source_image": "image16.png", "source_cell": "工程招标列 50~100亿元", "raw_text": "0.006%"}},
+            {"upper": null, "rate": {"value": 0.004, "source_image": "image16.png", "source_cell": "工程招标列 100亿以上", "raw_text": "0.004%"}}
+          ]
+        },
+        "goods": {
+          "label": "货物招标",
+          "bands": [
+            {"upper": 100, "rate": {"value": 1.5, "source_image": "image16.png", "source_cell": "货物招标列 100万元以下", "raw_text": "1.5%"}},
+            {"upper": 500, "rate": {"value": 1.1, "source_image": "image16.png", "source_cell": "货物招标列 100~500万元", "raw_text": "1.1%"}},
+            {"upper": 1000, "rate": {"value": 0.8, "source_image": "image16.png", "source_cell": "货物招标列 500~1000万元", "raw_text": "0.8%"}},
+            {"upper": 5000, "rate": {"value": 0.5, "source_image": "image16.png", "source_cell": "货物招标列 1000~5000万元", "raw_text": "0.5%"}},
+            {"upper": 10000, "rate": {"value": 0.25, "source_image": "image16.png", "source_cell": "货物招标列 5000万元~1亿元", "raw_text": "0.25%"}},
+            {"upper": 50000, "rate": {"value": 0.05, "source_image": "image16.png", "source_cell": "货物招标列 1~5亿元", "raw_text": "0.05%"}},
+            {"upper": 100000, "rate": {"value": 0.035, "source_image": "image16.png", "source_cell": "货物招标列 5~10亿元", "raw_text": "0.035%"}},
+            {"upper": 500000, "rate": {"value": 0.008, "source_image": "image16.png", "source_cell": "货物招标列 10~50亿元", "raw_text": "0.008%"}},
+            {"upper": 1000000, "rate": {"value": 0.006, "source_image": "image16.png", "source_cell": "货物招标列 50~100亿元", "raw_text": "0.006%"}},
+            {"upper": null, "rate": {"value": 0.004, "source_image": "image16.png", "source_cell": "货物招标列 100亿以上", "raw_text": "0.004%"}}
+          ]
+        },
+        "services": {
+          "label": "服务招标",
+          "bands": [
+            {"upper": 100, "rate": {"value": 1.5, "source_image": "image16.png", "source_cell": "服务招标列 100万元以下", "raw_text": "1.5%"}},
+            {"upper": 500, "rate": {"value": 0.8, "source_image": "image16.png", "source_cell": "服务招标列 100~500万元", "raw_text": "0.8%"}},
+            {"upper": 1000, "rate": {"value": 0.45, "source_image": "image16.png", "source_cell": "服务招标列 500~1000万元", "raw_text": "0.45%"}},
+            {"upper": 5000, "rate": {"value": 0.25, "source_image": "image16.png", "source_cell": "服务招标列 1000~5000万元", "raw_text": "0.25%"}},
+            {"upper": 10000, "rate": {"value": 0.1, "source_image": "image16.png", "source_cell": "服务招标列 5000万元~1亿元", "raw_text": "0.1%"}},
+            {"upper": 50000, "rate": {"value": 0.05, "source_image": "image16.png", "source_cell": "服务招标列 1~5亿元", "raw_text": "0.05%"}},
+            {"upper": 100000, "rate": {"value": 0.035, "source_image": "image16.png", "source_cell": "服务招标列 5~10亿元", "raw_text": "0.035%"}},
+            {"upper": 500000, "rate": {"value": 0.008, "source_image": "image16.png", "source_cell": "服务招标列 10~50亿元", "raw_text": "0.008%"}},
+            {"upper": 1000000, "rate": {"value": 0.006, "source_image": "image16.png", "source_cell": "服务招标列 50~100亿元", "raw_text": "0.006%"}},
+            {"upper": null, "rate": {"value": 0.004, "source_image": "image16.png", "source_cell": "服务招标列 100亿以上", "raw_text": "0.004%"}}
+          ]
+        }
+      },
+      "golden_example": {
+        "desc": "原表注2算例：工程招标，中标金额6000万元 → 100×1.0% + (500-100)×0.7% + (1000-500)×0.55% + (5000-1000)×0.35% + (6000-5000)×0.2% = 22.55万元",
+        "column": "works",
+        "base": 6000,
+        "expected_fee": 22.55,
+        "source_cell": "注2"
+      },
+      "notes": [
+        "注1：按本表费率计算的收费为招标代理服务全过程的收费基准价格，但不含工程量清单、工程标底或工程招标控制价的编制费用",
+        "注2：招标代理服务收费按差额定率累进法计算"
+      ]
+    },
+    {
+      "item_id": "cost_consulting_fee",
+      "fee_name": "工程造价咨询费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I12",
+      "fee_row": 12,
+      "source_image": "image15.png",
+      "source_table": "浙江省建设工程造价咨询服务基准收费标准",
+      "source_ref": "浙价服〔2009〕84号",
+      "paradigm": "progressive_difference",
+      "base": {"name": "收费基数（按子服务不同：估算价/概算价/建安工程造价/送审工程造价/建设项目总费用）", "unit": "万元"},
+      "rate_unit": "permille",
+      "min_fee_wanyuan": 0.2,
+      "min_fee_note": "说明1：每件咨询服务合同按上表计算不足2000元的，按2000元收费",
+      "default_column": "05_bill_budget_control_price",
+      "column_choice_note": "概算模板未注明取哪个子服务；默认取序号5（工程量清单及预算、招标控制价的编制或审核），UI 应提供切换——待造价员确认",
+      "columns": {
+        "01_investment_estimate": {"label": "投资估算编制或审核", "fee_base": "估算价", "rates_permille": [1.3, 1.1, 0.9, 0.7, 0.6, 0.5, 0.4], "source_cell": "序号1行"},
+        "02_design_estimate": {"label": "设计概算编制或审核", "fee_base": "概算价", "rates_permille": [1.7, 1.5, 1.3, 1.1, 1.0, 0.9, 0.8], "source_cell": "序号2行"},
+        "03_bill_alone": {"label": "清单计价法-工程量清单单独编制或审核", "fee_base": "建安工程造价", "rates_permille": [2.9, 2.7, 2.5, 2.3, 2.1, 1.9, 1.7], "source_cell": "序号3行"},
+        "04_bid_price": {"label": "清单计价法-投标报价编制", "fee_base": "建安工程造价", "rates_permille": [1.4, 1.2, 1.0, 0.8, 0.6, 0.5, 0.4], "source_cell": "序号4行"},
+        "05_bill_budget_control_price": {"label": "清单计价法-工程量清单及预算、招标控制价的编制或审核", "fee_base": "建安工程造价", "rates_permille": [3.6, 3.3, 3.0, 2.7, 2.4, 2.1, 1.8], "source_cell": "序号5行"},
+        "06_quota_pricing": {"label": "定额计价法-预算、招标控制价、投标报价的编制或审核", "fee_base": "建安工程造价", "rates_permille": [3.0, 2.5, 2.3, 2.1, 1.9, 1.7, 1.5], "source_cell": "序号6行"},
+        "07_settlement_compile": {"label": "工程结算编制", "fee_base": "建安工程造价", "rates_permille": [2.5, 2.2, 1.9, 1.6, 1.3, 1.0, 0.70], "source_cell": "序号7行"},
+        "08_settlement_audit_basic": {"label": "工程结算审核-基本收费", "fee_base": "送审工程造价", "rates_permille": [2.8, 2.5, 2.2, 1.9, 1.6, 1.3, 1.0], "source_cell": "序号8行 基本收费"},
+        "09_final_account": {"label": "竣工决算编制或审核", "fee_base": "建设项目总费用", "rates_permille": [2.0, 1.6, 1.2, 0.8, 0.5, 0.3, 0.1], "source_cell": "序号9行"},
+        "10_whole_process_control": {"label": "施工阶段全过程工程造价控制", "fee_base": "建安工程造价", "rates_permille": [12, 11, 10, 9, 7, 6, 5], "source_cell": "序号10行"}
+      },
+      "band_uppers": [100, 500, 1000, 2000, 5000, 10000, null],
+      "band_labels": ["100万元以内", "101-500万元", "501-1000万元", "1001-2000万元", "2001-5000万元", "5001-10000万元", "10000万元以上"],
+      "extra_rules": [
+        {"id": "settlement_audit_extra", "desc": "工程结算审核-追加费用：超过5%以外的核减额、核增额的5%", "rate_percent": 5, "source_cell": "序号8行 追加费用"}
+      ],
+      "notes": [
+        "费率单位：‰（分档累进计费标准）",
+        "说明2：单独委托的装饰、安装、园林绿化及仿古建筑工程的基本费率可在基准收费标准基础上上浮20%",
+        "说明4：施工阶段全过程造价控制不包含各类招标代理和结算审核费用",
+        "说明5：钢筋及预埋件重量计算按5元/吨标准收费（不含在本标准内）"
+      ]
+    },
+    {
+      "item_id": "supervision_fee",
+      "fee_name": "工程监理费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I14",
+      "fee_row": 14,
+      "source_image": "image3.png",
+      "source_table": "表2-1 序号3 及 续表2-1",
+      "source_ref": null,
+      "paradigm": "base_price_interpolation",
+      "base": {"name": "工程费用", "unit": "万元"},
+      "value_unit": "万元",
+      "anchors": [
+        {"x": 500, "y": {"value": 13.2, "source_image": "image3.png", "source_cell": "收费基价列 第1行", "raw_text": "13.2"}},
+        {"x": 1000, "y": {"value": 24.1, "source_image": "image3.png", "source_cell": "收费基价列 第2行", "raw_text": "24.1"}},
+        {"x": 3000, "y": {"value": 62.5, "source_image": "image3.png", "source_cell": "收费基价列 第3行", "raw_text": "62.5"}},
+        {"x": 5000, "y": {"value": 96.6, "source_image": "image3.png", "source_cell": "收费基价列 第4行", "raw_text": "96.6"}},
+        {"x": 8000, "y": {"value": 144.8, "source_image": "image3.png", "source_cell": "收费基价列 第5行", "raw_text": "144.8"}},
+        {"x": 10000, "y": {"value": 174.9, "source_image": "image3.png", "source_cell": "续表 收费基价列 第1行", "raw_text": "174.9"}},
+        {"x": 20000, "y": {"value": 314.7, "source_image": "image3.png", "source_cell": "续表 收费基价列 第2行", "raw_text": "314.7"}},
+        {"x": 40000, "y": {"value": 566.6, "source_image": "image3.png", "source_cell": "续表 收费基价列 第3行", "raw_text": "566.6"}},
+        {"x": 60000, "y": {"value": 793.1, "source_image": "image3.png", "source_cell": "续表 收费基价列 第4行", "raw_text": "793.1"}},
+        {"x": 80000, "y": {"value": 1004.6, "source_image": "image3.png", "source_cell": "续表 收费基价列 第5行", "raw_text": "1 004.6"}},
+        {"x": 100000, "y": {"value": 1205.6, "source_image": "image3.png", "source_cell": "续表 收费基价列 第6行", "raw_text": "1 205.6"}},
+        {"x": 200000, "y": {"value": 2170.0, "source_image": "image3.png", "source_cell": "续表 收费基价列 第7行", "raw_text": "2 170.0"}},
+        {"x": 400000, "y": {"value": 3906.1, "source_image": "image3.png", "source_cell": "续表 收费基价列 第8行", "raw_text": "3 906.1"}},
+        {"x": 600000, "y": {"value": 5468.5, "source_image": "image3.png", "source_cell": "续表 收费基价列 第9行", "raw_text": "5 468.5"}},
+        {"x": 800000, "y": {"value": 6926.7, "source_image": "image3.png", "source_cell": "续表 收费基价列 第10行", "raw_text": "6 926.7"}},
+        {"x": 1000000, "y": {"value": 8312.1, "source_image": "image3.png", "source_cell": "续表 收费基价列 第11行", "raw_text": "8 312.1"}}
+      ],
+      "adjustments": [
+        {"id": "complexity", "desc": "工程复杂系数达Ⅲ级或有特别注明的工程可在此费用基础上乘以复杂系数1.15~1.25", "factor_min": 1.15, "factor_max": 1.25, "source_cell": "备注 注1"},
+        {"id": "whole_process_consulting", "desc": "实行施工阶段全过程造价咨询的项目，相应工程监理费乘以系数0.92", "factor": 0.92, "source_cell": "备注 注2"}
+      ],
+      "notes": [
+        "注4：具体收费标准可根据工程费用在相对应的区间内用插入法计算",
+        "工程费用低于500万元或高于1000000万元时表外，引擎按比例外推并打 flag"
+      ]
+    },
+    {
+      "item_id": "feasibility_study_fee",
+      "fee_name": "可行性研究费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I16",
+      "fee_row": 16,
+      "source_image": "image4.png",
+      "source_table": "表2-4 可行性研究费 / 表2-5 按建设项目工程费用分档收费标准",
+      "source_ref": null,
+      "paradigm": "banded_value_range_interpolation",
+      "base": {"name": "工程费用（项目投资估算中的建设工程费用）", "unit": "万元"},
+      "value_unit": "万元",
+      "band_closure": "lower_exclusive_upper_inclusive",
+      "band_closure_note": "原表未注明闭开性，比照同类环评表2-17注1（下限不含、上限包含）约定；因插值连续，仅影响档界归属不影响数值",
+      "default_column": "feasibility_report",
+      "columns": {
+        "proposal": {
+          "label": "编制项目建议书",
+          "bands": [
+            {"lower": 0, "upper": 1000, "fee_min": 0.9, "fee_max": 2.3, "source_cell": "编制项目建议书行 1000以下", "raw_text": "0.9~2.3"},
+            {"lower": 1000, "upper": 3000, "fee_min": 2.3, "fee_max": 5.5, "source_cell": "编制项目建议书行 1000~3000", "raw_text": "2.3~5.5"},
+            {"lower": 3000, "upper": 10000, "fee_min": 5.5, "fee_max": 12.9, "source_cell": "编制项目建议书行 3000~10000", "raw_text": "5.5~12.9"},
+            {"lower": 10000, "upper": 50000, "fee_min": 12.9, "fee_max": 34.0, "source_cell": "编制项目建议书行 10000~50000", "raw_text": "12.9~34.0"},
+            {"lower": 50000, "upper": 100000, "fee_min": 34.0, "fee_max": 50.6, "source_cell": "编制项目建议书行 50000~100000", "raw_text": "34.0~50.6"},
+            {"lower": 100000, "upper": 500000, "fee_min": 50.6, "fee_max": 92.0, "source_cell": "编制项目建议书行 100000~500000", "raw_text": "50.6~92.0"},
+            {"lower": 500000, "upper": null, "fee_min": 92.0, "fee_max": 115.0, "source_cell": "编制项目建议书行 500000以上", "raw_text": "92.0~115.0"}
+          ]
+        },
+        "feasibility_report": {
+          "label": "编制可行性研究报告",
+          "bands": [
+            {"lower": 0, "upper": 1000, "fee_min": 1.8, "fee_max": 4.6, "source_cell": "编制可行性研究报告行 1000以下", "raw_text": "1.8~4.6"},
+            {"lower": 1000, "upper": 3000, "fee_min": 4.6, "fee_max": 14.7, "source_cell": "编制可行性研究报告行 1000~3000", "raw_text": "4.6~14.7"},
+            {"lower": 3000, "upper": 10000, "fee_min": 14.7, "fee_max": 25.8, "source_cell": "编制可行性研究报告行 3000~10000", "raw_text": "14.7~25.8"},
+            {"lower": 10000, "upper": 50000, "fee_min": 25.8, "fee_max": 69.0, "source_cell": "编制可行性研究报告行 10000~50000", "raw_text": "25.8~69.0"},
+            {"lower": 50000, "upper": 100000, "fee_min": 69.0, "fee_max": 101.2, "source_cell": "编制可行性研究报告行 50000~100000", "raw_text": "69.0~101.2"},
+            {"lower": 100000, "upper": 500000, "fee_min": 101.2, "fee_max": 184.0, "source_cell": "编制可行性研究报告行 100000~500000", "raw_text": "101.2~184.0"},
+            {"lower": 500000, "upper": null, "fee_min": 184.0, "fee_max": 230.0, "source_cell": "编制可行性研究报告行 500000以上", "raw_text": "184.0~230.0"}
+          ]
+        }
+      },
+      "notes": [
+        "注2：具体收费标准根据估算投资中的工程费用在相对应的区间内用插入法计算",
+        "注3：可分别乘以行业调整系数和工程复杂程度调整系数",
+        "注4：编制预可行性研究报告参照编制项目建议书收费标准，可适当调整",
+        "注5：计费基数原则上以工程费用为准，若编制单位实际发生土地费用测算行为，计费基数可计入土地费用"
+      ]
+    },
+    {
+      "item_id": "survey_design_fee",
+      "fee_name": "勘察设计费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I17",
+      "fee_row": 17,
+      "source_image": "image5.png",
+      "source_table": "表2-9 勘察设计费",
+      "source_ref": null,
+      "paradigm": "banded_rate_range_interpolation",
+      "base": {"name": "概算投资额（工程费用为基数）", "unit": "万元"},
+      "rate_unit": "percent",
+      "sub_item_manual": {"name": "工程勘察费", "reason": "费用标准为「详见文件」，无数值规则", "source_cell": "表2-9 序号1行"},
+      "rate_bands": [
+        {"lower": 200, "upper": 3000, "rate_min": 3.0, "rate_max": 3.8, "source_cell": "工程设计费 费用标准①", "raw_text": "①200万~3 000万元按3.0%~3.8%计"},
+        {"lower": 3000, "upper": 10000, "rate_min": 2.59, "rate_max": 3.0, "source_cell": "工程设计费 费用标准②", "raw_text": "②3 000万~1亿元按2.59%~3.0%计"},
+        {"lower": 10000, "upper": 60000, "rate_min": 2.15, "rate_max": 2.59, "source_cell": "工程设计费 费用标准③", "raw_text": "③1亿~6亿元按2.15%~2.59%计"}
+      ],
+      "interpolation_anchors_note": "档内插值锚点按「规模越大费率越低」方向取：(200万,3.8%)(3000万,3.0%)(1亿,2.59%)(6亿,2.15%)；原文未显式说明方向，需造价员确认",
+      "adjustments": [
+        {"id": "expansion_addition", "desc": "改扩建和技术改造项目附加调整系数为1.1~1.4", "factor_min": 1.1, "factor_max": 1.4, "source_cell": "备注 注3"}
+      ],
+      "notes": [
+        "备注注1：设计费=工程设计收费基价×专业调整系数×工程复杂程度调整系数×附加调整系数",
+        "备注注2：专业调整系数和工程复杂程度调整系数、附加调整系数详见表2-12~表2-15（未入图，不在本规则内）",
+        "备注注4：具体收费标准可根据工程费用在相对应的区间内用插入法计算"
+      ]
+    },
+    {
+      "item_id": "eia_fee",
+      "fee_name": "环境影响评价费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I18",
+      "fee_row": 18,
+      "source_image": "image6.png",
+      "source_table": "表2-16 环境影响评价费 / 表2-17 建设项目环境影响评价收费标准",
+      "source_ref": null,
+      "paradigm": "banded_value_range_interpolation",
+      "base": {"name": "工程费用（项目建议书或可行性研究报告中估算投资中的建设工程费用）", "unit": "万元"},
+      "value_unit": "万元",
+      "band_closure": "lower_exclusive_upper_inclusive",
+      "band_closure_note": "表2-17注1原文显式：表中数字下限为不含，上限为包含",
+      "default_column": "report_book",
+      "columns": {
+        "report_book": {
+          "label": "编制环境影响报告书（含大纲）",
+          "bands": [
+            {"lower": 0, "upper": 3000, "fee_min": 3.7, "fee_max": 4.5, "source_cell": "报告书行 3000以下", "raw_text": "3.7~4.5"},
+            {"lower": 3000, "upper": 20000, "fee_min": 4.5, "fee_max": 11.2, "source_cell": "报告书行 3000~20000", "raw_text": "4.5~11.2"},
+            {"lower": 20000, "upper": 100000, "fee_min": 11.2, "fee_max": 26.1, "source_cell": "报告书行 20000~100000", "raw_text": "11.2~26.1"},
+            {"lower": 100000, "upper": 500000, "fee_min": 26.1, "fee_max": 56.0, "source_cell": "报告书行 100000~500000", "raw_text": "26.1~56.0"},
+            {"lower": 500000, "upper": 1000000, "fee_min": 56.0, "fee_max": 82.2, "source_cell": "报告书行 500000~1000000", "raw_text": "56.0~82.2"},
+            {"lower": 1000000, "upper": null, "fee_min": 82.2, "fee_max": null, "source_cell": "报告书行 1000000以上", "raw_text": "82.2以上"}
+          ]
+        },
+        "report_form": {
+          "label": "编制环境影响报告表",
+          "bands": [
+            {"lower": 0, "upper": 3000, "fee_min": 0.7, "fee_max": 1.5, "source_cell": "报告表行 3000以下", "raw_text": "0.7~1.5"},
+            {"lower": 3000, "upper": 20000, "fee_min": 1.5, "fee_max": 3.0, "source_cell": "报告表行 3000~20000", "raw_text": "1.5~3.0"},
+            {"lower": 20000, "upper": 100000, "fee_min": 3.0, "fee_max": 5.2, "source_cell": "报告表行 20000~100000", "raw_text": "3.0~5.2"},
+            {"lower": 100000, "upper": null, "fee_min": 5.2, "fee_max": null, "source_cell": "报告表行 100000以上（原表100000~500000/500000~1000000/1000000以上三档合并单元格）", "raw_text": "5.2以上"}
+          ]
+        }
+      },
+      "extra_rules": [
+        {"id": "extra_topic", "desc": "报告表收费标准为不设评价专题基准价，每增加一个专题加收50%", "source_cell": "注5"}
+      ],
+      "notes": [
+        "注3：咨询服务收费标准根据投资估算额在对应区间内用插入法计算",
+        "注4：以本表收费标准为基础，按行业特点和区域环境敏感程度乘以调整系数（见表2-14和表2-13）确定咨询服务收费基准价",
+        "注6：费用不包括遥感、遥测、风洞测试、污染气象观测、示踪试验、地探、物探、卫星图片解读等特殊监测费用"
+      ]
+    },
+    {
+      "item_id": "energy_assessment_fee",
+      "fee_name": "节能评估费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I19",
+      "fee_row": 19,
+      "source_image": "image7.png",
+      "source_table": "表2-22 居住建筑节能评估收费表 / 表2-23 公共建筑节能评估收费表",
+      "source_ref": null,
+      "paradigm": "banded_unit_price_progressive",
+      "paradigm_note": "spec 将本项归类为「③分档单价×规模」；原表表头写「分档累进计费基准标准」，按累进实现（各档内面积×该档单价后累加）——归类差异需造价员拍板",
+      "base": {"name": "总建筑面积", "unit": "万m2"},
+      "price_unit": "元/m2",
+      "band_closure": "lower_inclusive_upper_exclusive",
+      "band_closure_note": "原表显式标注：如「5（含）~10（不含）」",
+      "float_range": {"factor_min": 0.8, "factor_max": 1.2, "desc": "注1：上下浮动幅度为20%", "source_cell": "注1"},
+      "default_column": "residential",
+      "columns": {
+        "residential": {
+          "label": "居住建筑",
+          "bands": [
+            {"lower": 0, "upper": 5, "price": {"value": 2.00, "source_image": "image7.png", "source_cell": "表2-22 第1档", "raw_text": "2.00"}, "band_label": "5（不含）以下"},
+            {"lower": 5, "upper": 10, "price": {"value": 1.75, "source_image": "image7.png", "source_cell": "表2-22 第2档", "raw_text": "1.75"}, "band_label": "5（含）~10（不含）"},
+            {"lower": 10, "upper": 15, "price": {"value": 1.55, "source_image": "image7.png", "source_cell": "续表2-22 第1档", "raw_text": "1.55"}, "band_label": "10（含）~15（不含）"},
+            {"lower": 15, "upper": 25, "price": {"value": 1.30, "source_image": "image7.png", "source_cell": "续表2-22 第2档", "raw_text": "1.30"}, "band_label": "15（含）~25（不含）"},
+            {"lower": 25, "upper": 50, "price": {"value": 1.05, "source_image": "image7.png", "source_cell": "续表2-22 第3档", "raw_text": "1.05"}, "band_label": "25（含）~50（不含）"},
+            {"lower": 50, "upper": null, "price": {"value": 0.85, "source_image": "image7.png", "source_cell": "续表2-22 第4档", "raw_text": "0.85"}, "band_label": "50（含）以上"}
+          ]
+        },
+        "public": {
+          "label": "公共建筑",
+          "bands": [
+            {"lower": 0, "upper": 3, "price": {"value": 3.00, "source_image": "image7.png", "source_cell": "表2-23 第1档", "raw_text": "3.00"}, "band_label": "3（不含）以下"},
+            {"lower": 3, "upper": 5, "price": {"value": 2.30, "source_image": "image7.png", "source_cell": "表2-23 第2档", "raw_text": "2.30"}, "band_label": "3（含）~5（不含）"},
+            {"lower": 5, "upper": 10, "price": {"value": 1.85, "source_image": "image7.png", "source_cell": "表2-23 第3档", "raw_text": "1.85"}, "band_label": "5（含）~10（不含）"},
+            {"lower": 10, "upper": 15, "price": {"value": 1.65, "source_image": "image7.png", "source_cell": "表2-23 第4档", "raw_text": "1.65"}, "band_label": "10（含）~15（不含）"},
+            {"lower": 15, "upper": 25, "price": {"value": 1.40, "source_image": "image7.png", "source_cell": "表2-23 第5档", "raw_text": "1.40"}, "band_label": "15（含）~25（不含）"},
+            {"lower": 25, "upper": 50, "price": {"value": 1.20, "source_image": "image7.png", "source_cell": "表2-23 第6档", "raw_text": "1.20"}, "band_label": "25（含）~50（不含）"},
+            {"lower": 50, "upper": null, "price": {"value": 0.95, "source_image": "image7.png", "source_cell": "表2-23 第7档", "raw_text": "0.95"}, "band_label": "50（含）以上"}
+          ]
+        }
+      },
+      "notes": [
+        "注2：城镇保障性住房（含廉租房、公共租赁房、经济适用房、危旧房改造等）按规定收费标准减半收取"
+      ]
+    },
+    {
+      "item_id": "site_preparation_fee",
+      "fee_name": "场地准备及临时设施费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I20",
+      "fee_row": 20,
+      "source_image": "image8.png",
+      "source_table": "表2-26 场地准备及临时设施费",
+      "source_ref": "根据近年来工程项目实际投入情况测算",
+      "paradigm": "base_rate_range",
+      "base": {"name": "工程费用", "unit": "万元"},
+      "rate_unit": "percent",
+      "attr_required": {"name": "region", "label": "项目所在地区", "default": "urban"},
+      "variants": {
+        "urban": {"label": "市区", "rate_min": 0.7, "rate_max": 0.8, "source_cell": "市区行", "raw_text": "0.7%~0.8%"},
+        "county_town": {"label": "县城镇", "rate_min": 0.8, "rate_max": 0.9, "source_cell": "县城镇行", "raw_text": "0.8%~0.9%"},
+        "other": {"label": "非市区、县城镇", "rate_min": 0.9, "rate_max": 1.1, "source_cell": "非市区、县城镇行", "raw_text": "0.9%~1.1%"}
+      },
+      "adjustments": [
+        {"id": "new_collective_land", "desc": "建设项目属新征集体土地的，乘以系数1.2", "factor": 1.2, "source_cell": "备注1"},
+        {"id": "high_unit_cost", "desc": "房屋建筑工程，建筑安装投资（含设备）单方造价大于5000元/m2的项目其费用需乘以系数0.8~0.9", "factor_min": 0.8, "factor_max": 0.9, "source_cell": "备注2"}
+      ],
+      "notes": [
+        "注：如果实际发生的临时设施费远超上述标准，提供相应的施工方案方可计入"
+      ]
+    },
+    {
+      "item_id": "engineering_insurance_fee",
+      "fee_name": "工程保险费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I21",
+      "fee_row": 21,
+      "source_image": "image11.png",
+      "source_table": "表2-27 工程保险费",
+      "source_ref": "涉及费用详见经银保监会备案相关保险条款",
+      "paradigm": "manual",
+      "manual_reason": "原表无任何数值费率：人身意外险按工程造价或工程面积计算但无费率；财产损失/第三者责任险引用表10-2/10-3（未入图），且注明费率以银保监会要求为准。不可规则化。",
+      "notes": [
+        "建筑施工人员人身意外伤害保险或安全生产责任险：按工程造价或工程面积（仅对房屋建筑工程）计算；工程保险费用的计入需经概算审批部门批准",
+        "工程财产损失和第三者责任险：建筑/安装工程一切险，物质损失部分见表10-2/表10-3；第三者责任险=赔偿限额×费率",
+        "注：表10-2和表10-3中的费率幅度参考市场实际情况较多，如与银保监会要求相悖，具体以银保监会相关要求为准"
+      ]
+    },
+    {
+      "item_id": "municipal_infrastructure_fee",
+      "fee_name": "市政基础设施配套费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I22",
+      "fee_row": 22,
+      "source_image": "image9.png",
+      "source_table": "表2-30 市政公用设施费",
+      "source_ref": "浙财综〔2012〕4号、浙价费〔2014〕22号",
+      "applicability": [
+        {
+          "attr": "project_city",
+          "label": "项目所在地",
+          "allowed": ["hangzhou_core"],
+          "options": [
+            {"value": "hangzhou_core", "label": "杭州市区（不含余杭、萧山）"},
+            {"value": "hangzhou_other", "label": "杭州余杭、萧山及其他区县"},
+            {"value": "zhejiang_other", "label": "浙江其他地市"},
+            {"value": "outside_zhejiang", "label": "省外"}
+          ],
+          "not_applicable_message": "该标准适用于杭州市区，本项目按当地文件人工填报",
+          "note": "本条单价出自杭州市区口径（原表注明「杭州市城市规划（不含余杭、萧山）」）。其他地区的配套费按当地文件人工填报；地市标准补录须造价员逐值签署（D49）。"
+        }
+      ],
+      "paradigm": "unit_price_matrix",
+      "base": {"name": "建筑面积（按用途拆分）", "unit": "m2"},
+      "price_unit": "元/m2",
+      "attr_required": {"name": "land_scenario", "label": "土地出让情形", "default": "standard"},
+      "matrix": {
+        "standard": {
+          "label": "现行标准（含杭州市区）",
+          "prices": {
+            "residential": {"value": 150, "source_image": "image9.png", "source_cell": "费用标准 住宅", "raw_text": "住宅：150元/平方米"},
+            "non_residential": {"value": 220, "source_image": "image9.png", "source_cell": "费用标准 非住宅", "raw_text": "非住宅：220元/平方米"}
+          }
+        },
+        "pre_2014_03": {
+          "label": "2014年3月前出让",
+          "prices": {
+            "residential": {"value": 90, "source_image": "image9.png", "source_cell": "费用标准 住宅括注", "raw_text": "（2014年3月前出让的，90元/平方米）"},
+            "non_residential": {"value": 140, "source_image": "image9.png", "source_cell": "费用标准 非住宅括注", "raw_text": "（2014年3月前出让的，140元/平方米）"}
+          }
+        },
+        "y2017_2019_new_area": {
+          "label": "2017-07-01至2019-12-31出让/划拨或改扩建新增面积（70%执收）",
+          "prices": {
+            "residential": {"value": 105, "derived": "150×70%", "source_image": "image9.png", "source_cell": "费用标准 第3段", "raw_text": "按照住宅150元/平方米、非住宅220元/平方米的70%执收"},
+            "non_residential": {"value": 154, "derived": "220×70%", "source_image": "image9.png", "source_cell": "费用标准 第3段", "raw_text": "同上"}
+          }
+        }
+      },
+      "notes": [
+        "杭州市城市规划（不含余杭、萧山）的建设项目，按住宅150元/平方米、非住宅220元/平方米的标准收取城市市政基础设施配套费",
+        "备注：杭州住宅150元/平方米，非住宅220元/平方米"
+      ]
+    },
+    {
+      "item_id": "high_reliability_power_fee",
+      "fee_name": "高可靠性供电费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I23",
+      "fee_row": 23,
+      "source_image": "image10.png",
+      "source_table": "表2-31 供（配）电工程高可靠性供电费收取标准",
+      "source_ref": null,
+      "paradigm": "unit_price_matrix",
+      "base": {"name": "受电容量", "unit": "kVA"},
+      "price_unit": "元/(kV·A)",
+      "attr_required": {"name": "voltage_level", "label": "用户受电电压等级(kV)", "default": "10"},
+      "scenario_attr": {"name": "scenario", "label": "计费情形", "default": "user_total"},
+      "matrix": {
+        "0.38/0.22": {
+          "user_total": {"value": 250, "source_cell": "0.38/0.22行 用户应缴纳列", "raw_text": "250"},
+          "supply": {"value": 90, "source_cell": "0.38/0.22行 供电高可靠性列", "raw_text": "90"},
+          "distribution": {"value": 160, "source_cell": "0.38/0.22行 配电高可靠性列", "raw_text": "160"},
+          "self_build": {"value": 200, "source_cell": "0.38/0.22行 自建本级电压外部供电列", "raw_text": "200"}
+        },
+        "10": {
+          "user_total": {"value": 200, "source_cell": "10kV行 用户应缴纳列", "raw_text": "200"},
+          "supply": {"value": 110, "source_cell": "10kV行 供电高可靠性列", "raw_text": "110"},
+          "distribution": {"value": 90, "source_cell": "10kV行 配电高可靠性列", "raw_text": "90"},
+          "self_build": {"value": 150, "source_cell": "10kV行 自建本级电压外部供电列", "raw_text": "150"}
+        },
+        "20": {
+          "user_total": {"value": 180, "source_cell": "20kV行 用户应缴纳列", "raw_text": "180"},
+          "supply": {"value": 100, "source_cell": "20kV行 供电高可靠性列", "raw_text": "100"},
+          "distribution": {"value": 80, "source_cell": "20kV行 配电高可靠性列", "raw_text": "80"},
+          "self_build": {"value": 110, "source_cell": "20kV行 自建本级电压外部供电列", "raw_text": "110"}
+        },
+        "35": {
+          "user_total": {"value": 150, "source_cell": "35kV行 用户应缴纳列", "raw_text": "150"},
+          "supply": {"value": 150, "source_cell": "35kV行 供电高可靠性列", "raw_text": "150"},
+          "distribution": {"value": null, "source_cell": "35kV行 配电高可靠性列", "raw_text": "—"},
+          "self_build": {"value": 70, "source_cell": "35kV行 自建本级电压外部供电列", "raw_text": "70"}
+        },
+        "110": {
+          "user_total": {"value": 70, "source_cell": "110kV行 用户应缴纳列", "raw_text": "70"},
+          "supply": {"value": 70, "source_cell": "110kV行 供电高可靠性列", "raw_text": "70"},
+          "distribution": {"value": null, "source_cell": "110kV行 配电高可靠性列", "raw_text": "—"},
+          "self_build": {"value": null, "source_cell": "110kV行 自建本级电压外部供电列", "raw_text": "—"}
+        }
+      },
+      "notes": [
+        "矩阵中「—」表示该情形不适用，引擎返回 manual flag"
+      ]
+    },
+    {
+      "item_id": "joint_commissioning_fee",
+      "fee_name": "联合试运转费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I28",
+      "fee_row": 28,
+      "source_image": "image14.png",
+      "source_table": "第十一节 联合试运转费",
+      "source_ref": null,
+      "applicability": [
+        {
+          "attr": "project_nature",
+          "label": "项目性质",
+          "allowed": ["production"],
+          "options": [
+            {"value": "production", "label": "生产性（有需联合试运转的工艺设备）"},
+            {"value": "non_production", "label": "非生产性"}
+          ],
+          "not_applicable_message": "非生产性项目通常不计列本项；确有时按实际人工填报",
+          "note": "原表只给「一般建设项目」口径，隐含前提是有需要试运转 / 生产准备的工艺设备；仓储、办公等非生产性房建项目不计列。"
+        }
+      ],
+      "paradigm": "base_rate_range",
+      "base": {"name": "工程费用", "unit": "万元"},
+      "rate_unit": "percent",
+      "variants": {
+        "default": {"label": "一般建设项目", "rate_min": 0.3, "rate_max": 1.0, "source_cell": "计算方法", "raw_text": "一般建设项目可（暂）按工程费用的0.3%~1%计列"}
+      },
+      "notes": [
+        "联合试运转费=联合试运转费用支出−联合试运转收入",
+        "不包括应由设备安装工程费用支出的调试及试车费用，以及试运转中因施工原因或设备缺陷等发生的处理费用"
+      ]
+    },
+    {
+      "item_id": "patent_technology_fee",
+      "fee_name": "专利及专有技术使用费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I29",
+      "fee_row": 29,
+      "source_image": "image13.png",
+      "source_table": "第十三节 专利及专有技术使用费",
+      "source_ref": null,
+      "paradigm": "base_rate_range",
+      "base": {"name": "单位产品价格×年设计产量", "unit": "万元"},
+      "base_note": "基数非工程费用，需项目属性（单位产品价格、年设计产量）；房建项目通常不适用，缺输入时返回 requires_input flag",
+      "rate_unit": "percent",
+      "variants": {
+        "default": {"label": "参考计列", "rate_min": 3.0, "rate_max": 5.0, "source_cell": "计算方法", "raw_text": "按单位产品价格×年设计产量×（3%~5%）参考计列"}
+      },
+      "notes": [
+        "按专利使用许可协议和专有技术使用合同的规定计列",
+        "项目投资中只计需在建设期支付的专利及专有技术使用费；生产期支付的在生产成本中核算"
+      ]
+    },
+    {
+      "item_id": "production_preparation_fee",
+      "fee_name": "生产准备及开办费",
+      "estimate_sheet": "5.工程建设其他费用",
+      "estimate_cell": "I30",
+      "fee_row": 30,
+      "source_image": "image12.png",
+      "source_table": "第十四节 生产准备及开办费",
+      "source_ref": null,
+      "applicability": [
+        {
+          "attr": "project_nature",
+          "label": "项目性质",
+          "allowed": ["production"],
+          "options": [
+            {"value": "production", "label": "生产性（有需联合试运转的工艺设备）"},
+            {"value": "non_production", "label": "非生产性"}
+          ],
+          "not_applicable_message": "非生产性项目通常不计列本项；确有时按实际人工填报",
+          "note": "原表只给「一般建设项目」口径，隐含前提是有需要试运转 / 生产准备的工艺设备；仓储、办公等非生产性房建项目不计列。"
+        }
+      ],
+      "paradigm": "base_rate_range",
+      "base": {"name": "工程费用", "unit": "万元"},
+      "rate_unit": "percent",
+      "variants": {
+        "default": {"label": "一般建设项目", "rate_min": 1.0, "rate_max": 1.2, "source_cell": "计算方法", "raw_text": "一般建设项目可暂按工程费用的1%~1.2%计列"}
+      },
+      "notes": [
+        "含人员培训费及提前进厂费、生产办公/生活家具用具购置费、第一套不够固定总产标准的生产工具器具用具购置费（不包括备品、备件费）"
+      ]
+    }
+  ]
+}

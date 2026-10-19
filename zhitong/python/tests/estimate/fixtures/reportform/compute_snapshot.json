@@ -1,0 +1,2819 @@
+[
+ {
+  "detail": "缺少必填输入位：经济技术指标!D4,经济技术指标!D7,经济技术指标!D8,经济技术指标!D10,经济技术指标!D11,经济技术指标!D12,经济技术指标!D13,经济技术指标!D15,经济技术指标!D16,经济技术指标!D19,经济技术指标!D20",
+  "name": "required_empty",
+  "status": 422
+ },
+ {
+  "detail": "缺少必填输入位：经济技术指标!D4,经济技术指标!D20",
+  "name": "required_partial",
+  "status": 422
+ },
+ {
+  "detail": "总建筑面积（经济技术指标!D5）为 0.0：房建概算没有建筑面积就没有可交付的口径（单方指标全部失真，金额只剩室外部分）。请回第 2 步填写单体面积（地下室 / 各栋楼 / 构筑物）后再生成。",
+  "name": "area_gate_zero_area_with_outdoor",
+  "status": 422
+ },
+ {
+  "detail": "单体槽位合计 37000.00 ㎡ 与原文总建筑面积 74000.00 ㎡ 相差 50.00%（阈值 1%）：多栋项目被截成模板槽位数时会少算面积。请回第 2 步「单体归位」把未归位的单体并入槽位；确属口径差异（如原文总面积含架空层）时，在第 5 步勾选确认并写明理由后再生成。",
+  "name": "area_reconcile_unacked",
+  "status": 422
+ },
+ {
+  "detail": "概算结果为全零：静态投资合计（估概算总表!C47）为 0，说明 150 个成本输入位一个都没填（或全填了 0）。请先完成费用明细——可调 POST /engine/estimate/suggest 用指标基准推算建议值，逐条确认后再回来生成。全零概算表对造价员是误导性成功，此处拒绝出表。",
+  "name": "all_zero",
+  "status": 422
+ },
+ {
+  "detail": "缺少必填输入位：经济技术指标!D4,经济技术指标!D7,经济技术指标!D8,经济技术指标!D10,经济技术指标!D11,经济技术指标!D12,经济技术指标!D13,经济技术指标!D15,经济技术指标!D16,经济技术指标!D19,经济技术指标!D20",
+  "name": "order_required_before_context_validation",
+  "status": 422
+ },
+ {
+  "detail": "总建筑面积（经济技术指标!D5）为 0.0：房建概算没有建筑面积就没有可交付的口径（单方指标全部失真，金额只剩室外部分）。请回第 2 步填写单体面积（地下室 / 各栋楼 / 构筑物）后再生成。",
+  "name": "order_area_gate_before_all_zero",
+  "status": 422
+ },
+ {
+  "detail": "总建筑面积（经济技术指标!D5）为 0.0：房建概算没有建筑面积就没有可交付的口径（单方指标全部失真，金额只剩室外部分）。请回第 2 步填写单体面积（地下室 / 各栋楼 / 构筑物）后再生成。",
+  "name": "order_area_gate_before_reconcile",
+  "status": 422
+ },
+ {
+  "detail": "单体槽位合计 37000.00 ㎡ 与原文总建筑面积 74000.00 ㎡ 相差 50.00%（阈值 1%）：多栋项目被截成模板槽位数时会少算面积。请回第 2 步「单体归位」把未归位的单体并入槽位；确属口径差异（如原文总面积含架空层）时，在第 5 步勾选确认并写明理由后再生成。",
+  "name": "order_reconcile_before_all_zero",
+  "status": 422
+ },
+ {
+  "detail": "area_checks.gross_building_area 必须是正数（㎡），实为 True",
+  "name": "bad_area_checks",
+  "status": 422
+ },
+ {
+  "detail": "确认 area_total_mismatch 须写明理由（reason 不能为空）",
+  "name": "ack_without_reason",
+  "status": 422
+ },
+ {
+  "detail": "acknowledged_checks 只接受 ['area_total_mismatch']，实为 {'code': 'x', 'reason': 'y'}",
+  "name": "ack_unknown_code",
+  "status": 422
+ },
+ {
+  "detail": "slot_labels 的键须是单体槽位 ['经济技术指标!D10', '经济技术指标!D11', '经济技术指标!D12', '经济技术指标!D13', '经济技术指标!D7', '经济技术指标!D8'] 之一，实为 '经济技术指标!D4'",
+  "name": "slot_label_not_a_slot",
+  "status": 422
+ },
+ {
+  "detail": "slot_labels.经济技术指标!D7 须是 1~40 字的单行文本，实为 '地下\\n室'",
+  "name": "slot_label_multiline",
+  "status": 422
+ },
+ {
+  "detail": "input_sources.1.建筑工程费!C7.source 只接受 ['user', 'extract', 'excel', 'baseline_reference', 'fee_rules', 'baseline_prefill', 'slot_empty', 'derived']，实为 'guess'",
+  "name": "bad_input_source",
+  "status": 422
+ },
+ {
+  "detail": "fee_bases.工程费用 必须是数值（万元 / ㎡ / kVA），实为 '1'",
+  "name": "bad_fee_base",
+  "status": 422
+ },
+ {
+  "detail": "fee_attrs.a 必须是字符串（受控词），实为 1",
+  "name": "bad_fee_attr",
+  "status": 422
+ },
+ {
+  "detail": "project_profile.building_function 只接受字符串 / 数值 / null",
+  "name": "bad_profile",
+  "status": 422
+ },
+ {
+  "detail": "generated_at 须是 ISO 时间（如 2026-09-30 10:00:00），实为 '昨天'",
+  "name": "bad_generated_at",
+  "status": 422
+ },
+ {
+  "detail": "输入位 1.建筑工程费!C7 的值必须是数值，实为 bool",
+  "name": "bool_input",
+  "status": 422
+ },
+ {
+  "name": "ok_cost_partial",
+  "response": {
+   "aggregate_checks": [],
+   "indicators": [
+    {
+     "label": "用地面积",
+     "seq": "1",
+     "unit": "㎡",
+     "value": 12000.0
+    },
+    {
+     "label": "总建筑面积",
+     "seq": "2",
+     "unit": "㎡",
+     "value": 37000.0
+    },
+    {
+     "label": "地下总建筑面积",
+     "seq": "3",
+     "unit": "㎡",
+     "value": 8300.0
+    },
+    {
+     "label": "A区地下室",
+     "seq": "3.1",
+     "unit": "㎡",
+     "value": 5200.0
+    },
+    {
+     "label": "B区地下室",
+     "seq": "3.2",
+     "unit": "㎡",
+     "value": 3100.0
+    },
+    {
+     "label": "地上总建筑面积",
+     "seq": "4",
+     "unit": "㎡",
+     "value": 28700.0
+    },
+    {
+     "label": "1#楼",
+     "seq": "4.1",
+     "unit": "㎡",
+     "value": 8800.0
+    },
+    {
+     "label": "2#楼",
+     "seq": "4.2",
+     "unit": "㎡",
+     "value": 7600.0
+    },
+    {
+     "label": "3#楼",
+     "seq": "4.3",
+     "unit": "㎡",
+     "value": 6400.0
+    },
+    {
+     "label": "构筑物",
+     "seq": "4.4",
+     "unit": "㎡",
+     "value": 5900.0
+    },
+    {
+     "label": "占地面积",
+     "seq": "5",
+     "unit": "㎡",
+     "value": 7500.0
+    },
+    {
+     "label": "A区地块",
+     "seq": "5.1",
+     "unit": "㎡",
+     "value": 4200.0
+    },
+    {
+     "label": "B区地块",
+     "seq": "5.2",
+     "unit": "㎡",
+     "value": 3300.0
+    },
+    {
+     "label": "室外面积",
+     "seq": "6",
+     "unit": "㎡",
+     "value": 4500.0
+    },
+    {
+     "label": "机动车位停车",
+     "seq": "7",
+     "unit": "辆",
+     "value": 400.0
+    },
+    {
+     "label": "地面机动车停车",
+     "seq": "7.1",
+     "unit": "辆",
+     "value": 260.0
+    },
+    {
+     "label": "地下机动车停车",
+     "seq": "7.2",
+     "unit": "辆",
+     "value": 140.0
+    }
+   ],
+   "input_coverage": {
+    "by_sheet": {
+     "1.建筑工程费": {
+      "cost_inputs": 29,
+      "filled": 1,
+      "missing": 28
+     },
+     "2.安装工程费": {
+      "cost_inputs": 38,
+      "filled": 0,
+      "missing": 38
+     },
+     "3.专项工程费": {
+      "cost_inputs": 42,
+      "filled": 0,
+      "missing": 42
+     },
+     "4.室外及配套工程费": {
+      "cost_inputs": 18,
+      "filled": 0,
+      "missing": 18
+     },
+     "5.工程建设其他费用": {
+      "cost_inputs": 23,
+      "filled": 1,
+      "missing": 22
+     }
+    },
+    "cost_inputs": 150,
+    "filled": 2,
+    "missing": 148,
+    "rate": 0.0133
+   },
+   "operator_id": null,
+   "project_id": null,
+   "quality": {
+    "reasons": [
+     {
+      "code": "coverage_below_draft",
+      "message": "成本位只填了 2/150（1.3%），低于 30%"
+     },
+     {
+      "code": "sheet_unfilled",
+      "message": "「2.安装工程费」一格都没填，该表合计按 0 计入"
+     },
+     {
+      "code": "sheet_unfilled_review",
+      "message": "「3.专项工程费」0/42、「4.室外及配套工程费」0/18 一格都没填，按 0 计入合计；本项目确实没有这类费用可以不填，否则请回第 3 步补"
+     },
+     {
+      "code": "input_sources_undeclared",
+      "message": "调用方未申报任何输入位的来源（input_sources），交付表无法说明每个数从哪来"
+     }
+    ],
+    "review_level": "draft"
+   },
+   "rates_used": {
+    "reserve_rate": 0.05
+   },
+   "sys_company_code": null,
+   "totals": {
+    "dynamic_total": {
+     "cell": "估概算总表!C50",
+     "label": "建设动态总投资（七）",
+     "value": 2236.5
+    },
+    "financing_fee": {
+     "cell": "估概算总表!C48",
+     "label": "建设期融资费用（五）",
+     "value": null
+    },
+    "initial_working_capital": {
+     "cell": "估概算总表!C49",
+     "label": "铺底流动资金（六）",
+     "value": null
+    },
+    "other_cost": {
+     "cell": "估概算总表!C45",
+     "label": "工程建设其他费用（二）",
+     "value": 2000.0
+    },
+    "project_cost": {
+     "cell": "估概算总表!C5",
+     "label": "工程费用（一）",
+     "value": 130.0
+    },
+    "reserve_fee": {
+     "cell": "估概算总表!C46",
+     "label": "工程预备费（三）",
+     "value": 106.5
+    },
+    "static_total": {
+     "cell": "估概算总表!C47",
+     "label": "建设静态总投资（四）",
+     "value": 2236.5
+    }
+   },
+   "warnings": [
+    {
+     "cell": "估概算总表!F30",
+     "code": "template_fix",
+     "message": "原表缺陷已修正：='3.专项工程费'!E35 → ='3.专项工程费'!E46（F30_wrong_ref）"
+    },
+    {
+     "cell": "估概算总表!G32",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G31",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G30",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "4.室外及配套工程费!F8",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "4.室外及配套工程费!F7",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "4.室外及配套工程费!F11",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F9",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F8",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F7",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F53",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F52",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F51",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F50",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F48",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F47",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F46",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F45",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F44",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F43",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F41",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F40",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F39",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F38",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F37",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F36",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F34",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F33",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F32",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F31",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F30",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F28",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F27",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F26",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F25",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F24",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F23",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F22",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F21",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F20",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F18",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F17",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F16",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F15",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F14",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F13",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F12",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F11",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F10",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F49",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G33",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F42",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G29",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F35",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G28",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F29",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G27",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F19",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G26",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!C48",
+     "code": "optional_input_missing",
+     "message": "可选输入位「建设期融资费用」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!C50]、建设期融资费用[估概算总表!G48]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "估概算总表!C49",
+     "code": "optional_input_missing",
+     "message": "可选输入位「铺底流动资金」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!C50]、铺底流动资金[估概算总表!G49]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "估概算总表!D48",
+     "code": "optional_input_missing",
+     "message": "可选输入位「建设期融资费用」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!D50]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "估概算总表!D49",
+     "code": "optional_input_missing",
+     "message": "可选输入位「铺底流动资金」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!D50]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": null,
+     "code": "cost_input_incomplete",
+     "message": "150 个成本输入位只填了 2 个（1.3%）；未填的按 Excel「空格 = 0」参与求值，合计因此偏低。缺口分布：3.专项工程费 缺 42/42；2.安装工程费 缺 38/38；1.建筑工程费 缺 28/29；5.工程建设其他费用 缺 22/23；4.室外及配套工程费 缺 18/18。可调 POST /engine/estimate/suggest 用指标基准推算建议值，逐条确认后再生成。"
+    }
+   ],
+   "xlsx_base64": null
+  },
+  "sheets_sha256": "0641e291a69819ec7c1268df2cfc8f6308dc055d698afb19de6f9e7deb353d64",
+  "status": 200
+ },
+ {
+  "name": "ok_area_acked",
+  "response": {
+   "aggregate_checks": [],
+   "indicators": [
+    {
+     "label": "用地面积",
+     "seq": "1",
+     "unit": "㎡",
+     "value": 12000.0
+    },
+    {
+     "label": "总建筑面积",
+     "seq": "2",
+     "unit": "㎡",
+     "value": 37000.0
+    },
+    {
+     "label": "地下总建筑面积",
+     "seq": "3",
+     "unit": "㎡",
+     "value": 8300.0
+    },
+    {
+     "label": "A区地下室",
+     "seq": "3.1",
+     "unit": "㎡",
+     "value": 5200.0
+    },
+    {
+     "label": "B区地下室",
+     "seq": "3.2",
+     "unit": "㎡",
+     "value": 3100.0
+    },
+    {
+     "label": "地上总建筑面积",
+     "seq": "4",
+     "unit": "㎡",
+     "value": 28700.0
+    },
+    {
+     "label": "1#楼",
+     "seq": "4.1",
+     "unit": "㎡",
+     "value": 8800.0
+    },
+    {
+     "label": "2#楼",
+     "seq": "4.2",
+     "unit": "㎡",
+     "value": 7600.0
+    },
+    {
+     "label": "3#楼",
+     "seq": "4.3",
+     "unit": "㎡",
+     "value": 6400.0
+    },
+    {
+     "label": "构筑物",
+     "seq": "4.4",
+     "unit": "㎡",
+     "value": 5900.0
+    },
+    {
+     "label": "占地面积",
+     "seq": "5",
+     "unit": "㎡",
+     "value": 7500.0
+    },
+    {
+     "label": "A区地块",
+     "seq": "5.1",
+     "unit": "㎡",
+     "value": 4200.0
+    },
+    {
+     "label": "B区地块",
+     "seq": "5.2",
+     "unit": "㎡",
+     "value": 3300.0
+    },
+    {
+     "label": "室外面积",
+     "seq": "6",
+     "unit": "㎡",
+     "value": 4500.0
+    },
+    {
+     "label": "机动车位停车",
+     "seq": "7",
+     "unit": "辆",
+     "value": 400.0
+    },
+    {
+     "label": "地面机动车停车",
+     "seq": "7.1",
+     "unit": "辆",
+     "value": 260.0
+    },
+    {
+     "label": "地下机动车停车",
+     "seq": "7.2",
+     "unit": "辆",
+     "value": 140.0
+    }
+   ],
+   "input_coverage": {
+    "by_sheet": {
+     "1.建筑工程费": {
+      "cost_inputs": 29,
+      "filled": 1,
+      "missing": 28
+     },
+     "2.安装工程费": {
+      "cost_inputs": 38,
+      "filled": 0,
+      "missing": 38
+     },
+     "3.专项工程费": {
+      "cost_inputs": 42,
+      "filled": 0,
+      "missing": 42
+     },
+     "4.室外及配套工程费": {
+      "cost_inputs": 18,
+      "filled": 0,
+      "missing": 18
+     },
+     "5.工程建设其他费用": {
+      "cost_inputs": 23,
+      "filled": 1,
+      "missing": 22
+     }
+    },
+    "cost_inputs": 150,
+    "filled": 2,
+    "missing": 148,
+    "rate": 0.0133
+   },
+   "operator_id": null,
+   "project_id": null,
+   "quality": {
+    "reasons": [
+     {
+      "code": "coverage_below_draft",
+      "message": "成本位只填了 2/150（1.3%），低于 30%"
+     },
+     {
+      "code": "sheet_unfilled",
+      "message": "「2.安装工程费」一格都没填，该表合计按 0 计入"
+     },
+     {
+      "code": "sheet_unfilled_review",
+      "message": "「3.专项工程费」0/42、「4.室外及配套工程费」0/18 一格都没填，按 0 计入合计；本项目确实没有这类费用可以不填，否则请回第 3 步补"
+     },
+     {
+      "code": "area_mismatch_acknowledged",
+      "message": "单体槽位合计与原文总建筑面积的差额已由用户确认"
+     },
+     {
+      "code": "input_sources_undeclared",
+      "message": "调用方未申报任何输入位的来源（input_sources），交付表无法说明每个数从哪来"
+     }
+    ],
+    "review_level": "draft"
+   },
+   "rates_used": {
+    "reserve_rate": 0.05
+   },
+   "sys_company_code": null,
+   "totals": {
+    "dynamic_total": {
+     "cell": "估概算总表!C50",
+     "label": "建设动态总投资（七）",
+     "value": 2236.5
+    },
+    "financing_fee": {
+     "cell": "估概算总表!C48",
+     "label": "建设期融资费用（五）",
+     "value": null
+    },
+    "initial_working_capital": {
+     "cell": "估概算总表!C49",
+     "label": "铺底流动资金（六）",
+     "value": null
+    },
+    "other_cost": {
+     "cell": "估概算总表!C45",
+     "label": "工程建设其他费用（二）",
+     "value": 2000.0
+    },
+    "project_cost": {
+     "cell": "估概算总表!C5",
+     "label": "工程费用（一）",
+     "value": 130.0
+    },
+    "reserve_fee": {
+     "cell": "估概算总表!C46",
+     "label": "工程预备费（三）",
+     "value": 106.5
+    },
+    "static_total": {
+     "cell": "估概算总表!C47",
+     "label": "建设静态总投资（四）",
+     "value": 2236.5
+    }
+   },
+   "warnings": [
+    {
+     "cell": "估概算总表!F30",
+     "code": "template_fix",
+     "message": "原表缺陷已修正：='3.专项工程费'!E35 → ='3.专项工程费'!E46（F30_wrong_ref）"
+    },
+    {
+     "cell": "估概算总表!G32",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G31",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G30",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "4.室外及配套工程费!F8",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "4.室外及配套工程费!F7",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "4.室外及配套工程费!F11",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F9",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F8",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F7",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F53",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F52",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F51",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F50",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F48",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F47",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F46",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F45",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F44",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F43",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F41",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F40",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F39",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F38",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F37",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F36",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F34",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F33",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F32",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F31",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F30",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F28",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F27",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F26",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F25",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F24",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F23",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F22",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F21",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F20",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F18",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F17",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F16",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F15",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F14",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F13",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F12",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F11",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F10",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F49",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G33",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F42",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G29",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F35",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G28",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F29",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G27",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F19",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G26",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "经济技术指标!D5",
+     "code": "area_mismatch_acknowledged",
+     "message": "单体槽位合计 37000.00 ㎡ 与原文总建筑面积 74000.00 ㎡ 相差 50.00%（阈值 1%），已由用户确认：原文总面积含架空层与人防，模板不计。本表按需复核处理。"
+    },
+    {
+     "cell": "估概算总表!C48",
+     "code": "optional_input_missing",
+     "message": "可选输入位「建设期融资费用」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!C50]、建设期融资费用[估概算总表!G48]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "估概算总表!C49",
+     "code": "optional_input_missing",
+     "message": "可选输入位「铺底流动资金」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!C50]、铺底流动资金[估概算总表!G49]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "估概算总表!D48",
+     "code": "optional_input_missing",
+     "message": "可选输入位「建设期融资费用」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!D50]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "估概算总表!D49",
+     "code": "optional_input_missing",
+     "message": "可选输入位「铺底流动资金」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!D50]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": null,
+     "code": "cost_input_incomplete",
+     "message": "150 个成本输入位只填了 2 个（1.3%）；未填的按 Excel「空格 = 0」参与求值，合计因此偏低。缺口分布：3.专项工程费 缺 42/42；2.安装工程费 缺 38/38；1.建筑工程费 缺 28/29；5.工程建设其他费用 缺 22/23；4.室外及配套工程费 缺 18/18。可调 POST /engine/estimate/suggest 用指标基准推算建议值，逐条确认后再生成。"
+    }
+   ],
+   "xlsx_base64": null
+  },
+  "sheets_sha256": "0641e291a69819ec7c1268df2cfc8f6308dc055d698afb19de6f9e7deb353d64",
+  "status": 200
+ },
+ {
+  "name": "ok_ratio_suspect",
+  "response": {
+   "aggregate_checks": [],
+   "indicators": [
+    {
+     "label": "用地面积",
+     "seq": "1",
+     "unit": "㎡",
+     "value": 12000.0
+    },
+    {
+     "label": "总建筑面积",
+     "seq": "2",
+     "unit": "㎡",
+     "value": 37000.0
+    },
+    {
+     "label": "地下总建筑面积",
+     "seq": "3",
+     "unit": "㎡",
+     "value": 8300.0
+    },
+    {
+     "label": "A区地下室",
+     "seq": "3.1",
+     "unit": "㎡",
+     "value": 5200.0
+    },
+    {
+     "label": "B区地下室",
+     "seq": "3.2",
+     "unit": "㎡",
+     "value": 3100.0
+    },
+    {
+     "label": "地上总建筑面积",
+     "seq": "4",
+     "unit": "㎡",
+     "value": 28700.0
+    },
+    {
+     "label": "1#楼",
+     "seq": "4.1",
+     "unit": "㎡",
+     "value": 8800.0
+    },
+    {
+     "label": "2#楼",
+     "seq": "4.2",
+     "unit": "㎡",
+     "value": 7600.0
+    },
+    {
+     "label": "3#楼",
+     "seq": "4.3",
+     "unit": "㎡",
+     "value": 6400.0
+    },
+    {
+     "label": "构筑物",
+     "seq": "4.4",
+     "unit": "㎡",
+     "value": 5900.0
+    },
+    {
+     "label": "占地面积",
+     "seq": "5",
+     "unit": "㎡",
+     "value": 7500.0
+    },
+    {
+     "label": "A区地块",
+     "seq": "5.1",
+     "unit": "㎡",
+     "value": 4200.0
+    },
+    {
+     "label": "B区地块",
+     "seq": "5.2",
+     "unit": "㎡",
+     "value": 3300.0
+    },
+    {
+     "label": "室外面积",
+     "seq": "6",
+     "unit": "㎡",
+     "value": 4500.0
+    },
+    {
+     "label": "机动车位停车",
+     "seq": "7",
+     "unit": "辆",
+     "value": 400.0
+    },
+    {
+     "label": "地面机动车停车",
+     "seq": "7.1",
+     "unit": "辆",
+     "value": 260.0
+    },
+    {
+     "label": "地下机动车停车",
+     "seq": "7.2",
+     "unit": "辆",
+     "value": 140.0
+    }
+   ],
+   "input_coverage": {
+    "by_sheet": {
+     "1.建筑工程费": {
+      "cost_inputs": 29,
+      "filled": 1,
+      "missing": 28
+     },
+     "2.安装工程费": {
+      "cost_inputs": 38,
+      "filled": 0,
+      "missing": 38
+     },
+     "3.专项工程费": {
+      "cost_inputs": 42,
+      "filled": 0,
+      "missing": 42
+     },
+     "4.室外及配套工程费": {
+      "cost_inputs": 18,
+      "filled": 0,
+      "missing": 18
+     },
+     "5.工程建设其他费用": {
+      "cost_inputs": 23,
+      "filled": 1,
+      "missing": 22
+     }
+    },
+    "cost_inputs": 150,
+    "filled": 2,
+    "missing": 148,
+    "rate": 0.0133
+   },
+   "operator_id": null,
+   "project_id": null,
+   "quality": {
+    "reasons": [
+     {
+      "code": "coverage_below_draft",
+      "message": "成本位只填了 2/150（1.3%），低于 30%"
+     },
+     {
+      "code": "sheet_unfilled",
+      "message": "「2.安装工程费」一格都没填，该表合计按 0 计入"
+     },
+     {
+      "code": "sheet_unfilled_review",
+      "message": "「3.专项工程费」0/42、「4.室外及配套工程费」0/18 一格都没填，按 0 计入合计；本项目确实没有这类费用可以不填，否则请回第 3 步补"
+     },
+     {
+      "code": "input_sources_undeclared",
+      "message": "调用方未申报任何输入位的来源（input_sources），交付表无法说明每个数从哪来"
+     }
+    ],
+    "review_level": "draft"
+   },
+   "rates_used": {
+    "reserve_rate": 0.05
+   },
+   "sys_company_code": null,
+   "totals": {
+    "dynamic_total": {
+     "cell": "估概算总表!C50",
+     "label": "建设动态总投资（七）",
+     "value": 2236.5
+    },
+    "financing_fee": {
+     "cell": "估概算总表!C48",
+     "label": "建设期融资费用（五）",
+     "value": null
+    },
+    "initial_working_capital": {
+     "cell": "估概算总表!C49",
+     "label": "铺底流动资金（六）",
+     "value": null
+    },
+    "other_cost": {
+     "cell": "估概算总表!C45",
+     "label": "工程建设其他费用（二）",
+     "value": 2000.0
+    },
+    "project_cost": {
+     "cell": "估概算总表!C5",
+     "label": "工程费用（一）",
+     "value": 130.0
+    },
+    "reserve_fee": {
+     "cell": "估概算总表!C46",
+     "label": "工程预备费（三）",
+     "value": 106.5
+    },
+    "static_total": {
+     "cell": "估概算总表!C47",
+     "label": "建设静态总投资（四）",
+     "value": 2236.5
+    }
+   },
+   "warnings": [
+    {
+     "cell": "估概算总表!F30",
+     "code": "template_fix",
+     "message": "原表缺陷已修正：='3.专项工程费'!E35 → ='3.专项工程费'!E46（F30_wrong_ref）"
+    },
+    {
+     "cell": "估概算总表!G32",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G31",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G30",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "4.室外及配套工程费!F8",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "4.室外及配套工程费!F7",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "4.室外及配套工程费!F11",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F9",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F8",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F7",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F53",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F52",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F51",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F50",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F48",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F47",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F46",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F45",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F44",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F43",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F41",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F40",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F39",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F38",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F37",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F36",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F34",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F33",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F32",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F31",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F30",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F28",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F27",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F26",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F25",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F24",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F23",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F22",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F21",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F20",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F18",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F17",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F16",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F15",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F14",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F13",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F12",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F11",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F10",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F49",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G33",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F42",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G29",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F35",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G28",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F29",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G27",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F19",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G26",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!C48",
+     "code": "optional_input_missing",
+     "message": "可选输入位「建设期融资费用」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!C50]、建设期融资费用[估概算总表!G48]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "估概算总表!C49",
+     "code": "optional_input_missing",
+     "message": "可选输入位「铺底流动资金」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!C50]、铺底流动资金[估概算总表!G49]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "估概算总表!D49",
+     "code": "optional_input_missing",
+     "message": "可选输入位「铺底流动资金」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!D50]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "估概算总表!D48",
+     "code": "ratio_scale_suspect",
+     "message": "「建设期融资费用」[估概算总表!D48] 是**比值列**，格子里存的是小数（列头写的 % 只是显示格式）；本次收到 3，即 300%。若你想表达的是 3%，应传 0.03。本次仍按 3 照算（哨兵不设硬闸），请核对标度。"
+    },
+    {
+     "cell": null,
+     "code": "cost_input_incomplete",
+     "message": "150 个成本输入位只填了 2 个（1.3%）；未填的按 Excel「空格 = 0」参与求值，合计因此偏低。缺口分布：3.专项工程费 缺 42/42；2.安装工程费 缺 38/38；1.建筑工程费 缺 28/29；5.工程建设其他费用 缺 22/23；4.室外及配套工程费 缺 18/18。可调 POST /engine/estimate/suggest 用指标基准推算建议值，逐条确认后再生成。"
+    }
+   ],
+   "xlsx_base64": null
+  },
+  "sheets_sha256": "14dc62727d1fb1f1fce1fc2f8cfc0f317767f80e176d402d94d666fe8f203b2b",
+  "status": 200
+ },
+ {
+  "name": "ok_unknown_input",
+  "response": {
+   "aggregate_checks": [],
+   "indicators": [
+    {
+     "label": "用地面积",
+     "seq": "1",
+     "unit": "㎡",
+     "value": 12000.0
+    },
+    {
+     "label": "总建筑面积",
+     "seq": "2",
+     "unit": "㎡",
+     "value": 37000.0
+    },
+    {
+     "label": "地下总建筑面积",
+     "seq": "3",
+     "unit": "㎡",
+     "value": 8300.0
+    },
+    {
+     "label": "A区地下室",
+     "seq": "3.1",
+     "unit": "㎡",
+     "value": 5200.0
+    },
+    {
+     "label": "B区地下室",
+     "seq": "3.2",
+     "unit": "㎡",
+     "value": 3100.0
+    },
+    {
+     "label": "地上总建筑面积",
+     "seq": "4",
+     "unit": "㎡",
+     "value": 28700.0
+    },
+    {
+     "label": "1#楼",
+     "seq": "4.1",
+     "unit": "㎡",
+     "value": 8800.0
+    },
+    {
+     "label": "2#楼",
+     "seq": "4.2",
+     "unit": "㎡",
+     "value": 7600.0
+    },
+    {
+     "label": "3#楼",
+     "seq": "4.3",
+     "unit": "㎡",
+     "value": 6400.0
+    },
+    {
+     "label": "构筑物",
+     "seq": "4.4",
+     "unit": "㎡",
+     "value": 5900.0
+    },
+    {
+     "label": "占地面积",
+     "seq": "5",
+     "unit": "㎡",
+     "value": 7500.0
+    },
+    {
+     "label": "A区地块",
+     "seq": "5.1",
+     "unit": "㎡",
+     "value": 4200.0
+    },
+    {
+     "label": "B区地块",
+     "seq": "5.2",
+     "unit": "㎡",
+     "value": 3300.0
+    },
+    {
+     "label": "室外面积",
+     "seq": "6",
+     "unit": "㎡",
+     "value": 4500.0
+    },
+    {
+     "label": "机动车位停车",
+     "seq": "7",
+     "unit": "辆",
+     "value": 400.0
+    },
+    {
+     "label": "地面机动车停车",
+     "seq": "7.1",
+     "unit": "辆",
+     "value": 260.0
+    },
+    {
+     "label": "地下机动车停车",
+     "seq": "7.2",
+     "unit": "辆",
+     "value": 140.0
+    }
+   ],
+   "input_coverage": {
+    "by_sheet": {
+     "1.建筑工程费": {
+      "cost_inputs": 29,
+      "filled": 1,
+      "missing": 28
+     },
+     "2.安装工程费": {
+      "cost_inputs": 38,
+      "filled": 0,
+      "missing": 38
+     },
+     "3.专项工程费": {
+      "cost_inputs": 42,
+      "filled": 0,
+      "missing": 42
+     },
+     "4.室外及配套工程费": {
+      "cost_inputs": 18,
+      "filled": 0,
+      "missing": 18
+     },
+     "5.工程建设其他费用": {
+      "cost_inputs": 23,
+      "filled": 1,
+      "missing": 22
+     }
+    },
+    "cost_inputs": 150,
+    "filled": 2,
+    "missing": 148,
+    "rate": 0.0133
+   },
+   "operator_id": null,
+   "project_id": null,
+   "quality": {
+    "reasons": [
+     {
+      "code": "coverage_below_draft",
+      "message": "成本位只填了 2/150（1.3%），低于 30%"
+     },
+     {
+      "code": "sheet_unfilled",
+      "message": "「2.安装工程费」一格都没填，该表合计按 0 计入"
+     },
+     {
+      "code": "sheet_unfilled_review",
+      "message": "「3.专项工程费」0/42、「4.室外及配套工程费」0/18 一格都没填，按 0 计入合计；本项目确实没有这类费用可以不填，否则请回第 3 步补"
+     },
+     {
+      "code": "input_sources_undeclared",
+      "message": "调用方未申报任何输入位的来源（input_sources），交付表无法说明每个数从哪来"
+     }
+    ],
+    "review_level": "draft"
+   },
+   "rates_used": {
+    "reserve_rate": 0.05
+   },
+   "sys_company_code": null,
+   "totals": {
+    "dynamic_total": {
+     "cell": "估概算总表!C50",
+     "label": "建设动态总投资（七）",
+     "value": 2236.5
+    },
+    "financing_fee": {
+     "cell": "估概算总表!C48",
+     "label": "建设期融资费用（五）",
+     "value": null
+    },
+    "initial_working_capital": {
+     "cell": "估概算总表!C49",
+     "label": "铺底流动资金（六）",
+     "value": null
+    },
+    "other_cost": {
+     "cell": "估概算总表!C45",
+     "label": "工程建设其他费用（二）",
+     "value": 2000.0
+    },
+    "project_cost": {
+     "cell": "估概算总表!C5",
+     "label": "工程费用（一）",
+     "value": 130.0
+    },
+    "reserve_fee": {
+     "cell": "估概算总表!C46",
+     "label": "工程预备费（三）",
+     "value": 106.5
+    },
+    "static_total": {
+     "cell": "估概算总表!C47",
+     "label": "建设静态总投资（四）",
+     "value": 2236.5
+    }
+   },
+   "warnings": [
+    {
+     "cell": "不存在的表!Z9",
+     "code": "unknown_input",
+     "message": "未声明的输入位，已忽略（引擎只写声明位）"
+    },
+    {
+     "cell": "估概算总表!F30",
+     "code": "template_fix",
+     "message": "原表缺陷已修正：='3.专项工程费'!E35 → ='3.专项工程费'!E46（F30_wrong_ref）"
+    },
+    {
+     "cell": "估概算总表!G32",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G31",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G30",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "4.室外及配套工程费!F8",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "4.室外及配套工程费!F7",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "4.室外及配套工程费!F11",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F9",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F8",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F7",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F53",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F52",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F51",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F50",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F48",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F47",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F46",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F45",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F44",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F43",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F41",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F40",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F39",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F38",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F37",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F36",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F34",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F33",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F32",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F31",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F30",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F28",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F27",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F26",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F25",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F24",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F23",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F22",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F21",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F20",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F18",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F17",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F16",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F15",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F14",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F13",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F12",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F11",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F10",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F49",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G33",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F42",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G29",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F35",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G28",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F29",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G27",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "3.专项工程费!F19",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!G26",
+     "code": "div_by_zero",
+     "message": "除数为 0（对应 Excel #DIV/0!）"
+    },
+    {
+     "cell": "估概算总表!C48",
+     "code": "optional_input_missing",
+     "message": "可选输入位「建设期融资费用」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!C50]、建设期融资费用[估概算总表!G48]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "估概算总表!C49",
+     "code": "optional_input_missing",
+     "message": "可选输入位「铺底流动资金」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!C50]、铺底流动资金[估概算总表!G49]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "估概算总表!D48",
+     "code": "optional_input_missing",
+     "message": "可选输入位「建设期融资费用」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!D50]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "估概算总表!D49",
+     "code": "optional_input_missing",
+     "message": "可选输入位「铺底流动资金」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!D50]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": null,
+     "code": "cost_input_incomplete",
+     "message": "150 个成本输入位只填了 2 个（1.3%）；未填的按 Excel「空格 = 0」参与求值，合计因此偏低。缺口分布：3.专项工程费 缺 42/42；2.安装工程费 缺 38/38；1.建筑工程费 缺 28/29；5.工程建设其他费用 缺 22/23；4.室外及配套工程费 缺 18/18。可调 POST /engine/estimate/suggest 用指标基准推算建议值，逐条确认后再生成。"
+    }
+   ],
+   "xlsx_base64": null
+  },
+  "sheets_sha256": "0641e291a69819ec7c1268df2cfc8f6308dc055d698afb19de6f9e7deb353d64",
+  "status": 200
+ },
+ {
+  "name": "ok_synthetic",
+  "response": {
+   "aggregate_checks": [
+    {
+     "aggregate_cell": "5.工程建设其他费用!C6",
+     "children": [
+      "5.工程建设其他费用!C7",
+      "5.工程建设其他费用!C8"
+     ],
+     "children_sum": 3204.32,
+     "deviation": 0.496397,
+     "fee_name": "项目建设管理费",
+     "filled_cells": [
+      "5.工程建设其他费用!C7",
+      "5.工程建设其他费用!C8"
+     ],
+     "item_id": "project_management_fee",
+     "level": "warn",
+     "status": "mismatch",
+     "subtotal": 2141.3575
+    },
+    {
+     "aggregate_cell": "5.工程建设其他费用!C9",
+     "children": [
+      "5.工程建设其他费用!C10",
+      "5.工程建设其他费用!C11",
+      "5.工程建设其他费用!C12",
+      "5.工程建设其他费用!C13"
+     ],
+     "children_sum": 12614.12,
+     "deviation": 10.436487,
+     "fee_name": "建设管理其他费",
+     "filled_cells": [
+      "5.工程建设其他费用!C10",
+      "5.工程建设其他费用!C11",
+      "5.工程建设其他费用!C12",
+      "5.工程建设其他费用!C13"
+     ],
+     "item_id": "management_other_fee",
+     "level": "warn",
+     "status": "mismatch",
+     "subtotal": 1102.9716
+    },
+    {
+     "aggregate_cell": "5.工程建设其他费用!C9",
+     "cell": "5.工程建设其他费用!C12",
+     "fee_name": "建设管理其他费",
+     "item_id": "management_other_fee",
+     "level": "warn",
+     "reason": "注3：建设管理其他费已含施工阶段全过程造价咨询费用",
+     "status": "possible_double_count",
+     "subtotal": 1102.9716,
+     "value": 4269.25
+    }
+   ],
+   "indicators": [
+    {
+     "label": "用地面积",
+     "seq": "1",
+     "unit": "㎡",
+     "value": 30201.74
+    },
+    {
+     "label": "总建筑面积",
+     "seq": "2",
+     "unit": "㎡",
+     "value": 155554.44
+    },
+    {
+     "label": "地下总建筑面积",
+     "seq": "3",
+     "unit": "㎡",
+     "value": 64080.01
+    },
+    {
+     "label": "A区地下室",
+     "seq": "3.1",
+     "unit": "㎡",
+     "value": 17109.15
+    },
+    {
+     "label": "B区地下室",
+     "seq": "3.2",
+     "unit": "㎡",
+     "value": 46970.86
+    },
+    {
+     "label": "地上总建筑面积",
+     "seq": "4",
+     "unit": "㎡",
+     "value": 91474.43
+    },
+    {
+     "label": "1#楼",
+     "seq": "4.1",
+     "unit": "㎡",
+     "value": 32696.73
+    },
+    {
+     "label": "2#楼",
+     "seq": "4.2",
+     "unit": "㎡",
+     "value": 3590.16
+    },
+    {
+     "label": "3#楼",
+     "seq": "4.3",
+     "unit": "㎡",
+     "value": 47878.47
+    },
+    {
+     "label": "构筑物",
+     "seq": "4.4",
+     "unit": "㎡",
+     "value": 7309.07
+    },
+    {
+     "label": "占地面积",
+     "seq": "5",
+     "unit": "㎡",
+     "value": 38999.909999999996
+    },
+    {
+     "label": "A区地块",
+     "seq": "5.1",
+     "unit": "㎡",
+     "value": 37198.96
+    },
+    {
+     "label": "B区地块",
+     "seq": "5.2",
+     "unit": "㎡",
+     "value": 1800.95
+    },
+    {
+     "label": "室外面积",
+     "seq": "6",
+     "unit": "㎡",
+     "value": -8798.169999999995
+    },
+    {
+     "label": "机动车位停车",
+     "seq": "7",
+     "unit": "辆",
+     "value": 78130.35
+    },
+    {
+     "label": "地面机动车停车",
+     "seq": "7.1",
+     "unit": "辆",
+     "value": 48222.8
+    },
+    {
+     "label": "地下机动车停车",
+     "seq": "7.2",
+     "unit": "辆",
+     "value": 29907.55
+    }
+   ],
+   "input_coverage": {
+    "by_sheet": {
+     "1.建筑工程费": {
+      "cost_inputs": 29,
+      "filled": 29,
+      "missing": 0
+     },
+     "2.安装工程费": {
+      "cost_inputs": 38,
+      "filled": 38,
+      "missing": 0
+     },
+     "3.专项工程费": {
+      "cost_inputs": 42,
+      "filled": 42,
+      "missing": 0
+     },
+     "4.室外及配套工程费": {
+      "cost_inputs": 18,
+      "filled": 18,
+      "missing": 0
+     },
+     "5.工程建设其他费用": {
+      "cost_inputs": 23,
+      "filled": 23,
+      "missing": 0
+     }
+    },
+    "cost_inputs": 150,
+    "filled": 150,
+    "missing": 0,
+    "rate": 1.0
+   },
+   "operator_id": null,
+   "project_id": null,
+   "quality": {
+    "reasons": [
+     {
+      "code": "input_sources_undeclared",
+      "message": "调用方未申报任何输入位的来源（input_sources），交付表无法说明每个数从哪来"
+     }
+    ],
+    "review_level": "needs_review"
+   },
+   "rates_used": {
+    "reserve_rate": 0.05
+   },
+   "sys_company_code": null,
+   "totals": {
+    "dynamic_total": {
+     "cell": "估概算总表!C50",
+     "label": "建设动态总投资（七）",
+     "value": 394353.0605
+    },
+    "financing_fee": {
+     "cell": "估概算总表!C48",
+     "label": "建设期融资费用（五）",
+     "value": 1329.12
+    },
+    "initial_working_capital": {
+     "cell": "估概算总表!C49",
+     "label": "铺底流动资金（六）",
+     "value": 371.6
+    },
+    "other_cost": {
+     "cell": "估概算总表!C45",
+     "label": "工程建设其他费用（二）",
+     "value": 63883.119999999995
+    },
+    "project_cost": {
+     "cell": "估概算总表!C5",
+     "label": "工程费用（一）",
+     "value": 310071.49000000005
+    },
+    "reserve_fee": {
+     "cell": "估概算总表!C46",
+     "label": "工程预备费（三）",
+     "value": 18697.7305
+    },
+    "static_total": {
+     "cell": "估概算总表!C47",
+     "label": "建设静态总投资（四）",
+     "value": 392652.34050000005
+    }
+   },
+   "warnings": [
+    {
+     "cell": "估概算总表!F30",
+     "code": "template_fix",
+     "message": "原表缺陷已修正：='3.专项工程费'!E35 → ='3.专项工程费'!E46（F30_wrong_ref）"
+    },
+    {
+     "cell": "估概算总表!D48",
+     "code": "optional_input_missing",
+     "message": "可选输入位「建设期融资费用」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!D50]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "估概算总表!D49",
+     "code": "optional_input_missing",
+     "message": "可选输入位「铺底流动资金」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!D50]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "5.工程建设其他费用!C6",
+     "code": "fee_aggregate_mismatch",
+     "item_id": "project_management_fee",
+     "message": "项目建设管理费：子项 C7、C8 之和 3204.32 万元，与规则小计参考值 2141.3575 万元相差 +49.6%（阈值 ±20%）。请核对子项拆分是否重复计列或漏项；引擎不替你拆分。"
+    },
+    {
+     "cell": "5.工程建设其他费用!C9",
+     "code": "fee_aggregate_mismatch",
+     "item_id": "management_other_fee",
+     "message": "建设管理其他费：子项 C10、C11、C12、C13 之和 12614.12 万元，与规则小计参考值 1102.9716 万元相差 +1043.6%（阈值 ±20%）。请核对子项拆分是否重复计列或漏项；引擎不替你拆分。"
+    },
+    {
+     "cell": "5.工程建设其他费用!C12",
+     "code": "fee_possible_double_count",
+     "item_id": "management_other_fee",
+     "message": "建设管理其他费（5.工程建设其他费用!C9）的规则小计参考值 1102.9716 万元，注3：建设管理其他费已含施工阶段全过程造价咨询费用；5.工程建设其他费用!C12 又填了 4269.25 万元，可能重复计列。政府投资项目请核对是否另计结算审核费用。"
+    }
+   ],
+   "xlsx_base64": null
+  },
+  "sheets_sha256": "d92dc7059ec154e699146b5e7cfcd6ca20721ef85027a3f66850ebc7016e0fcf",
+  "status": 200
+ },
+ {
+  "name": "ok_synthetic_all_user_with_fee",
+  "response": {
+   "aggregate_checks": [
+    {
+     "aggregate_cell": "5.工程建设其他费用!C6",
+     "children": [
+      "5.工程建设其他费用!C7",
+      "5.工程建设其他费用!C8"
+     ],
+     "children_sum": 3204.32,
+     "deviation": 0.496397,
+     "fee_name": "项目建设管理费",
+     "filled_cells": [
+      "5.工程建设其他费用!C7",
+      "5.工程建设其他费用!C8"
+     ],
+     "item_id": "project_management_fee",
+     "level": "warn",
+     "status": "mismatch",
+     "subtotal": 2141.3575
+    },
+    {
+     "aggregate_cell": "5.工程建设其他费用!C9",
+     "children": [
+      "5.工程建设其他费用!C10",
+      "5.工程建设其他费用!C11",
+      "5.工程建设其他费用!C12",
+      "5.工程建设其他费用!C13"
+     ],
+     "children_sum": 12614.12,
+     "deviation": 10.436487,
+     "fee_name": "建设管理其他费",
+     "filled_cells": [
+      "5.工程建设其他费用!C10",
+      "5.工程建设其他费用!C11",
+      "5.工程建设其他费用!C12",
+      "5.工程建设其他费用!C13"
+     ],
+     "item_id": "management_other_fee",
+     "level": "warn",
+     "status": "mismatch",
+     "subtotal": 1102.9716
+    },
+    {
+     "aggregate_cell": "5.工程建设其他费用!C9",
+     "cell": "5.工程建设其他费用!C12",
+     "fee_name": "建设管理其他费",
+     "item_id": "management_other_fee",
+     "level": "warn",
+     "reason": "注3：建设管理其他费已含施工阶段全过程造价咨询费用",
+     "status": "possible_double_count",
+     "subtotal": 1102.9716,
+     "value": 4269.25
+    }
+   ],
+   "indicators": [
+    {
+     "label": "用地面积",
+     "seq": "1",
+     "unit": "㎡",
+     "value": 30201.74
+    },
+    {
+     "label": "总建筑面积",
+     "seq": "2",
+     "unit": "㎡",
+     "value": 155554.44
+    },
+    {
+     "label": "地下总建筑面积",
+     "seq": "3",
+     "unit": "㎡",
+     "value": 64080.01
+    },
+    {
+     "label": "A区地下室",
+     "seq": "3.1",
+     "unit": "㎡",
+     "value": 17109.15
+    },
+    {
+     "label": "B区地下室",
+     "seq": "3.2",
+     "unit": "㎡",
+     "value": 46970.86
+    },
+    {
+     "label": "地上总建筑面积",
+     "seq": "4",
+     "unit": "㎡",
+     "value": 91474.43
+    },
+    {
+     "label": "1#楼",
+     "seq": "4.1",
+     "unit": "㎡",
+     "value": 32696.73
+    },
+    {
+     "label": "2#楼",
+     "seq": "4.2",
+     "unit": "㎡",
+     "value": 3590.16
+    },
+    {
+     "label": "3#楼",
+     "seq": "4.3",
+     "unit": "㎡",
+     "value": 47878.47
+    },
+    {
+     "label": "构筑物",
+     "seq": "4.4",
+     "unit": "㎡",
+     "value": 7309.07
+    },
+    {
+     "label": "占地面积",
+     "seq": "5",
+     "unit": "㎡",
+     "value": 38999.909999999996
+    },
+    {
+     "label": "A区地块",
+     "seq": "5.1",
+     "unit": "㎡",
+     "value": 37198.96
+    },
+    {
+     "label": "B区地块",
+     "seq": "5.2",
+     "unit": "㎡",
+     "value": 1800.95
+    },
+    {
+     "label": "室外面积",
+     "seq": "6",
+     "unit": "㎡",
+     "value": -8798.169999999995
+    },
+    {
+     "label": "机动车位停车",
+     "seq": "7",
+     "unit": "辆",
+     "value": 78130.35
+    },
+    {
+     "label": "地面机动车停车",
+     "seq": "7.1",
+     "unit": "辆",
+     "value": 48222.8
+    },
+    {
+     "label": "地下机动车停车",
+     "seq": "7.2",
+     "unit": "辆",
+     "value": 29907.55
+    }
+   ],
+   "input_coverage": {
+    "by_sheet": {
+     "1.建筑工程费": {
+      "cost_inputs": 29,
+      "filled": 29,
+      "missing": 0
+     },
+     "2.安装工程费": {
+      "cost_inputs": 38,
+      "filled": 38,
+      "missing": 0
+     },
+     "3.专项工程费": {
+      "cost_inputs": 42,
+      "filled": 42,
+      "missing": 0
+     },
+     "4.室外及配套工程费": {
+      "cost_inputs": 18,
+      "filled": 18,
+      "missing": 0
+     },
+     "5.工程建设其他费用": {
+      "cost_inputs": 23,
+      "filled": 23,
+      "missing": 0
+     }
+    },
+    "cost_inputs": 150,
+    "filled": 150,
+    "missing": 0,
+    "rate": 1.0
+   },
+   "operator_id": null,
+   "project_id": null,
+   "quality": {
+    "reasons": [
+     {
+      "code": "owner_released_fee_adopted",
+      "message": "采纳了 1 条费率建议值，费率规则集为仓主默认放行、未经造价员逐值签署"
+     }
+    ],
+    "review_level": "needs_review"
+   },
+   "rates_used": {
+    "reserve_rate": 0.01
+   },
+   "sys_company_code": null,
+   "totals": {
+    "dynamic_total": {
+     "cell": "估概算总表!C50",
+     "label": "建设动态总投资（七）",
+     "value": 379394.8761
+    },
+    "financing_fee": {
+     "cell": "估概算总表!C48",
+     "label": "建设期融资费用（五）",
+     "value": 1329.12
+    },
+    "initial_working_capital": {
+     "cell": "估概算总表!C49",
+     "label": "铺底流动资金（六）",
+     "value": 371.6
+    },
+    "other_cost": {
+     "cell": "估概算总表!C45",
+     "label": "工程建设其他费用（二）",
+     "value": 63883.119999999995
+    },
+    "project_cost": {
+     "cell": "估概算总表!C5",
+     "label": "工程费用（一）",
+     "value": 310071.49000000005
+    },
+    "reserve_fee": {
+     "cell": "估概算总表!C46",
+     "label": "工程预备费（三）",
+     "value": 3739.5461000000005
+    },
+    "static_total": {
+     "cell": "估概算总表!C47",
+     "label": "建设静态总投资（四）",
+     "value": 377694.1561
+    }
+   },
+   "warnings": [
+    {
+     "cell": "估概算总表!C46",
+     "code": "rate_out_of_range",
+     "message": "reserve_rate=0.01 超出常规区间 0.03~0.08，按输入照算（费率可调、不设硬闸）"
+    },
+    {
+     "cell": "估概算总表!F30",
+     "code": "template_fix",
+     "message": "原表缺陷已修正：='3.专项工程费'!E35 → ='3.专项工程费'!E46（F30_wrong_ref）"
+    },
+    {
+     "cell": "估概算总表!D48",
+     "code": "optional_input_missing",
+     "message": "可选输入位「建设期融资费用」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!D50]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "估概算总表!D49",
+     "code": "optional_input_missing",
+     "message": "可选输入位「铺底流动资金」未填，按空格=0 参与求值；受影响的合计格：建设动态总投资（四+五+六）[估概算总表!D50]。该项若非零，这些合计是少算的 —— 请补填后重算。"
+    },
+    {
+     "cell": "5.工程建设其他费用!C6",
+     "code": "fee_aggregate_mismatch",
+     "item_id": "project_management_fee",
+     "message": "项目建设管理费：子项 C7、C8 之和 3204.32 万元，与规则小计参考值 2141.3575 万元相差 +49.6%（阈值 ±20%）。请核对子项拆分是否重复计列或漏项；引擎不替你拆分。"
+    },
+    {
+     "cell": "5.工程建设其他费用!C9",
+     "code": "fee_aggregate_mismatch",
+     "item_id": "management_other_fee",
+     "message": "建设管理其他费：子项 C10、C11、C12、C13 之和 12614.12 万元，与规则小计参考值 1102.9716 万元相差 +1043.6%（阈值 ±20%）。请核对子项拆分是否重复计列或漏项；引擎不替你拆分。"
+    },
+    {
+     "cell": "5.工程建设其他费用!C12",
+     "code": "fee_possible_double_count",
+     "item_id": "management_other_fee",
+     "message": "建设管理其他费（5.工程建设其他费用!C9）的规则小计参考值 1102.9716 万元，注3：建设管理其他费已含施工阶段全过程造价咨询费用；5.工程建设其他费用!C12 又填了 4269.25 万元，可能重复计列。政府投资项目请核对是否另计结算审核费用。"
+    }
+   ],
+   "xlsx_base64": null
+  },
+  "sheets_sha256": "65cafee294dbdcca1c2cc72885daf9eb69b97a1b550013cd0c49eaf5dab2aabb",
+  "status": 200
+ }
+]
