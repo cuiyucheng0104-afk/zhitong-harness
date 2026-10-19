@@ -1,0 +1,155 @@
+{
+ "_about": "从旧仓 前端/frontend/scripts/verify/fixtures/tkAnomalyExportParity.json（zhitong-cost-ai@991ff5cd，手写夹具）抽出的页签对照：每行只留规则 anomalyType、detail.marker_scope 与旧前端页签 tab（focus 重点 / quality 数据质量 / bulk 批量）。旧前端随旧系统废弃；这里冻结它定下的口径，zt.tk.engine._fold_tier 的去处档 0 ⇔ 页签 focus。",
+ "rows": [
+  {
+   "id": "2105786011382534152",
+   "anomalyType": "price_over_baseline",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "2105786011382534160",
+   "anomalyType": "qty_over_baseline",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "2105786011382534170",
+   "anomalyType": "missing_submit",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "9",
+   "anomalyType": "zangu",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "10",
+   "anomalyType": "zangu",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "11",
+   "anomalyType": "self_check",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "12",
+   "anomalyType": "duplicate",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "13",
+   "anomalyType": "big_amount",
+   "marker_scope": null,
+   "tab": "bulk"
+  },
+  {
+   "id": "14",
+   "anomalyType": "big_amount",
+   "marker_scope": null,
+   "tab": "bulk"
+  },
+  {
+   "id": "15",
+   "anomalyType": "big_amount",
+   "marker_scope": null,
+   "tab": "bulk"
+  },
+  {
+   "id": "16",
+   "anomalyType": "code_repeat",
+   "marker_scope": null,
+   "tab": "quality"
+  },
+  {
+   "id": "17",
+   "anomalyType": "new_item",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "18",
+   "anomalyType": "duplicate",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "19",
+   "anomalyType": "",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "20",
+   "anomalyType": "weird_rule",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "21",
+   "anomalyType": "price_over_baseline",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "8",
+   "anomalyType": "qty_over_baseline",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "22",
+   "anomalyType": "zangu",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "23",
+   "anomalyType": "big_amount",
+   "marker_scope": null,
+   "tab": "bulk"
+  },
+  {
+   "id": "24",
+   "anomalyType": "price_over_baseline",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "25",
+   "anomalyType": "qty_over_baseline",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "26",
+   "anomalyType": "zangu",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "27",
+   "anomalyType": "duplicate",
+   "marker_scope": null,
+   "tab": "focus"
+  },
+  {
+   "id": "28",
+   "anomalyType": "zangu",
+   "marker_scope": "feature_text",
+   "tab": "quality"
+  },
+  {
+   "id": "29",
+   "anomalyType": "zangu",
+   "marker_scope": "provisional_amount",
+   "tab": "focus"
+  }
+ ]
+}

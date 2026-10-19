@@ -1,0 +1,63 @@
+# ② 投控检测引擎 v1 规则配置(M-A;DISPATCH 红线:阈值全配置,禁止硬编码)
+# 状态:draft。train(6 项目)上调参;test 分数只做基线记录,不因 test 调参。
+# 落库:后续并入 cfg_* seed(seed_config.py);引擎 v1 直接读本文件。
+version: v1-20260711
+rules:
+  duplicate:            # 重复计取:同项目+专业内,清单键重复(M2 子类)
+    enabled: true
+    min_amount: 0       # 门槛留 0:实测 duplicate→1万会掉 recall(真重复也含 sub-1万),正解是 P0-G 拆正常分行
+  zangu:                # 暂估价滥用(整项存疑,M4 族)
+    enabled: true
+    # WS26-n(D-R164)分四档,四档都照出、不少出一条:清单表「其中:暂估价」列本行非零、名称里有 markers、
+    # 项目特征里有 price_words → 置信 confidence.zangu;只在项目特征里出现裸的 markers
+    # (TK-C06:「5. 钢筋含量:暂定按100kg/m3」是含钢量的取值说明)→ feature_text_confidence,前端归「数据质量」
+    markers: ["暂估", "暂定", "暂列"]
+    # 项目特征里说「价」的词。每个都含一个 markers 里的字,所以分档不改命中集合
+    price_words: ["暂估价", "暂定价", "暂列金额", "暂估单价", "暂定单价", "暂估金额", "暂定金额"]
+    feature_text_confidence: 0.3
+    min_amount: 1000
+  self_check:           # 行内自洽:|量×价 − 金额|/金额 超容差(送审侧可判)
+    enabled: true
+    tol_pct: 2.0
+    min_amount: 1000
+  big_amount:           # 整项存疑-大额(无基准档时的粗筛;precision 差,置信度最低)
+    enabled: true
+    # train(6项目)扫描定版 2026-07-11:200k→R41.9/P27.8 100k→55.7/32.5 50k→66.0/33.1
+    #   20k→76.0/30.3(定版:召回×复核负担平衡) 10k→80.9/26.5;test 分数见 STOP
+    min_amount: 20000
+  price_over_baseline:  # v2:送审单价>合同单价×(1+P%) → 单价疑似超合同(需勾选合同/中标清单)
+    enabled: true
+    over_pct: 10          # P 默认 10% 起联调(DISPATCH §B-3)
+    min_amount: 1000
+  qty_over_baseline:    # v2:送审量>合同量×(1+Q%) → 工程量疑似超合同(需勾选合同/中标清单)
+    enabled: true
+    over_pct: 15          # Q 默认 15% 起联调
+    min_amount: 1000
+  missing_submit:       # 族A:送审量价金额全空+基准有项(严重度=基准金额)
+    enabled: true
+    min_base_amount: 10000   # 保守起点;train(01)有同类样本则在 train 上调
+  new_item:             # 族B:合同外新增(对齐 NEW_ITEM)
+    enabled: true
+    min_amount: 5000    # P0-A 撤回:实测 new_item→1万掉 0.6pt recall(核增大额项被砍),门槛法砍不准;精度靠 C/D 展示层
+
+confidence:
+  missing_submit: 0.5
+  new_item: 0.55
+  price_over_baseline: 0.75
+  qty_over_baseline: 0.7
+  duplicate: 0.7
+  zangu: 0.6
+  self_check: 0.55
+  big_amount: 0.3
+  code_repeat: 0.3      # WS08-11:同码但金额非零不足 2 行,降级为数据质量提示
+
+# ---------- v2 · 合同基准规则族(DISPATCH ②合同基准 §B-3;数据前先合成联调) ----------
+# WS08-07(铁律 3):对齐只认严格对齐(编码+名称+单位,补充码/无编码为名称+特征+单位),
+# 删掉了 difflib 模糊对齐的 fuzzy_feature_min / fuzzy_conf_factor —— 模糊候选只进
+# align_suggestions,不出金额。
+baseline_align:
+  # 基准覆盖率 = 严格对齐行数 ÷ 送审行中带标准编码的行数。低于此值不判「合同外新增」
+  # (对不上的大多是基准没选全,不是真新增),出 baseline_coverage_low 告警。
+  new_item_min_coverage: 0.5
+rules_v2_note: "price/qty 阈值为联调起点值,真数据到后只在 train(6项目)上调"
+# ---------- v3 · 漏项分析补族(20260712 §三;阈值 train 调/无样本则保守固定) ----------

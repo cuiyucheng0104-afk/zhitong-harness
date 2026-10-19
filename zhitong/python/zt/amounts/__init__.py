@@ -1,1 +1,1 @@
-"""zt.amounts：内容由后续工单填写（见 zhitong/CONVENTIONS.md 目录与归属）。"""
+"""zt.amounts：金额、费率、天数的解析与比较，数字回链索引（旧 ``amounts.py``，见 :mod:`zt.amounts.amounts`）。"""
