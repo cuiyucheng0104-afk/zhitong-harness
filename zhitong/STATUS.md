@@ -15,7 +15,7 @@
 | W6 zt-knowledge | 已合入 | `82c7d030c` | `check_knowledge.py --root knowledge-seed`：12 个目录、16 条、0 违规 |
 | W7 zt-volc | 已合入 | `e7f584cb0` | volc 102 通过（`ve` 输出为合成夹具） |
 | W8 迁移 | 未开始 | — | `zhitong/migration/` 不存在 |
-| W9 安装包 | 未开始 | — | — |
+| W9 安装包 | 代码与文档已合入；Mac / Windows 实机打包与 M0 验收待用户在目标机器上执行（[INSTALL.md](INSTALL.md) 第二至四部分） | `8f2201c28` `71ca9f9a7` `25872c4e4` `e987013f9` `6a5ecbf66` `810fba853` `67a1a2953` `9f45c916f` 及文档提交 | 见下「W9 验证」 |
 | W10 门户文案 | 已合入 | `d4a7fa2dc` | 无测试 |
 
 ## 测试原始结果
@@ -52,13 +52,18 @@ zhitong/plugins/config-import$ pnpm exec tsc --noEmit -p .   → exit 0
 
 ## 遗留问题
 
-### 需要 W0 / W9 处理
+### W9 已处理（原「需要 W0 / W9 处理」）
 
-- **解释器**：skill 脚本只在能 `import zt` 的解释器下运行。用系统 `python3` 直接跑会以 `ModuleNotFoundError` 退出（退出码 1、无 JSON），不符合结果契约。安装包要设置 `ZT_PYTHON` 并让 `zt` 可导入；或由 W0 给脚本加一段统一的导入检查，输出 `{"error": {"code": "zt_not_importable", …}}` 并以退出码 2 结束。
-- **打包内容**：`skills/_shared/`（无 SKILL.md，不应被当作 skill 加载）与 `skills/zt-project/data/` 要随 skills 一起分发；W1 的脚本会把 `ZT_PROJECT_DATA` 设为各自 skill 的 `data/`。
-- **zt-volc 接入 config-import**（W7）：`ssh`、`volc` 两节目前只校验（`deferredSections`）。config-import 需把 `volc.profile`、`volc.region`、`ssh.hosts[].alias` 写到 skill 可读的位置并设置 `ZT_VOLC_CONFIG`；`host`、`user`、`port`、`privateKey` 写进 `~/.ssh/config`。CONFIG-PACKAGE.md 要写明 `ve` profile 由用户 `ve configure set` 创建。
-- **模型**：bundle 没有固定模型，按账户目录取默认；spec 定的是 DeepSeek V4.1 Flash（上游目录 id `deepseek-flash`），如需固定由 W0 在 profile 里设置。
-- **python/README.md**（W0 拥有）：可补各分区 CLI 入口：`zt.textextract.cli extract|search|check-answer`、`zt.sidecar.cli parse|locate`、`zt.inventory.cli scan`、`zt.costsheet.cli probe`、`zt.reconcile.cli run`、`zt.indicator.cli run`、`zt.tk.cli detect|review|progress`，以及 W7 新增的 `zt/volc/` 分区（CONVENTIONS 的目录表里没有它）。
+- **解释器**：所有 skill 脚本先执行 `skills/_shared/zt_launch.py`：`ZT_PYTHON` → `$DSH_HOME/dsh-runtimes/dsh-primary-runtime` 的解释器 → 安装包内 `Resources/runtime/primary-runtime` 的解释器 → 当前解释器；选中的不是当前解释器就重跑一次；`zt` 从 skills 旁的 `python/` 进 `sys.path`；Python < 3.11 或缺依赖时输出 `zt_not_importable`、退出码 2。11 份 SKILL.md 改成 `<python> scripts/<x>.py`（`<python>` = `$ZT_PYTHON`，否则 `load_workspace_dependencies` 返回的 `python`，都没有才 `python3`），不再写 `-m zt.*`；zt-ask 新增 `scripts/check_answer.py`。
+- **Python 依赖**：上游 `scripts/primary-runtime/lock.json` 五个目标都加了 pydantic 2.14.1、pydantic-core 2.50.1、annotated-types 0.8.0、typing-inspection 0.4.4、pypdf 6.21.1、PyYAML 6.0.3（typing-extensions 4.16.0、openpyxl、python-docx、lxml、et-xmlfile 原已在内）。`zt` 不进 wheel 列表（lock 只接受远程 URL）：打包时复制进 `@zhitong/bundle/python/zt`，与 skills 一起解到 asar 外。
+- **打包内容**：`skills/`（含 `_shared/`、各 `data/`、`templates/`、`references/`）与 `python/zt` 随 `@zhitong/bundle` 进 `app.asar/dsh`，asarUnpack 到 `app.asar.unpacked/`；`bundledSkillDir` 由 `@zhitong/bundle/skills-dir.cjs` 算出并换成 asar 外路径。`_shared/` 没有 SKILL.md，skill-filesystem 读不到文件时静默跳过、不告警（`readSkillText` 对 ENOENT 返回 undefined）。
+- **zt-volc 接入 config-import**：`volc.profile`、`volc.region`、`ssh.hosts[].alias` 写进只有名称的 `$DSH_HOME/zhitong/volc.config.json`，zt-volc 在 `ZT_VOLC_CONFIG` 未设置时读它；`host`、`port`、`user` 写进 `~/.ssh/config` 开头的受管块，私钥写 `~/.ssh/zhitong/<alias>`（0600）。CONFIG-PACKAGE.md 写明 `ve configure set`。
+- **模型**：bundle 重述 `agent-default-model` 为 `deepseek-official` / `deepseek-flash`（DeepSeek-V4.1-Flash）；设置页保存的选择仍优先。
+- **python/README.md**：补各分区 CLI 入口表与运行时依赖说明；CONVENTIONS 目录表加 `zt/volc/`、`skills/_shared/`、`scripts/`。
+- **lockfile**：`pnpm-lock.yaml` 的 `zhitong/bundle` 条目补上 W5 合入时漏掉的 `@zhitong/tool-cad`。
+
+### 仍需处理
+
 - **zt.common**：`to_rel_posix("   ")` 不拒收纯空格路径，之后才报 `file_not_found`；实际使用无影响。
 - **CI**：可在有真实语料的机器上设置 `ZT_NAS_DATA`、`TG_GOLDEN_XLSX`，跑上面 7 个跳过用例。
 - **W8 迁移**：`upload.sh` 要排除 `knowledge-seed/_tools/`；生成项目说明时对齐 W1 的格式（可直接用 `zt.inventory.draft.draft_project_doc`）。
@@ -79,3 +84,43 @@ zhitong/plugins/config-import$ pnpm exec tsc --noEmit -p .   → exit 0
 - W7 的 `ve` 与 `tosutil` 输出是按 SDK 字段手写的合成夹具，`tosutil.*.txt` 的行格式未经真实工具核实；拿到真实 `ve` 后按 `tests/volc/fixtures/README.md` 重录并脱敏。夹具里的 `120.55.10.x` 是真实公网段，因为校验逻辑要求 `is_global`，不能换成文档保留段。
 - 还没有录制 keyless 会话快照（W1 工单要求的一项），也没有在三平台 CI 上跑过；Windows 路径只有单元测试覆盖。
 - W5 tool-cad 在独立分支上，合入后需重新执行本文件的 bundle 与 skill 检查（新插件包名、`zt-cad` 的 SKILL.md）。
+
+## W9 上游改动
+
+合并上游时逐项核对；代码里每处都有 `zhitong increment` 注释（JSON 文件除外）。
+
+| 文件 | 改动 |
+|---|---|
+| `scripts/primary-runtime/lock.json` | 共享 `wheels` 加 annotated-types、typing-inspection、pydantic、pypdf 的 py3 wheel；五个目标各加 pydantic-core、PyYAML 的 cp312 wheel；`pythonPackages` 加六项。改变所有目标的 payload digest（已安装的 runtime 会在下次使用时整体替换），也进入 Python SDK 的 runtime payload |
+| `apps/desktop/scripts/package-target.ts` | vendor 打包之后运行 `zhitong/scripts/pack-desktop.mjs`，输出到 `packed/zhitong` |
+| `apps/desktop/scripts/prepare-package-set.ts` | `ROOT_PACKAGES` 加 `@zhitong/bundle`；默认输入加 `packedZhitong` |
+| `apps/desktop/scripts/desktop-build-paths.mjs`、`.d.mts` | 新路径 `packedZhitong` |
+| `apps/desktop/scripts/electron-builder-config.mjs` | asarUnpack 加 `@zhitong/bundle/{skills,python}`、`@zhitong/tool-cad/{bin,assets}` |
+| `apps/desktop/src/project-manager.ts` | 新 profile 在运行时描述含 `@zhitong/bundle` 时选中它（`desktopProfileBundles`）；恢复操作保留它；运行时项目 `allowBuilds` 加 `tos-crc64-js: false` |
+| `apps/desktop/scripts/smoke-runtime.ts` | Host 冒烟用与新 profile 相同的 bundle 列表 |
+| `apps/desktop/tests/{desktop-build-paths,prepare-package-set,project-manager}.spec.ts`、`runtime-fixture.ts` | 对应断言与夹具 |
+| `pnpm-lock.yaml` | config-import 新增两个 workspace 依赖；bundle 补 tool-cad |
+
+## W9 验证（Linux 容器，2026-10-19）
+
+```text
+scripts/primary-runtime$ vitest run prepare.spec.ts                      17 passed
+tsx scripts/primary-runtime/prepare.ts --target linux-x64 --python-only  exit 0（含 smoke.py 发行包集合核对与 pip check：No broken requirements found）
+apps/desktop$ vitest run tests/                                           145 文件通过；macos-notarization-proxy.spec.ts 15 例失败（flock 原生插件未构建，与本次改动无关）
+apps/desktop$ tsc --noEmit -p tsconfig.host.json                          exit 0
+zhitong/python$ uv run pytest                                             3045 passed, 20 skipped
+zhitong/plugins/{tool-tos,config-import,tool-cad}$ vitest run             38+1 跳过 / 15 / 46 通过；tsc --noEmit 均 exit 0
+node --test zhitong/scripts/tests/*.test.mjs                              7 passed
+node zhitong/scripts/pack-desktop.mjs --platform linux --arch x64         4 个 tarball，内容检查通过
+pnpm install --frozen-lockfile（排除 documentpreview）                    通过
+```
+
+模拟验证：把打出的 tarball 解到假的 `Resources/app.asar{,.unpacked}/dsh/node_modules` 布局，按 Cordis YAML 方言解析 `cordis.patch.yml` 并以 `with (ctx) eval` 求值 `bundledSkillDir`：安装包布局（空 profile + installAnchor）得到 `app.asar.unpacked/.../skills`，仓库布局（link 安装）得到 `zhitong/skills`，两者都没有时报错；`verify-desktop-app.mjs` 对假布局（真实 asar 描述文件 + linux-x64 standalone Python 3.12）20 项全部通过，其中没有依赖的 venv 解释器经启动器重跑到内置解释器。tarball 用 pnpm（hoisted、autoInstallPeers=false）装进临时项目，外部依赖装得上，暴露出 `tos-crc64-js` 构建脚本需要在运行时项目放行（已加）。
+
+### Linux 上无法验证（需在目标机器上做）
+
+- `pnpm run package:desktop:mac:arm64:unsigned` 与 `package:desktop:win:x64:unsigned` 整条流程（含 `build:official`、`release:pack`、Electron 下载、`prepare:dsh` 的 `pnpm install --prod`、Host 冒烟、electron-builder、DMG / NSIS），以及 Host 冒烟在带 `@zhitong/bundle` 的 profile 下能否启动。
+- Electron `ELECTRON_RUN_AS_NODE` 下：运行时解析能否从 `profileContext.installAnchor` 解析到 `@zhitong/bundle/skills-dir.cjs`、asar 内 `existsSync` 与 asar→unpacked 映射、`@napi-rs/canvas` 从 unpacked 路径注册字体、从 unpacked 路径启动 dwg2dxf。
+- macOS 上 `build-dwg2dxf.sh`（clang 静态链接、`otool -L` 检查、ad-hoc 签名）与 ad-hoc 签名应用里子进程能否执行；Gatekeeper 首次打开流程。
+- Windows：`fetch-dwg2dxf-win64.ps1`（没有 PowerShell，未执行；zip 的 sha256 与根目录文件清单已在 Linux 上核对）、`.env.windows` 最小配置下打包、NSIS 安装、中文用户名路径。
+- 打开应用后的验收清单（预设、12 个 skill、`load_workspace_dependencies` 对智通预设可见、`cad_open`、`config_import` 写 ssh/volc）与两台干净机器的 M0 验收。

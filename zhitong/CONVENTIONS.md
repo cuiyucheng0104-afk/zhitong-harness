@@ -15,8 +15,11 @@ zhitong/
     zt/costsheet/ zt/code_registry/ zt/amounts/ zt/reconcile/ zt/indicator/ zt/tk/            W2
     zt/report/                                                                                W3
     zt/quantity/ zt/estimate/                                                                 W4
+    zt/volc/                                                                                  W7
     tests/<area>/         与上面同名分区；夹具放 tests/<area>/fixtures/
   skills/<name>/          SKILL.md + scripts/（薄 CLI）+ data/（规则与模板）                    各工单
+  skills/_shared/         各 skill 共用的说明与 zt_launch.py（解释器与 zt 定位，无 SKILL.md）     W9
+  scripts/                pack-desktop.mjs（桌面安装包打包 bundle、插件、skills 与 zt）           W9
   knowledge-seed/                                                                             W6
   migration/                                                                                  W8
 ```
@@ -26,6 +29,7 @@ zhitong/
 ## Python
 
 - 入口统一：`python -m zt.<area>.cli <子命令> --in request.json --out result.json`，或 skill 的 `scripts/<x>.py`（只做参数解析后调用 `zt`）。stdout 只输出一个 JSON；日志走 stderr。
+- skill 脚本在导入 `zt` 之前执行 `skills/_shared/zt_launch.py` 的固定片段（见该文件文档）：解释器取 `ZT_PYTHON` → 桌面版 primary runtime → 当前解释器，`zt` 不可导入时输出 `zt_not_importable`。新脚本照抄现有脚本的头部；片段之前只能有文档字符串与 `from __future__`。
 - 结果信封（`zt.common.envelope`）：`{"status": "ok|partial|empty|insufficient", "status_reason": str|null, "coverage": {...}, "warning_items": [{"code","level","message","hint"?}], "data": {...}, "needs_manual": true}`。金额与数量字段所在对象都带 `needs_manual: true`。失败：退出码 2，stdout 为 `{"error": {"code","message","hint"?}}`，绝不输出「成功 + 空」。
 - 不调用任何模型 API。原来夹在流程中间的 LLM 步骤拆成 `prepare` 与 `finalize` 两个子命令（spec §4.1）。
 - 跨平台：`pathlib`，显式 `encoding="utf-8"`，不用 `shell=True`，不假定 `/tmp`。Python ≥3.11；容器里是 3.13。
@@ -43,7 +47,8 @@ zhitong/
 ## Skill
 
 - `zhitong/skills/<kebab-name>/SKILL.md`，frontmatter 必有 `name`、`description`，可选 `whenToUse`。正文 ≤ 8000 字符（上游工具结果修剪阈值 8192），长内容放 `references/` 按需读。
-- 正文写：何时用、步骤、调用哪个脚本（相对 skill 目录的路径，运行方式 `$ZT_PYTHON -m ...`，未设置时 `python3`）、结果如何转述、落盘到项目的哪个目录、纪律（结果契约、needs_manual、引用只指向读过的内容）。
+- 正文写：何时用、步骤、调用哪个脚本（`<python> scripts/<x>.py ...`；`<python>` 取 `$ZT_PYTHON`，否则 `load_workspace_dependencies` 返回的 `python`，都没有才 `python3`；不要写 `-m zt...`，桌面版的解释器里 `zt` 不在 site-packages）、结果如何转述、落盘到项目的哪个目录、纪律（结果契约、needs_manual、引用只指向读过的内容）。
+- `skills/` 根目录只放 skill 目录与 `_shared/`，不放 `.md` 文件（会被当作 skill 解析）。
 - 旧提示词措辞进 SKILL.md 或 `references/`，标注 `prompt_version` 与签核状态。
 
 ## Git

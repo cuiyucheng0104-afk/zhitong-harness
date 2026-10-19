@@ -30,10 +30,10 @@
 
 ```text
 安装包（Mac .dmg / Windows .exe，基于上游 apps/desktop）
-├─ DeepSeek Harness 桌面版，profile = zhitong
-├─ 内置 Python 运行时（uv 锁定 3.11）+ skill 脚本依赖（openpyxl、pypdf、PyYAML、python-docx…）
+├─ DeepSeek Harness 桌面版，profile = desktop（Web 模板 + @zhitong/bundle；开发时用 zhitong profile）
+├─ 内置 Python 运行时（上游桌面版 primary runtime，Python 3.12，lock.json 加锁 zt 依赖：openpyxl、pypdf、PyYAML、python-docx、pydantic…）
 ├─ 内置 dwg2dxf（LibreDWG，GPL 进程边界，asar 外）
-├─ plugins/   tool-tos · tool-cad · config-import
+├─ plugins/   tool-tos · tool-cad · config-import（随 @zhitong/bundle 进 app.asar/dsh，新 profile 默认启用）
 └─ skills/    zt-project · zt-reconcile · zt-indicator · zt-tk · zt-report · zt-quantity
               zt-estimate · zt-ask · zt-archive · zt-knowledge · zt-volc · zt-cad
 

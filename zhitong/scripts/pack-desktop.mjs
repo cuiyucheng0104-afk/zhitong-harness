@@ -198,7 +198,7 @@ function main() {
       ...missingConverter.length > 0 ? [] : converter],
     entry: 'lib/index.js',
   })
-  console.log(`pack-desktop: ${tarballs.length} tarballs in ${relative(REPOSITORY, out) || out}（${skills.length} 个 skill${missingConverter.length > 0 ? '，未带 dwg2dxf' : ''}）`)
+  console.log(`pack-desktop: ${tarballs.length} tarballs in ${out.startsWith(REPOSITORY) ? relative(REPOSITORY, out) : out}（${skills.length} 个 skill${missingConverter.length > 0 ? '，未带 dwg2dxf' : ''}）`)
   if (missingConverter.length > 0) console.warn(`pack-desktop: 警告：未打包 dwg2dxf（${dirname(converter[0])}），安装后只能打开 DXF`)
 }
 
