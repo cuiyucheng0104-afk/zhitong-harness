@@ -28,7 +28,8 @@ import { tarballFiles } from '../../../scripts/release/tarball.ts'
 import { resolveDesktopTargetBuildPaths } from './desktop-build-paths.mjs'
 
 const DSH_PACKAGE = '@deepseek-ai/dsh'
-const ROOT_PACKAGES = [DSH_PACKAGE, DESKTOP_HOST_PACKAGE] as const
+// zhitong increment: the 智通数工AI bundle roots its plugin closure beside dsh (zhitong/README.md §10).
+const ROOT_PACKAGES = [DSH_PACKAGE, DESKTOP_HOST_PACKAGE, '@zhitong/bundle'] as const
 const APP_ROOT = resolve(import.meta.dirname, '..')
 const REPOSITORY_ROOT = resolve(APP_ROOT, '..', '..')
 
@@ -164,6 +165,8 @@ function main(): void {
     buildPaths.packedDsh,
     buildPaths.packedVendor,
     buildPaths.packedLandlock,
+    // zhitong increment
+    buildPaths.packedZhitong,
   ]
   const { values } = parseArgs({
     options: { from: { type: 'string', multiple: true }, out: { type: 'string' } },

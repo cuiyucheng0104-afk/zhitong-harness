@@ -483,6 +483,9 @@ export async function packageTarget(
     buildPaths.packedDsh,
   ], buildEnv, REPOSITORY_ROOT)
   await execute(['run', 'release:pack', '--family', 'vendor', '--out', buildPaths.packedVendor, ...packArguments], buildEnv, REPOSITORY_ROOT)
+  // zhitong increment: pack @zhitong/bundle (skills, zt) and its plugins for the dsh tree (zhitong/INSTALL.md).
+  await execute(['exec', 'node', 'zhitong/scripts/pack-desktop.mjs', '--out', buildPaths.packedZhitong,
+    '--platform', target.platform, '--arch', target.arch], buildEnv, REPOSITORY_ROOT)
   rmSync(buildPaths.packedLandlock, { recursive: true, force: true })
   mkdirSync(buildPaths.packedLandlock, { recursive: true })
   await execute(['--dir', 'native/system', 'run', 'build:ts'], buildEnv, REPOSITORY_ROOT)

@@ -14,6 +14,8 @@ export interface DesktopTargetBuildPaths {
   readonly packedDsh: string
   readonly packedVendor: string
   readonly packedLandlock: string
+  /** zhitong increment: packed @zhitong/bundle and plugins. */
+  readonly packedZhitong: string
   readonly downloads: string
 }
 

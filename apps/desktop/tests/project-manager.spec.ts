@@ -186,6 +186,22 @@ describe('desktop external plugin profile', () => {
     expect(existsSync(join(manager.paths.profile, 'desktop-runtime-state.json'))).toBe(false)
   })
 
+  // zhitong increment: the installation-shipped @zhitong/bundle joins new profiles and survives recovery.
+  it('selects @zhitong/bundle in a new profile when the runtime ships it and keeps it through recovery', async () => {
+    const root = temporaryRoot()
+    const dsh = join(root, 'resources', 'dsh')
+    runtimeFixture(dsh, '1.0.0', '24.17.0', ['@zhitong/bundle'])
+    const manager = new DesktopProjectManager(resolveDesktopPaths(join(root, '.dsh')), { dsh })
+    await manager.applyRelease()
+    const bundles = (): string[] => (JSON.parse(readFileSync(join(manager.paths.profile, 'package.json'), 'utf8')) as {
+      dsh: { profile: { bundles: string[] } }
+    }).dsh.profile.bundles
+    expect(bundles()).toEqual(['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app', '@zhitong/bundle'])
+    seedPlugin(manager)
+    await manager.disableAllPlugins()
+    expect(bundles()).toEqual(['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app', '@zhitong/bundle'])
+  })
+
   it('initializes and restarts offline without executing pnpm', async () => {
     const { manager } = setup()
     await expect(manager.applyRelease()).resolves.toBeUndefined()

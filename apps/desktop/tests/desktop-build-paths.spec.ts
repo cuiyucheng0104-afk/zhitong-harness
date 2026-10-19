@@ -25,6 +25,8 @@ describe('desktop build paths', () => {
       'packedDsh',
       'packedVendor',
       'packedLandlock',
+      // zhitong increment
+      'packedZhitong',
     ] as const
 
     for (const key of mutableKeys) {

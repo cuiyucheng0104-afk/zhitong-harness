@@ -36,6 +36,11 @@ describe('desktop package-set selection', () => {
       ['@deepseek-ai/cordis', packed('@deepseek-ai/cordis')],
       ['@deepseek-ai/platform-package', packed('@deepseek-ai/platform-package')],
       ['@deepseek-ai/unused', packed('@deepseek-ai/unused')],
+      // zhitong increment: the bundle root pulls its plugin and shared peers into the closure.
+      ['@zhitong/bundle', packed('@zhitong/bundle', {
+        dependencies: { '@zhitong/tool-tos': '0.1.0' }, peerDependencies: { '@deepseek-ai/cordis': '^1.0.0' },
+      })],
+      ['@zhitong/tool-tos', packed('@zhitong/tool-tos', { dependencies: { '@volcengine/tos-sdk': '2.9.1' } })],
     ])
     expect(selectDesktopPackageClosure(available).map(entry => entry.manifest.name)).toEqual([
       '@deepseek-ai/cordis',
@@ -43,6 +48,8 @@ describe('desktop package-set selection', () => {
       '@deepseek-ai/dsh-base',
       '@deepseek-ai/dsh-desktop-host',
       '@deepseek-ai/platform-package',
+      '@zhitong/bundle',
+      '@zhitong/tool-tos',
     ])
   })
 
@@ -56,6 +63,7 @@ describe('desktop package-set selection', () => {
       ['@deepseek-ai/dsh-desktop-host', packed('@deepseek-ai/dsh-desktop-host', {
         dependencies: { '@deepseek-ai/dsh': '^1.0.0' },
       })],
+      ['@zhitong/bundle', packed('@zhitong/bundle')],
     ])
     expect(() => selectDesktopPackageClosure(available)).toThrow(/unpacked package/u)
     expect(() => selectDesktopPackageClosure(new Map([
@@ -72,10 +80,19 @@ describe('desktop package-set selection', () => {
         },
       })],
       ['@deepseek-ai/dsh-desktop-host', packed('@deepseek-ai/dsh-desktop-host')],
+      ['@zhitong/bundle', packed('@zhitong/bundle')],
     ])
     expect(selectDesktopPackageClosure(available).map(entry => entry.manifest.name)).toEqual([
-      '@deepseek-ai/dsh', '@deepseek-ai/dsh-desktop-host',
+      '@deepseek-ai/dsh', '@deepseek-ai/dsh-desktop-host', '@zhitong/bundle',
     ])
+  })
+
+  // zhitong increment
+  it('requires the @zhitong/bundle root', () => {
+    expect(() => selectDesktopPackageClosure(new Map([
+      ['@deepseek-ai/dsh', packed('@deepseek-ai/dsh')],
+      ['@deepseek-ai/dsh-desktop-host', packed('@deepseek-ai/dsh-desktop-host')],
+    ]))).toThrow(/omit @zhitong\/bundle/u)
   })
 
   it('requires both Desktop Host and public CLI entries', () => {

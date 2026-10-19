@@ -27,12 +27,13 @@ export function writePackage(modules: string, name: string, fields: Record<strin
  * @param root - New runtime directory.
  * @param version - Shell and dsh version.
  * @param nodeVersion - Bundled Node version recorded in resource metadata.
+ * @param extraBundles - zhitong increment: further installation bundles sealed as shared packages.
  * @returns Sealed runtime metadata.
  */
-export function runtimeFixture(root: string, version = '1.0.0', nodeVersion = '24.17.0'): DesktopRuntimeDescriptor {
-  const names = ['@deepseek-ai/dsh', '@deepseek-ai/dsh-desktop-host', '@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app', '@deepseek-ai/cordis']
+export function runtimeFixture(root: string, version = '1.0.0', nodeVersion = '24.17.0', extraBundles: readonly string[] = []): DesktopRuntimeDescriptor {
+  const names = ['@deepseek-ai/dsh', '@deepseek-ai/dsh-desktop-host', '@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app', '@deepseek-ai/cordis', ...extraBundles]
   for (const name of names) {
-    const bundle = name === '@deepseek-ai/dsh-base' || name === '@deepseek-ai/dsh-web-app'
+    const bundle = name === '@deepseek-ai/dsh-base' || name === '@deepseek-ai/dsh-web-app' || extraBundles.includes(name)
     const path = writePackage(join(root, 'node_modules'), name, {
       version,
       ...(name === '@deepseek-ai/dsh' ? { dependencies: Object.fromEntries(names.slice(1).map(dependency => [dependency, version])) } : {}),
