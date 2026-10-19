@@ -17,11 +17,11 @@ whenToUse: 用户要按设计说明 / 做法表出清单框架、清单编码、
 工作目录 `工作/<YYYY-MM-DD>-清单/`。在项目根目录运行（路径相对项目根）：
 
 ```sh
-"$ZT_PYTHON" -m zt.quantity.cli prepare --files 资料/建筑设计说明.docx 资料/做法表.xlsx \
+<python> scripts/quantity.py prepare --files 资料/建筑设计说明.docx 资料/做法表.xlsx \
   --project-name "<项目名称，含标段>" [--eng-category 房屋建筑] --out 工作/2026-10-19-清单/prepare/
 ```
 
-`$ZT_PYTHON` 未设置时用 `python3`；等价写法 `scripts/quantity.py prepare ...`（相对本 skill 目录）。产物：`prepare/result.json`（`batches`、`exclusions`、`prepare_fingerprint`）、`清单分类说明.md`（角色定义、易混淆对照、条件候选、490 条受控码表）、`清单分类批次.md`（逐批片段 JSON 行与本批相关的排除句）。
+`<python>` 是解释器绝对路径：设置了 `$ZT_PYTHON` 就用它；否则调用 `load_workspace_dependencies`，用返回的 `python`（桌面版内置 Python）；都没有才用 `python3`。命令里的 scripts/ 路径相对本 skill 目录，写成绝对路径；PowerShell 里写 `& "<python>" …`。脚本报 `zt_not_importable`（退出码 2）时把 `message` 与 `hint` 告诉用户，不要换解释器硬跑。产物：`prepare/result.json`（`batches`、`exclusions`、`prepare_fingerprint`）、`清单分类说明.md`（角色定义、易混淆对照、条件候选、490 条受控码表）、`清单分类批次.md`（逐批片段 JSON 行与本批相关的排除句）。
 
 `status=empty` 时转述原因并停：`out_of_scope`（不是房建）、`no_practice`（没认出做法层）、`no_items`（认出的层全被层内自理 / 排除）。退出码 2：`no_text`、`too_many_segments`（>800 片段，按单体或专业拆开多次做）。
 
@@ -53,7 +53,7 @@ whenToUse: 用户要按设计说明 / 做法表出清单框架、清单编码、
 ## 4. finalize
 
 ```sh
-"$ZT_PYTHON" -m zt.quantity.cli finalize --prepare 工作/2026-10-19-清单/prepare/result.json \
+<python> scripts/quantity.py finalize --prepare 工作/2026-10-19-清单/prepare/result.json \
   --answers 工作/2026-10-19-清单/answers.json --out 工作/2026-10-19-清单/finalize/
 ```
 
@@ -64,7 +64,7 @@ whenToUse: 用户要按设计说明 / 做法表出清单框架、清单编码、
 ## 5. render
 
 ```sh
-"$ZT_PYTHON" -m zt.quantity.cli render --result 工作/2026-10-19-清单/finalize/result.json \
+<python> scripts/quantity.py render --result 工作/2026-10-19-清单/finalize/result.json \
   --xlsx 工作/2026-10-19-清单/清单框架.xlsx
 ```
 

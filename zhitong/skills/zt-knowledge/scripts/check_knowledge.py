@@ -22,11 +22,17 @@ stdout 只输出一个 JSON（结果信封字段）。退出码：0 全部通过
 """
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "_shared"))
+import zt_launch  # noqa: E402  解释器与 zt 定位：../../_shared/zt_launch.py
+
+zt_launch.ensure(__file__)
+
 import argparse
 import json
 import re
-import sys
-from pathlib import Path
 from typing import Any
 
 import yaml

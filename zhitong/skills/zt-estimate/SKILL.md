@@ -8,14 +8,14 @@ whenToUse: 用户要做投资估算 / 设计概算、按规模估总投资、出
 
 脚本：`zt.estimate`（零模型）。两段式：**抽取不出数，计算才出数**——你抽回来的规模量必须经用户确认才进计算。模板 `gsyz_v1` 是脱敏样本；费率规则 `fee_rules_zj2018.json`（浙江 2018 其他费用定额等 16 项）的签核状态是 `owner_release`「仓主默认放行，非造价员签署」，393 个转录数值未经造价员逐值核对；`勘察设计费` 档界闭开性未确认（CLOSURE_KNOWN_GAPS），该条金额单独扣留。随包指标基准是单一来源样本，只作单样本参考。偏离阈值 0.20 是未经造价员确认的占位值。
 
-在项目根目录运行，`$ZT_PYTHON` 未设置时用 `python3`；等价写法 `scripts/estimate.py <子命令> ...`。工作目录 `工作/<YYYY-MM-DD>-概算/`。
+在项目根目录运行（数据路径相对项目根）。`<python>` 是解释器绝对路径：设置了 `$ZT_PYTHON` 就用它；否则调用 `load_workspace_dependencies`，用返回的 `python`（桌面版内置 Python）；都没有才用 `python3`。命令里的 scripts/ 路径相对本 skill 目录，写成绝对路径；PowerShell 里写 `& "<python>" …`。脚本报 `zt_not_importable`（退出码 2）时把 `message` 与 `hint` 告诉用户，不要换解释器硬跑。工作目录 `工作/<YYYY-MM-DD>-概算/`。
 
 ## 1. 抽规模量（两半）
 
 读 `项目说明.md` 找设计说明 / 可研 / 经济技术指标表；扫描件无旁车先 `read_image` 看图写旁车。
 
 ```sh
-"$ZT_PYTHON" -m zt.estimate.cli extract_prepare --files 资料/可研报告.pdf 资料/建施说明.docx \
+<python> scripts/estimate.py extract_prepare --files 资料/可研报告.pdf 资料/建施说明.docx \
   --project-name "<项目名称，含标段>" --out 工作/2026-10-19-概算/extract/
 ```
 
@@ -31,7 +31,7 @@ whenToUse: 用户要做投资估算 / 设计概算、按规模估总投资、出
 只抄原文、不换算不推算；`quote` 逐字可在正文找到、≤40 字；一格多个不同值全列；面积为空的单体也列（area 给 null）；**严禁写任何金额**。
 
 ```sh
-"$ZT_PYTHON" -m zt.estimate.cli extract_finalize --prepare 工作/2026-10-19-概算/extract/result.json \
+<python> scripts/estimate.py extract_finalize --prepare 工作/2026-10-19-概算/extract/result.json \
   --answers 工作/2026-10-19-概算/extract_answers.json --out 工作/2026-10-19-概算/extract_final/
 ```
 
@@ -46,7 +46,7 @@ whenToUse: 用户要做投资估算 / 设计概算、按规模估总投资、出
 请求 `工作/<日期>-概算/suggest_request.json`：`{"inputs": {确认过的格: 数}, "dims": {...}, "fee_bases": {"工程费用": 万元}, "fee_attrs": {...}}`。
 
 ```sh
-"$ZT_PYTHON" -m zt.estimate.cli suggest --in 工作/2026-10-19-概算/suggest_request.json \
+<python> scripts/estimate.py suggest --in 工作/2026-10-19-概算/suggest_request.json \
   [--baselines 知识库/指标基准.json] --out 工作/2026-10-19-概算/suggest/
 ```
 
@@ -57,12 +57,12 @@ whenToUse: 用户要做投资估算 / 设计概算、按规模估总投资、出
 请求 `compute_request.json`：`inputs`（用户确认的全部格）、可选 `rates`（`reserve_rate` 预备费率，默认 5%，3–8% 外只告警）、`area_checks`、`acknowledged_checks`（`[{code, reason}]`，用户确认面积差异的理由）、`slot_labels`（槽位格 → 单体名）、`input_sources`（每格来源 user / extract / fee_rules…）、`fee_bases`、`fee_attrs`、`project_profile`、`project_name`、`generated_at`（固定它则两次出表逐字节一致）。
 
 ```sh
-"$ZT_PYTHON" -m zt.estimate.cli compute --in 工作/2026-10-19-概算/compute_request.json --out 工作/2026-10-19-概算/
+<python> scripts/estimate.py compute --in 工作/2026-10-19-概算/compute_request.json --out 工作/2026-10-19-概算/
 ```
 
 拦截闸顺序固定：必填 → 面积闸 → 面积对账（可带理由确认放行）→ 全零。被拦时 `status=insufficient`，`status_reason` 是闸的码，`data.detail` 原文转述给用户并按它补输入。通过后 `概算.xlsx`：499 条真公式、费率独立在 `估概算总表!J46`、末页「生成说明」；`quality.review_level` 非 ok 时标题带【草稿】/【需复核】，信封 `status_reason` 也是它。
 
-模板元数据（行树、输入位、告警码中文名）：`"$ZT_PYTHON" -m zt.estimate.cli template`。
+模板元数据（行树、输入位、告警码中文名）：`<python> scripts/estimate.py template`。
 
 ## 5. 汇报与纪律
 

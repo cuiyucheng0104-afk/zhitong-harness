@@ -23,6 +23,7 @@ _SCRIPT_CLIS = {
     ("zt-archive", "archive"): (load_script("zt-archive", "archive").cli, None),
     ("zt-ask", "read_doc"): (textextract_cli, "extract"),
     ("zt-ask", "find_text"): (textextract_cli, "search"),
+    ("zt-ask", "check_answer"): (textextract_cli, "check-answer"),
 }
 
 
@@ -84,11 +85,11 @@ def test_example_commands_use_real_subcommands_and_flags(skill):
     assert checked, "没有检查到任何示例命令（正则漂移？）"
 
 
-def test_module_commands_in_zt_ask_exist():
+def test_check_answer_command_in_zt_ask_uses_real_flags():
     text = (SKILLS / "zt-ask" / "SKILL.md").read_text(encoding="utf-8")
-    m = re.search(r"-m zt\.textextract\.cli (check-answer)((?:\s|\\\n|[^\n`])*)", text)
+    m = re.search(r"scripts/check_answer\.py((?:\s|\\\n|[^\n`])*)", text)
     assert m
-    flags = re.findall(r"(?<![\w-])(--[a-z][\w-]*)", m.group(2))
+    flags = re.findall(r"(?<![\w-])(--[a-z][\w-]*)", m.group(1))
     assert flags and set(flags) <= _options(textextract_cli, "check-answer")
 
 

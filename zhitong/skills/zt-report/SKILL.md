@@ -6,7 +6,7 @@ whenToUse: 用户要写、生成、起草某个项目的报告、说明、审定
 
 # 报告初稿
 
-脚本 `scripts/report.py`（等价 `"$ZT_PYTHON" -m zt.report.cli`，未设置 `$ZT_PYTHON` 用 `python3`）。每步 stdout 一行摘要，完整结果在 `--out` 下的 `result.json`。工作目录 `工作/<YYYY-MM-DD>-报告/`（下称 `W/`），命令都在项目根目录跑，`--root .`。
+脚本 `scripts/report.py`，运行写 `<python> scripts/report.py <子命令> …`。`<python>` 是解释器绝对路径：设置了 `$ZT_PYTHON` 就用它；否则调用 `load_workspace_dependencies`，用返回的 `python`（桌面版内置 Python）；都没有才用 `python3`。命令里的 scripts/ 路径相对本 skill 目录，写成绝对路径；PowerShell 里写 `& "<python>" …`。脚本报 `zt_not_importable`（退出码 2）时把 `message` 与 `hint` 告诉用户，不要换解释器硬跑。每步 stdout 一行摘要，完整结果在 `--out` 下的 `result.json`。工作目录 `工作/<YYYY-MM-DD>-报告/`（下称 `W/`），命令都在项目根目录跑，`--root .`。
 
 ## 1. 选模板
 

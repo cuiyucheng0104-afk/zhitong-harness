@@ -6,6 +6,12 @@
 from __future__ import annotations
 
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "_shared"))
+import zt_launch  # noqa: E402  解释器与 zt 定位：../../_shared/zt_launch.py
+
+zt_launch.ensure(__file__)
 
 from zt.textextract.cli import cli
 

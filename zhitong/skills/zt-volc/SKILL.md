@@ -8,7 +8,7 @@ whenToUse: 用户要看或操作公司的火山引擎资源（ECS 状态、启�
 
 脚本 `zt.volc` 是 `ve`（火山引擎官方 CLI）与 `ssh` 的封装，不直接调 SDK，零模型。它对应用户本机的三个旧工具：`vec`（`ve --profile <profile>`）、`ssh-access-sync.sh`（把当前公网 IP 同步进安全组白名单）、`pssh`（用 `~/.ssh/config` 别名登录服务器）。
 
-调用：`"$ZT_PYTHON" -m zt.volc.cli <子命令> [选项]`（`$ZT_PYTHON` 未设置时用 `python3`；等价写法 `scripts/volc.py ...`）。stdout 是一个 JSON：成功是结果信封，失败是退出码 2 + `{"error": {code, message, hint}}`。
+调用：`<python> scripts/volc.py <子命令> [选项]`。`<python>` 是解释器绝对路径：设置了 `$ZT_PYTHON` 就用它；否则调用 `load_workspace_dependencies`，用返回的 `python`（桌面版内置 Python）；都没有才用 `python3`。命令里的 scripts/ 路径相对本 skill 目录，写成绝对路径；PowerShell 里写 `& "<python>" …`。脚本报 `zt_not_importable`（退出码 2）时把 `message` 与 `hint` 告诉用户，不要换解释器硬跑。stdout 是一个 JSON：成功是结果信封，失败是退出码 2 + `{"error": {code, message, hint}}`。
 
 ## 1. 名称从哪来
 

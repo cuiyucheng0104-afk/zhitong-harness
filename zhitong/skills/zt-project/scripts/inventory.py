@@ -5,8 +5,15 @@
 """
 from __future__ import annotations
 
-import os
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "_shared"))
+import zt_launch  # noqa: E402  解释器与 zt 定位：../../_shared/zt_launch.py
+
+zt_launch.ensure(__file__)
+
+import os
 
 os.environ.setdefault("ZT_PROJECT_DATA", str(Path(__file__).resolve().parent.parent / "data"))
 

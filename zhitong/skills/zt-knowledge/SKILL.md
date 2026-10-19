@@ -70,10 +70,10 @@ title: 条目标题
 ## 校验
 
 ```sh
-"$ZT_PYTHON" scripts/check_knowledge.py --root ~/zhitong/知识库
+<python> scripts/check_knowledge.py --root ~/zhitong/知识库
 ```
 
-`$ZT_PYTHON` 未设置时用 `python3`；不带 `--root` 检查仓库里的 `zhitong/knowledge-seed`。stdout 是一个 JSON：`status=ok` 全部通过；`partial` 时 `warning_items` 逐条给出违规（`missing_readme`、`missing_source`、`missing_date`、`missing_scope`、`bad_frontmatter`），退出码 1。把 `status` 和违规条目如实告诉用户，不要在没改正前推送。
+`<python>` 是解释器绝对路径：设置了 `$ZT_PYTHON` 就用它；否则调用 `load_workspace_dependencies`，用返回的 `python`（桌面版内置 Python）；都没有才用 `python3`。命令里的 scripts/ 路径相对本 skill 目录，写成绝对路径；PowerShell 里写 `& "<python>" …`。脚本报 `zt_not_importable`（退出码 2）时把 `message` 与 `hint` 告诉用户，不要换解释器硬跑。不带 `--root` 检查仓库里的 `zhitong/knowledge-seed`。stdout 是一个 JSON：`status=ok` 全部通过；`partial` 时 `warning_items` 逐条给出违规（`missing_readme`、`missing_source`、`missing_date`、`missing_scope`、`bad_frontmatter`），退出码 1。把 `status` 和违规条目如实告诉用户，不要在没改正前推送。
 
 ## 清单编码生成件
 

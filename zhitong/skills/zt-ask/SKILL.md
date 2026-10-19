@@ -6,7 +6,7 @@ whenToUse: 用户就某个项目的资料、成果，或知识库里的规范、
 
 # 项目 / 知识库问答
 
-没有索引、没有数据库：先看目录，再读文件，答案只来自你实际读到的内容。脚本在本 skill 的 `scripts/`（零模型），运行方式 `"${ZT_PYTHON:-python3}" scripts/<x>.py ...`；stdout 是一个 JSON，`status` 与 `warning_items` 要如实转述。
+没有索引、没有数据库：先看目录，再读文件，答案只来自你实际读到的内容。脚本在本 skill 的 `scripts/`（零模型），运行方式 `<python> scripts/<x>.py ...`。`<python>` 是解释器绝对路径：设置了 `$ZT_PYTHON` 就用它；否则调用 `load_workspace_dependencies`，用返回的 `python`（桌面版内置 Python）；都没有才用 `python3`。命令里的 scripts/ 路径相对本 skill 目录，写成绝对路径；PowerShell 里写 `& "<python>" …`。脚本报 `zt_not_importable`（退出码 2）时把 `message` 与 `hint` 告诉用户，不要换解释器硬跑。stdout 是一个 JSON，`status` 与 `warning_items` 要如实转述。
 
 ## 范围先定
 
@@ -32,7 +32,7 @@ scripts/find_text.py --root <本机项目目录> --keyword 合同价款 --keywor
 6. **回答前核对**（含数字的回答必做）：把答案存成文本，读过的资料文本用 `--text-out` 留好，然后
 
 ```sh
-"${ZT_PYTHON:-python3}" -m zt.textextract.cli check-answer --answer 工作/问答/答案.md \
+<python> scripts/check_answer.py --answer 工作/问答/答案.md \
   --source 资料/合同.pdf=工作/问答/合同.txt --source 资料/清单.xlsx=工作/问答/清单.txt
 ```
    `warning_items` 里的 `unattributed_number`（数字在读过的资料里找不到）、`citation_not_read`（引用了没读过的文件）、`citation_locator_missing`（引用的页或行不存在）都要处理：补读、改正，或在答案里明确写「该数字资料中未找到出处」。`data.passed=false` 时不要原样发出去。

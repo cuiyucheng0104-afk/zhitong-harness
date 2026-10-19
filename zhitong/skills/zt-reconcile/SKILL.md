@@ -17,7 +17,7 @@ whenToUse: 用户要对比送审与审定（或报审与审核）计价表、统
 预检（只看是不是计价表，不读金额）：
 
 ```sh
-"$ZT_PYTHON" -m zt.costsheet.cli probe --files 资料/a.xlsx 资料/b.xlsx
+<python> scripts/probe.py probe --files 资料/a.xlsx 资料/b.xlsx
 ```
 
 `kind=costsheet` 才是计价表；`other` 是读过但没有清单表头；`unknown` 看 `reason`。
@@ -30,12 +30,12 @@ whenToUse: 用户要对比送审与审定（或报审与审核）计价表、统
 工作目录 `工作/<YYYY-MM-DD>-核对/`（同一天再做一次用 `-核对-2`）。
 
 ```sh
-"$ZT_PYTHON" -m zt.reconcile.cli run \
+<python> scripts/reconcile.py run \
   --submitted 资料/送审.xlsx --approved 资料/审定.xlsx \
   [--basis auto] --out 工作/2026-10-19-核对/
 ```
 
-- `$ZT_PYTHON` 未设置时用 `python3`。等价写法：`scripts/reconcile.py run ...`、`scripts/probe.py probe ...`（相对本 skill 目录）。
+- `<python>` 是解释器绝对路径：设置了 `$ZT_PYTHON` 就用它；否则调用 `load_workspace_dependencies`，用返回的 `python`（桌面版内置 Python）；都没有才用 `python3`。命令里的 scripts/ 路径相对本 skill 目录，写成绝对路径；PowerShell 里写 `& "<python>" …`。脚本报 `zt_not_importable`（退出码 2）时把 `message` 与 `hint` 告诉用户，不要换解释器硬跑。
 - `--basis`：`auto`（有本期列比本期，否则比合价，默认）/ `current` 本期 / `cumulative` 累计 / `contract` 合同价。进度款表先用 `auto`；结果提示口径问题时按提示换。
 - 也可 `--in request.json`：`{"submitted_file": 路径或 {"path","file_id","file_name"}, "approved_file": …, "basis": "auto"}`。
 - stdout 只有一行摘要 `{status, status_reason, warning_items, out}`；完整结果在 `<out>/result.json`，底稿 `<out>/核对结果.xlsx`（汇总、逐行核对、按章汇总）。

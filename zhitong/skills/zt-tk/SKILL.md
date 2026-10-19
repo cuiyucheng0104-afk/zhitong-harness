@@ -11,7 +11,7 @@ whenToUse: 用户要做投控检测、进度款/结算的异常排查、对照�
 ## 1. 准备输入
 
 1. 读 `项目说明.md`：「关键文件指引」里的送审计价表（本期进度款或结算送审，可多份），以及合同/中标清单。
-2. 不明确时列 `资料/` 下的 `.xlsx/.xlsm` 并预检（`"$ZT_PYTHON" -m zt.costsheet.cli probe --files ...`），把候选列给用户用 `ask_user_question` 确认哪些是送审、哪份是合同清单。`.xls` 请用户另存为 `.xlsx`。
+2. 不明确时列 `资料/` 下的 `.xlsx/.xlsm` 并预检（`<python> ../zt-reconcile/scripts/probe.py probe --files ...`），把候选列给用户用 `ask_user_question` 确认哪些是送审、哪份是合同清单。`.xls` 请用户另存为 `.xlsx`。
 3. 没有合同/中标清单也能跑：只跑 v1 规则（重复计取、暂估、行内自洽、大额），`rules_skipped` 会写 `baseline_not_provided`。
 
 ## 2. 检测
@@ -19,12 +19,12 @@ whenToUse: 用户要做投控检测、进度款/结算的异常排查、对照�
 工作目录 `工作/<YYYY-MM-DD>-投控/`。
 
 ```sh
-"$ZT_PYTHON" -m zt.tk.cli detect --files 资料/第5期送审.xlsx \
+<python> scripts/tk.py detect --files 资料/第5期送审.xlsx \
   [--baseline-files 资料/中标清单.xlsx] [--basis auto] --project-id 2026-007 \
   --out 工作/2026-10-19-投控/
 ```
 
-- `$ZT_PYTHON` 未设置时用 `python3`；等价写法 `scripts/tk.py detect ...`（相对本 skill 目录）。
+- `<python>` 是解释器绝对路径：设置了 `$ZT_PYTHON` 就用它；否则调用 `load_workspace_dependencies`，用返回的 `python`（桌面版内置 Python）；都没有才用 `python3`。命令里的 scripts/ 路径相对本 skill 目录，写成绝对路径；PowerShell 里写 `& "<python>" …`。脚本报 `zt_not_importable`（退出码 2）时把 `message` 与 `hint` 告诉用户，不要换解释器硬跑。
 - `--project-id` 用项目编号：它进入每条异常的 `anomaly_id`。`anomaly_id` 还含文件标识（缺省是命令行里写的路径，`\` 与 `./` 会规范化）：始终在项目根目录下用同一种相对路径（如 `资料/第5期送审.xlsx`）调用，同一行清单在不同轮次的身份才不变；换了写法（相对改绝对）`anomaly_id` 会变，旧 `复核.jsonl` 对不上。
 - `--basis`：送审文件的期次口径，`auto`（默认）/ `current` / `cumulative` / `contract`。
 - `--rules` 可换用另一份阈值 YAML（用户明确要求调阈值时才用，并在汇报里说明用了哪份）。
@@ -45,10 +45,10 @@ whenToUse: 用户要做投控检测、进度款/结算的异常排查、对照�
 按严重度顺序与用户逐条过（一次 3–5 条）：给出 `detail`、定位，必要时打开原表那一行核对；用户判断后追加决定：
 
 ```sh
-"$ZT_PYTHON" -m zt.tk.cli review --result 工作/2026-10-19-投控/result.json \
+<python> scripts/tk.py review --result 工作/2026-10-19-投控/result.json \
   --log 工作/2026-10-19-投控/复核.jsonl --anomaly-id <anomaly_id> \
   --state confirmed|dismissed|pending --reason "依据……" [--reviewer 张工]
-"$ZT_PYTHON" -m zt.tk.cli progress --result 工作/2026-10-19-投控/result.json --log 工作/2026-10-19-投控/复核.jsonl
+<python> scripts/tk.py progress --result 工作/2026-10-19-投控/result.json --log 工作/2026-10-19-投控/复核.jsonl
 ```
 
 - `confirmed` 确认异常，`dismissed` 判为误报，`pending` 撤回为待复核；理由必填，写明依据（对照了哪份文件哪一行）。

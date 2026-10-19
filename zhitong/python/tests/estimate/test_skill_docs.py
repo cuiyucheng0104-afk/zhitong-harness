@@ -31,7 +31,7 @@ def test_skill_md_frontmatter_budget_and_commands():
     assert len(body) <= BODY_MAX, f"正文 {len(body)} 字符，超过 {BODY_MAX}"
     for rel in re.findall(r"`(scripts/[\w.]+\.py)", body) + re.findall(r"`(references/[^`]+)`", body):
         assert (SKILL / rel).is_file(), f"引用了不存在的 {rel}"
-    used = set(re.findall(r"zt\.estimate\.cli (\w+)", body))
+    used = set(re.findall(r"scripts/estimate\.py (\w+)", body))
     assert used == set(cli._commands), f"SKILL.md 的子命令与 CLI 不一致：{sorted(used ^ set(cli._commands))}"
 
 

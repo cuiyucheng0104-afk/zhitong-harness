@@ -6,7 +6,7 @@ whenToUse: 用户说项目做完了、要归档、要把成果入库，或要把
 
 # 项目归档
 
-脚本 `scripts/archive.py`（零模型）：`"${ZT_PYTHON:-python3}" scripts/archive.py <check|apply> ...`。stdout 一个 JSON，`status` 与 `warning_items` 如实转述。归档就是三件事：核对、推送、登记。不做后台任务，不做锁；多人同时改案例索引靠桶的版本控制回退。
+脚本 `scripts/archive.py`（零模型）：`<python> scripts/archive.py <check|apply> ...`。`<python>` 是解释器绝对路径：设置了 `$ZT_PYTHON` 就用它；否则调用 `load_workspace_dependencies`，用返回的 `python`（桌面版内置 Python）；都没有才用 `python3`。命令里的 scripts/ 路径相对本 skill 目录，写成绝对路径；PowerShell 里写 `& "<python>" …`。脚本报 `zt_not_importable`（退出码 2）时把 `message` 与 `hint` 告诉用户，不要换解释器硬跑。stdout 一个 JSON，`status` 与 `warning_items` 如实转述。归档就是三件事：核对、推送、登记。不做后台任务，不做锁；多人同时改案例索引靠桶的版本控制回退。
 
 ## 步骤
 

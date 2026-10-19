@@ -11,7 +11,7 @@ whenToUse: 用户要算单方造价、专业/章节占比、造价构成，或�
 ## 1. 准备输入
 
 1. 读 `项目说明.md`：「关键文件指引」里的计价表（控制价、预算、结算的分部分项计价表；多个单体可以一起给），以及总建筑面积、业态、结构。
-2. 计价表不明确时：列 `资料/` 下的 `.xlsx/.xlsm` 并预检（`"$ZT_PYTHON" -m zt.costsheet.cli probe --files ...`，或 `../zt-reconcile/scripts/probe.py probe ...`），把候选列给用户用 `ask_user_question` 确认。`.xls` 请用户另存为 `.xlsx`。
+2. 计价表不明确时：列 `资料/` 下的 `.xlsx/.xlsm` 并预检（`<python> ../zt-reconcile/scripts/probe.py probe --files ...`，脚本在 zt-reconcile skill 目录下），把候选列给用户用 `ask_user_question` 确认。`.xls` 请用户另存为 `.xlsx`。
 3. 总建筑面积：只用项目说明或资料里写明的数，并记下出处（`--area-source` 写来源，例如「项目说明」「设计说明第 3 页」）；找不到就问用户，不要估。
 4. 用户给了含税总造价时用 `--total-amount`，否则脚本按「费用表合计 → 清单明细合计」取。
 
@@ -20,12 +20,12 @@ whenToUse: 用户要算单方造价、专业/章节占比、造价构成，或�
 工作目录 `工作/<YYYY-MM-DD>-指标/`。
 
 ```sh
-"$ZT_PYTHON" -m zt.indicator.cli run --files 资料/6号楼.xlsx 资料/7号楼.xlsx \
+<python> scripts/indicator.py run --files 资料/6号楼.xlsx 资料/7号楼.xlsx \
   --gross-area 12000 --area-source 项目说明 [--total-amount 50000000] [--baseline 工作/2026-10-19-指标/对标.json] \
   --out 工作/2026-10-19-指标/
 ```
 
-- `$ZT_PYTHON` 未设置时用 `python3`；等价写法 `scripts/indicator.py run ...`（相对本 skill 目录）。
+- `<python>` 是解释器绝对路径：设置了 `$ZT_PYTHON` 就用它；否则调用 `load_workspace_dependencies`，用返回的 `python`（桌面版内置 Python）；都没有才用 `python3`。命令里的 scripts/ 路径相对本 skill 目录，写成绝对路径；PowerShell 里写 `& "<python>" …`。脚本报 `zt_not_importable`（退出码 2）时把 `message` 与 `hint` 告诉用户，不要换解释器硬跑。
 - 也可 `--in request.json`：`{"price_files": [...], "gross_area", "area_source", "total_amount", "baseline"}`。
 - stdout 一行摘要；完整结果 `<out>/result.json`，底稿 `<out>/指标结果.xlsx`（汇总、指标、按章、造价驱动项、未计入文件）。
 - 退出码 2 是调用错误（文件不存在、超上限、参数不对），按 `error.hint` 修正。

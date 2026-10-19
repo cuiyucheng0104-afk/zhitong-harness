@@ -6,7 +6,7 @@ whenToUse: 用户要新建项目、打开某个已有项目、问「资料齐不
 
 # 开项目与资料盘点
 
-脚本都在本 skill 的 `scripts/`（零模型）。运行方式：`"${ZT_PYTHON:-python3}" scripts/<x>.py <子命令> ...`（`ZT_PYTHON` 未设置时用 `python3`）。stdout 只有一个 JSON；`status` 与 `warning_items` 要如实转述给用户，`error` 按 `hint` 修。本机缓存根默认 `~/zhitong`（Windows `%USERPROFILE%\zhitong`），与桶同构，`tos_pull` 返回的路径就是本机路径。
+脚本都在本 skill 的 `scripts/`（零模型）。运行方式：`<python> scripts/<x>.py <子命令> ...`。`<python>` 是解释器绝对路径：设置了 `$ZT_PYTHON` 就用它；否则调用 `load_workspace_dependencies`，用返回的 `python`（桌面版内置 Python）；都没有才用 `python3`。命令里的 scripts/ 路径相对本 skill 目录，写成绝对路径；PowerShell 里写 `& "<python>" …`。脚本报 `zt_not_importable`（退出码 2）时把 `message` 与 `hint` 告诉用户，不要换解释器硬跑。stdout 只有一个 JSON；`status` 与 `warning_items` 要如实转述给用户，`error` 按 `hint` 修。本机缓存根默认 `~/zhitong`（Windows `%USERPROFILE%\zhitong`），与桶同构，`tos_pull` 返回的路径就是本机路径。
 
 ## 1. 打开已有项目
 
