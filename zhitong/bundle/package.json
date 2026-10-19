@@ -1,0 +1,29 @@
+{
+  "name": "@zhitong/bundle",
+  "description": "智通数工AI：造价咨询工作台 profile 层（TOS 文件通道、配置包导入、内置 skill、造价人设）",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "cordis.patch.yml"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "dependencies": {
+    "@zhitong/config-import": "workspace:*",
+    "@zhitong/tool-tos": "workspace:*"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "workspace:~"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "workspace:~"
+  }
+}
