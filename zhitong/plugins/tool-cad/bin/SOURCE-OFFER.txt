@@ -1,0 +1,16 @@
+LibreDWG dwg2dxf — corresponding source (GNU GPL v3, section 6)
+
+The dwg2dxf executable in this directory is an unmodified build of GNU LibreDWG.
+It is licensed under the GNU General Public License version 3 (see COPYING).
+The CAD plugin of 智通数工AI starts it only as a separate process (command-line
+arguments and temporary files); it is not linked into the plugin, and it can be
+replaced or removed, in which case only DWG input is unavailable.
+
+Corresponding source for the version named in VERSION.txt:
+  https://github.com/LibreDWG/libredwg/releases  (release tarball libredwg-<version>.tar.xz)
+  https://ftp.gnu.org/gnu/libredwg/
+The build command and the source tarball's SHA-256 are recorded in VERSION.txt.
+
+For at least three years after we distribute this executable, anyone may request
+a copy of the exact corresponding source from the distributor of this installer,
+for no more than the cost of physically performing the distribution.

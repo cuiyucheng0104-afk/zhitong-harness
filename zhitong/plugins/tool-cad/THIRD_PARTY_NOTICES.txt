@@ -1,0 +1,35 @@
+@zhitong/tool-cad — third-party notices
+=======================================
+
+1. LibreDWG dwg2dxf (bin/<platform>-<arch>/dwg2dxf[.exe] and, on Windows, the DLLs beside it)
+   License: GNU General Public License v3.0 (bin/<platform>-<arch>/COPYING)
+   The plugin starts dwg2dxf only as a separate process through the harness
+   subprocess service; data crosses the process boundary as command-line
+   paths, temporary files, and the exit code. No LibreDWG code is linked or
+   embedded. The executable can be replaced or removed; without it only DWG
+   input is unavailable and DXF files still open.
+   Corresponding source: see bin/SOURCE-OFFER.txt and VERSION.txt next to the
+   executable (https://github.com/LibreDWG/libredwg/releases).
+   No linked LibreDWG wrapper (for example @mlightcad/libredwg-web or an N-API
+   binding) may be added to this package.
+
+2. KST32B.shx stroke font (assets/fonts/kst32b.shx)
+   Copyright (C) 2004 Saka.N. FREEWARE, free to copy and change, no
+   responsibility. Original license text (Shift-JIS):
+   assets/fonts/LICENSE_KST32B_v2.txt
+
+3. Noto Sans SC, GB2312 subset (assets/fonts/NotoSansSC-Regular-GB2312.otf)
+   © 2014-2021 Adobe (http://www.adobe.com/). SIL Open Font License 1.1
+   (assets/fonts/OFL-NotoSansSC.txt).
+   Subset of NotoSansSC-Regular.otf version 2.004 (notofonts/noto-cjk,
+   Sans/SubsetOTF/SC, sha256 faa6c9df652116dde789d351359f3d7e5d2285a2b2a1f04a2d7244df706d5ea9)
+   produced with fontTools pyftsubset over the character set of
+   scripts/font-charset.py (GB2312, ASCII, Latin-1, CJK punctuation, full-width
+   forms, CAD symbols).
+
+4. npm dependencies, bundled with the application:
+   dxf-parser 1.1.2 (MIT), earcut 3.2.3 (ISC), @mlightcad/shx-parser 1.4.5 (MIT),
+   @napi-rs/canvas 1.0.8 (MIT; includes Skia, BSD-3-Clause).
+
+No Autodesk or Tianzheng proprietary font ships with this package. SHX fonts a
+user configures through `shxFonts` are read locally and never redistributed.
