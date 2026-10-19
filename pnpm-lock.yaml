@@ -16111,6 +16111,9 @@ importers:
       '@zhitong/config-import':
         specifier: workspace:*
         version: link:../plugins/config-import
+      '@zhitong/tool-cad':
+        specifier: workspace:*
+        version: link:../plugins/tool-cad
       '@zhitong/tool-tos':
         specifier: workspace:*
         version: link:../plugins/tool-tos
@@ -16121,6 +16124,12 @@ importers:
 
   zhitong/plugins/config-import:
     dependencies:
+      '@deepseek-ai/dsh-atomic-write':
+        specifier: workspace:*
+        version: link:../../../packages/util/atomic-write
+      '@deepseek-ai/dsh-home-paths':
+        specifier: workspace:*
+        version: link:../../../packages/util/home-paths
       '@deepseek-ai/schemastery':
         specifier: link:../../../vendor/schemastery
         version: link:../../../vendor/schemastery

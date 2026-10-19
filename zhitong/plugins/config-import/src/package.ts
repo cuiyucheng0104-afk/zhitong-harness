@@ -25,7 +25,7 @@ export interface TosSection {
   readonly secretAccessKey: string
 }
 
-/** Validated SSH host (applied by the zt-volc work order; validated here). */
+/** Validated SSH host; `config_import` writes it into the managed block of the OpenSSH config. */
 export interface SshHost {
   readonly alias: string
   readonly host: string
@@ -166,11 +166,16 @@ export function parsePackage(text: string): ConfigPackage {
           const port = host['port'] ?? 22
           if (typeof port !== 'number' || !Number.isInteger(port) || port < 1 || port > 65535) problems.push(`${at}.port 必须是 1–65535 的整数`)
           const privateKey = host['privateKey'] === undefined ? undefined : secret(host, at, 'privateKey', problems, false)
+          // host and user land verbatim in ~/.ssh/config, so whitespace or quotes could inject options.
+          const hostName = text1(host, at, 'host', problems)
+          if (hostName !== '' && !/^[A-Za-z0-9.:%_-]+$/u.test(hostName)) problems.push(`${at}.host 只能是主机名或 IP 地址`)
+          const user = text1(host, at, 'user', problems)
+          if (user !== '' && !/^[A-Za-z0-9._][A-Za-z0-9._-]*$/u.test(user)) problems.push(`${at}.user 只能含字母、数字、. _ -`)
           hosts.push({
             alias,
-            host: text1(host, at, 'host', problems),
+            host: hostName,
             port: typeof port === 'number' ? port : 22,
-            user: text1(host, at, 'user', problems),
+            user,
             ...privateKey !== undefined ? { privateKey } : {},
           })
         })

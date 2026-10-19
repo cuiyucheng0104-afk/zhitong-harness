@@ -1,10 +1,11 @@
-import { writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { strToU8, zipSync } from 'fflate'
 import type { Context } from '@deepseek-ai/cordis'
 import * as ConfigImport from '../src/index.ts'
 import { PackageError, parsePackage } from '../src/package.ts'
+import { mergeSshConfig, SSH_BLOCK_BEGIN, SSH_BLOCK_END } from '../src/remote.ts'
 import { call, tempDir, text, toolContext, valueOf } from '../../tool-tos/tests/support.ts'
 
 const SECRET_ID = 'AKLTexampleAccessKeyId0001'
@@ -64,8 +65,14 @@ async function setup(options: { editor?: boolean; credentials?: boolean } = {}) 
     ctx.provide('configEditor')
     ctx.set('configEditor', editor)
   }
-  await ctx.plugin(ConfigImport, {})
-  return { ctx, credentials, editor }
+  const home = workDir()
+  const targets = {
+    volcConfigPath: join(home, 'dsh', 'zhitong', 'volc.config.json'),
+    sshConfigPath: join(home, '.ssh', 'config'),
+    sshKeyDir: join(home, '.ssh', 'zhitong'),
+  }
+  await ctx.plugin(ConfigImport, targets)
+  return { ctx, credentials, editor, targets }
 }
 
 function writePackage(dir: string, value: unknown, name = 'zhitong.config.json'): string {
@@ -84,7 +91,10 @@ interface ImportValue {
   company: string
   tos: { endpoint: string; region: string; bucket: string; prefix: string }
   storedCredentials: string[]
-  deferredSections: string[]
+  volcProfile: string
+  volcConfig: string
+  sshConfig: string
+  sshHosts: string[]
 }
 
 async function importOk(ctx: Context, path: string, dryRun = false): Promise<{ value: ImportValue; output: string }> {
@@ -102,7 +112,10 @@ describe('config_import', () => {
       company: '某某工程造价咨询有限公司',
       tos: { endpoint: 'tos-cn-beijing.volces.com', region: 'cn-beijing', bucket: 'zt-company', prefix: '某某咨询' },
       storedCredentials: ['ZT_TOS_ACCESS_KEY_ID', 'ZT_TOS_SECRET_ACCESS_KEY'],
-      deferredSections: [],
+      volcProfile: '',
+      volcConfig: '',
+      sshConfig: '',
+      sshHosts: [],
     })
     expectNoSecret(output)
     expect(credentials!.values.get('ZT_TOS_ACCESS_KEY_ID')).toBe(SECRET_ID)
@@ -176,16 +189,97 @@ describe('config_import', () => {
     expectNoSecret(text(result))
   })
 
-  it('validates and defers the ssh and volc sections', async () => {
-    const { ctx } = await setup()
+  it('writes the volc names, the managed ssh block, and owner-only key files', async () => {
+    const { ctx, targets } = await setup()
+    const KEY = '-----BEGIN OPENSSH PRIVATE KEY-----\nSENTINEL-KEY-BODY\n-----END OPENSSH PRIVATE KEY-----'
     const withExtras = pkg({
-      ssh: { hosts: [{ alias: 'zt-prod', host: '10.0.0.1', user: 'root', privateKey: '-----BEGIN OPENSSH PRIVATE KEY-----\nxx\n' }] },
+      ssh: { hosts: [
+        { alias: 'zt-prod', host: '10.0.0.1', user: 'root', privateKey: KEY },
+        { alias: 'zt-bastion', host: 'bastion.example.com', port: 2222, user: 'ops' },
+      ] },
       volc: { profile: 'zt-ak', region: 'cn-beijing' },
     })
+    mkdirSync(join(targets.sshConfigPath, '..'), { recursive: true })
+    writeFileSync(targets.sshConfigPath, 'Host *\n  User someone\n')
     const { value, output } = await importOk(ctx, writePackage(workDir(), withExtras))
-    expect(value.deferredSections).toEqual(['ssh', 'volc'])
-    expect(output).toContain('暂不应用')
-    expect(output).not.toContain('PRIVATE KEY')
+    expect(value).toMatchObject({
+      applied: true, volcProfile: 'zt-ak', volcConfig: targets.volcConfigPath,
+      sshConfig: targets.sshConfigPath, sshHosts: ['zt-prod', 'zt-bastion'],
+    })
+    expect(output).toContain('ve configure set --profile zt-ak')
+    expect(output).not.toContain('SENTINEL-KEY-BODY')
+    expectNoSecret(output)
+
+    const settings = readFileSync(targets.volcConfigPath, 'utf8')
+    expect(JSON.parse(settings)).toEqual({
+      format: 'zhitong.config/1',
+      company: { name: '某某工程造价咨询有限公司' },
+      volc: { profile: 'zt-ak', region: 'cn-beijing' },
+      ssh: { hosts: [{ alias: 'zt-prod' }, { alias: 'zt-bastion' }] },
+    })
+    expect(settings).not.toContain('10.0.0.1')
+    expectNoSecret(settings)
+
+    const sshConfig = readFileSync(targets.sshConfigPath, 'utf8')
+    const keyFile = join(targets.sshKeyDir, 'zt-prod')
+    expect(sshConfig).toBe([
+      SSH_BLOCK_BEGIN,
+      'Host zt-prod', '  HostName 10.0.0.1', '  Port 22', '  User root',
+      `  IdentityFile "${keyFile.replaceAll('\\', '/')}"`, '  IdentitiesOnly yes',
+      'Host zt-bastion', '  HostName bastion.example.com', '  Port 2222', '  User ops',
+      SSH_BLOCK_END, '', 'Host *', '  User someone', '',
+    ].join('\n'))
+    expect(readFileSync(keyFile, 'utf8')).toBe(`${KEY}\n`)
+    if (process.platform !== 'win32') {
+      expect(statSync(keyFile).mode & 0o777).toBe(0o600)
+      expect(statSync(targets.sshConfigPath).mode & 0o777).toBe(0o600)
+    }
+
+    // Re-import replaces the managed block in place and keeps the user's own sections.
+    const again = pkg({ ssh: { hosts: [{ alias: 'zt-new', host: '10.0.0.2', user: 'root' }] } })
+    await importOk(ctx, writePackage(workDir(), again))
+    const replaced = readFileSync(targets.sshConfigPath, 'utf8')
+    expect(replaced.match(/zhitong config-import（/gu)).toHaveLength(1)
+    expect(replaced).toContain('Host zt-new')
+    expect(replaced).not.toContain('zt-prod')
+    expect(replaced.endsWith('Host *\n  User someone\n')).toBe(true)
+    expect(JSON.parse(readFileSync(targets.volcConfigPath, 'utf8'))).toEqual({
+      format: 'zhitong.config/1', company: { name: '某某工程造价咨询有限公司' }, ssh: { hosts: [{ alias: 'zt-new' }] },
+    })
+  })
+
+  it.skipIf(process.platform === 'win32')('updates a symlinked ssh config at its target', async () => {
+    const { ctx, targets } = await setup()
+    const real = join(workDir(), 'dotfiles-ssh-config')
+    writeFileSync(real, 'Host old\n  HostName 1.2.3.4\n')
+    mkdirSync(join(targets.sshConfigPath, '..'), { recursive: true })
+    symlinkSync(real, targets.sshConfigPath)
+    await importOk(ctx, writePackage(workDir(), pkg({ ssh: { hosts: [{ alias: 'zt-prod', host: '10.0.0.1', user: 'root' }] } })))
+    expect(readFileSync(real, 'utf8')).toContain('Host zt-prod')
+    expect(readFileSync(targets.sshConfigPath, 'utf8')).toContain('Host old')
+  })
+
+  it('rejects ssh fields that could inject OpenSSH options', async () => {
+    const { ctx, targets } = await setup()
+    const bad = pkg({ ssh: { hosts: [{ alias: 'zt-prod', host: '10.0.0.1\n  ProxyCommand x', user: 'root "x"' }] } })
+    const output = text(await call(ctx, 'config_import', { path: writePackage(workDir(), bad) }))
+    expect(output).toContain('ssh.hosts[0].host')
+    expect(output).toContain('ssh.hosts[0].user')
+    expect(() => readFileSync(targets.sshConfigPath)).toThrow()
+  })
+
+  it('validates the remote sections on dry_run without writing them', async () => {
+    const { ctx, targets } = await setup()
+    const withExtras = pkg({ ssh: { hosts: [{ alias: 'zt-prod', host: '10.0.0.1', user: 'root' }] }, volc: { profile: 'zt-ak' } })
+    const { value, output } = await importOk(ctx, writePackage(workDir(), withExtras), true)
+    expect(value).toMatchObject({ applied: false, volcProfile: 'zt-ak', volcConfig: '', sshConfig: '', sshHosts: ['zt-prod'] })
+    expect(output).toContain('校验通过')
+    expect(() => readFileSync(targets.volcConfigPath)).toThrow()
+  })
+
+  it('refuses a managed block whose end marker is missing', () => {
+    expect(() => mergeSshConfig(`${SSH_BLOCK_BEGIN}\nHost x\n`, 'block\n')).toThrow('结尾标记')
+    expect(mergeSshConfig('', 'block\n')).toBe('block\n')
   })
 
   it('refuses relative paths, missing files, and oversized packages', async () => {
