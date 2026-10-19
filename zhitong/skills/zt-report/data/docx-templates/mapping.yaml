@@ -1,0 +1,25 @@
+# 正式 docx 模板 ↔ AI 初稿模板（report_templates.yaml 的 template_code）对照
+#
+# 版本：v1（2026-10-19，W3 新写）。签核状态：【待签核】。依据是旧仓 docs/报告模板扩充包/README.md 与
+# 勘察报告 survey/04 §D 的章节结构对照，由迁移者按名称与章节骨架配对，客户没有确认过。
+# 用途：zt-report 写完 AI 初稿后，提示「这套初稿有哪几份正式模板可以套」；不影响初稿生成。
+# 改本文件后运行 build_manifest 重写 manifest.json（tests/report 会核对两者一致）。
+# 没有对应 AI 初稿模板的（竣工财务决算审核报告、造价咨询意见书、造价咨询实施方案）不列。
+
+report_templates:
+  竣工结算审核报告（房建）.docx: [jiesuan_shenhe_bg]
+  工程造价审定单.docx: [zaojia_shendingdan]
+  竣工结算审核报告封面扉页.docx: [jiesuan_shenhe_bg, jiesuan_shenhe_bg_shizheng, jiesuan_shenhe_bg_yuanlin]
+  竣工结算审核报告（市政）.docx: [jiesuan_shenhe_bg_shizheng]
+  竣工结算审核报告（园林）.docx: [jiesuan_shenhe_bg_yuanlin]
+  招标控制价编制报告.docx: [kzj_bz_baogao, kzj_bz_baogao_shizheng, kzj_bz_baogao_yuanlin]
+  工程量清单及招标控制价编制说明.docx: [qd_bz_shuoming, qd_bz_shuoming_shizheng, qd_bz_shuoming_yuanlin]
+  预算（招标控制价）审核报告.docx: [yusuan_shenhe, yusuan_shenhe_shizheng, yusuan_shenhe_yuanlin]
+  设计概算审核报告.docx: [gaisuan_shenhe, gaisuan_shenhe_shizheng]
+  全过程造价咨询月报.docx: [tzkz_monthly_v0]
+  咨询成果报告书（估算）.docx: [guzhi_chengguo]
+  咨询成果报告书（概算）.docx: [gaisuan_chengguo]
+  咨询成果报告书（结算编制）.docx: [jiesuan_chengguo]
+  结算审核报告（起步模板）.docx: [jiesuan_shenhe_bg]
+  工程造价审定单（起步模板）.docx: [zaojia_shendingdan]
+  报告封面扉页（起步模板）.docx: [jiesuan_shenhe_bg]

@@ -1,0 +1,229 @@
+{
+ "_说明": [
+  "旧引擎（zhitong-cost-ai@991ff5c）对每章算出的 prompt_version，用 inline (ModuleNotFoundError) 与旧 report_compose.prompt_version 生成；",
+  "zt.report 对同一份 report_templates.yaml 必须逐章算出相同的值（改了提示词措辞才允许变，变了要升 PROMPT_TEMPLATE_VERSION）。"
+ ],
+ "PROMPT_TEMPLATE_VERSION": "ws24-6",
+ "templates": {
+  "tzkz_monthly_v0": {
+   "gaikuang": "0e696ee1a91bf724",
+   "jinzhan": "31a03d3373a90f40",
+   "touzi": "ed54c6360bdbbde7",
+   "gongzuo": "a6b5a7c6bcf4d44f",
+   "zhongda": "0ac774cbc80332f7",
+   "wenti": "e2bb7ff6240ba422",
+   "jihua": "e7f531e2941ea0b1"
+  },
+  "guzhi_chengguo": {
+   "fengmian": "2afe00dd110f06ac",
+   "feiye": "84093a26942f4ab8",
+   "mulu": "b6c5a8f9005a6801",
+   "bianzhi": "50cdbe295ff4383e",
+   "jiben": "ab72653e3d54381b",
+   "guzhi_qingkuang": "f780021ec37d773c",
+   "qita": "ab5d61b435a2bc43",
+   "fubiao": "33fee40287b45f41"
+  },
+  "gaisuan_chengguo": {
+   "fengmian": "104d38ab7272caf3",
+   "feiye": "84093a26942f4ab8",
+   "mulu": "fbab871fac2bd59c",
+   "bianzhi": "9e318332bff0e8b4",
+   "jiben": "f4737cfba52171ea",
+   "gaisuan_qingkuang": "a7bdf71e34011c6c",
+   "qita": "eb04224a0ff2e060",
+   "fubiao": "b7c2a7f584086901"
+  },
+  "yusuan_chengguo": {
+   "fengmian": "6b46133b2ccfaac7",
+   "feiye": "84093a26942f4ab8",
+   "mulu": "0309aa48ac165e28",
+   "bianzhi": "113372dd18ad433b",
+   "jiben": "b7953114ecc23d55",
+   "yusuan_qingkuang": "b0dc29d9322318ce",
+   "qita": "90bb4a40a83bb62a",
+   "fubiao": "277da0646fc3f536"
+  },
+  "jiesuan_chengguo": {
+   "fengmian": "88ad57884e47680f",
+   "feiye": "84093a26942f4ab8",
+   "mulu": "12e6c2af53922682",
+   "bianzhi": "54537c9c597f8e70",
+   "jiben": "0c6198276f117c9d",
+   "jiesuan_qingkuang": "10e3b0ac637bec87",
+   "qita": "59551613c6ee8003",
+   "fubiao": "c39bd206214fea72"
+  },
+  "guzhi_shuoming": {
+   "yiju": "3f56e2d181b29f72",
+   "yuanze": "6a1b2bd49e31fd2c",
+   "qita": "ca61237d9c46bbc3"
+  },
+  "gaisuan_shuoming": {
+   "yiju": "c8d7af431edafb31",
+   "yuanze": "0d7cf6b1558d2cdd",
+   "qita": "59247da7892b665c"
+  },
+  "kzj_bz_baogao": {
+   "daoyu": "1901222f8cc9b77e",
+   "gaikuang": "4cd968a62c52e5ef",
+   "zhaobiao_fanwei": "7d3a42c922ae3c91",
+   "yiju": "d94d8bc0e757466d",
+   "yaoqiu": "e6848ead886a7f2f",
+   "qufei": "943c289edd14dc80",
+   "qtxmf": "af98f9a2525f6a42",
+   "teshu": "1a2b651b49ec810f",
+   "chengguo": "00ce9899eefdea54",
+   "luokuan": "4a9ffafbcf773dcf"
+  },
+  "jiesuan_shuoming": {
+   "gaikuang": "b549f8baca830059",
+   "yiju": "f642b77eb830fca9",
+   "yuanze": "6198ad2ba7291101",
+   "teshu": "c28a26092cc8f352"
+  },
+  "guzhi_shenhe": {
+   "yiju": "46662b39097d49b8",
+   "yuanze": "4f17423f3537f79c",
+   "qita": "1e4f5004ed3d557d"
+  },
+  "gaisuan_shenhe": {
+   "daoyu": "1ed86e05f099d757",
+   "gaikuang": "0108de176bacb1af",
+   "yiju": "b95f231300846927",
+   "qingkuang": "7681853a252042b3",
+   "jieguo": "90538ef18d1d2be5",
+   "duibi": "c194f9d524bcdafa",
+   "fujian": "737ae2aff618b8c9",
+   "luokuan": "4a9ffafbcf773dcf"
+  },
+  "yusuan_shenhe": {
+   "daoyu": "d774deec3e6b0b17",
+   "gaikuang": "5d27ef914459388a",
+   "fanwei": "1cab1662ee3d8ada",
+   "yiju": "51d8c49a8c945252",
+   "qufei": "c2082a60dfa8a54f",
+   "shixiang": "345ac276774ab236",
+   "jieguo": "59745d63edff5f03",
+   "duibi": "90bc17094d6d0d56",
+   "luokuan": "4a9ffafbcf773dcf"
+  },
+  "jiesuan_shenhe_bg": {
+   "daoyu": "ac0094c173981869",
+   "gaikuang": "89772e8aff7b7b60",
+   "tezheng": "46ae5989165fed84",
+   "yiju": "bc83ba518f104dc0",
+   "shixiang": "9468d0b9a870f8ea",
+   "jieguo": "69373c45a3718fba",
+   "duibi": "2db17ec63ba20191",
+   "fujian": "e2d86f99b443e273",
+   "luokuan": "6d5e15e21fd568e2"
+  },
+  "zaojia_shendingdan": {
+   "shendingdan": "d3b4ab069f49bad0"
+  },
+  "kzj_bz_baogao_shizheng": {
+   "daoyu": "65d210ec17ef89f1",
+   "gaikuang": "ea93491368c50e4a",
+   "fanwei": "c981159433b7dd9f",
+   "yiju": "2a1347537519cc9f",
+   "qufei": "fc250a4478fd80eb",
+   "qtxmf": "118a82e8e28af119",
+   "shixiang": "2f24a67f40dde9a7",
+   "chengguo": "936b1b3396fe312e",
+   "luokuan": "4a9ffafbcf773dcf"
+  },
+  "kzj_bz_baogao_yuanlin": {
+   "daoyu": "9da1ab2cec059a19",
+   "gaikuang": "d25e374dd8eae289",
+   "fanwei": "e8aa1ccc8e3349b2",
+   "yiju": "86dfa41b89628eb1",
+   "qufei": "97b8002a467d02d3",
+   "shixiang": "d281e16d69205120",
+   "chengguo": "ea00e00a8d310b93",
+   "luokuan": "4a9ffafbcf773dcf"
+  },
+  "gaisuan_shenhe_shizheng": {
+   "daoyu": "52949c73e6fbdd6e",
+   "gaikuang": "c6e06640db11e35b",
+   "yiju": "c1db5587eba22c65",
+   "qingkuang": "0d71221924498438",
+   "jieguo": "29f970e6f66f0f6e",
+   "duibi": "43b258774fdd7f4a",
+   "fujian": "4dcb876d0e66b9c4",
+   "luokuan": "4a9ffafbcf773dcf"
+  },
+  "yusuan_shenhe_shizheng": {
+   "daoyu": "a518431181073963",
+   "gaikuang": "ee136fb31cc05e5e",
+   "yiju": "cb09b88dd379e3c7",
+   "shixiang": "9733fcaa6a58db9c",
+   "jieguo": "02f67c6acf4ae30a",
+   "duibi": "e3b3cd48359141f6",
+   "luokuan": "4a9ffafbcf773dcf"
+  },
+  "yusuan_shenhe_yuanlin": {
+   "daoyu": "be523c601034292c",
+   "gaikuang": "890f7cabbd980d5e",
+   "fanwei": "4a2ada1ef929a3f6",
+   "yiju": "183a0b053c01089d",
+   "qufei": "ee5df42ecc431c2f",
+   "shixiang": "5150475e35fa5dde",
+   "jieguo": "94f9f04add4c9cad",
+   "duibi": "90bc17094d6d0d56",
+   "luokuan": "4a9ffafbcf773dcf"
+  },
+  "jiesuan_shenhe_bg_shizheng": {
+   "daoyu": "fc59eb1568135119",
+   "gaikuang": "9d6474bfde71d722",
+   "tezheng": "227d51a186163490",
+   "yiju": "ed24fdf44c0da2c7",
+   "shixiang": "350796d05301e1d5",
+   "jieguo": "c428137060225f2d",
+   "duibi": "d59e38fa79562970",
+   "fujian": "c3dd8eef8fc48ad2",
+   "luokuan": "6d5e15e21fd568e2"
+  },
+  "jiesuan_shenhe_bg_yuanlin": {
+   "daoyu": "29c7fbed0f89d71c",
+   "gaikuang": "8d031f7a8ea9ffa6",
+   "tezheng": "7bd264fc15303fac",
+   "yiju": "5ace543570e55c5d",
+   "shixiang": "2047861670e2a9c3",
+   "jieguo": "8fdbef23ec526566",
+   "duibi": "3125973acc00ba73",
+   "fujian": "9c10c2284b454151",
+   "luokuan": "6d5e15e21fd568e2"
+  },
+  "qd_bz_shuoming": {
+   "gaikuang": "9ce8d239f8a8f760",
+   "zhaobiao_fanwei": "d29cfe57ed4f29c7",
+   "yiju": "19f401d477fb0812",
+   "yaoqiu": "96ac80e32788f4f9",
+   "feilv": "251456da5a8a90fe",
+   "qtxmf": "64687be446ab3be8",
+   "gongxing": "1e396f103537a7f1",
+   "jianzhu": "672ba77f02311bee",
+   "anzhuang": "b4264ab662ccb97c",
+   "yueding": "5262ae9f2e4acf28"
+  },
+  "qd_bz_shuoming_shizheng": {
+   "gaikuang": "761a50039f895708",
+   "zhaobiao_fanwei": "d2c64c21bfb1b123",
+   "yiju": "861ee23e7766519a",
+   "yaoqiu": "02468898d8118cc9",
+   "feilv": "31cc482a7822a349",
+   "qtxmf": "c523fc4f6ebe0dad",
+   "shixiang": "d2bb903c888f4ce2"
+  },
+  "qd_bz_shuoming_yuanlin": {
+   "gaikuang": "547611e5b8170bb9",
+   "zhaobiao_fanwei": "d84452f5dd4556e8",
+   "yiju": "914c7bb081ab3821",
+   "yaoqiu": "55f1f34028cbfe88",
+   "feilv": "ef9bdf055bca30b0",
+   "qtxmf": "0314f7256d4d4f16",
+   "shixiang": "1e39a9c4b706126f"
+  }
+ }
+}
