@@ -17,7 +17,7 @@
  */
 
 import { execFileSync, spawnSync } from 'node:child_process'
-import { builtinModules } from 'node:module'
+import { builtinModules, createRequire } from 'node:module'
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs'
 import { basename, dirname, join, relative, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
@@ -99,11 +99,22 @@ function run(command, args, cwd) {
   if (result.status !== 0) throw new Error(`pack-desktop: ${basename(command)} ${args.join(' ')} exited with ${String(result.status ?? result.signal)}`)
 }
 
-function pnpm(args, cwd) {
+/**
+ * pnpm's JavaScript entry: the one running this script when pnpm set `npm_execpath`, else the version
+ * apps/desktop pins as a devDependency. Running it with this Node avoids spawning `pnpm.cmd` on Windows.
+ * @returns {string} Absolute path of a pnpm `.js`/`.cjs`/`.mjs` entry.
+ */
+function pnpmEntry() {
   const entry = process.env.npm_execpath
-  // Under `pnpm exec`, npm_execpath names pnpm's JavaScript entry; a direct `node` launch uses pnpm from PATH.
-  if (entry !== undefined && entry !== '' && /\.(?:c|m)?js$/u.test(entry)) run(process.execPath, [entry, ...args], cwd)
-  else run(process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm', args, cwd)
+  if (entry !== undefined && /\.(?:c|m)?js$/u.test(entry) && existsSync(entry)) return entry
+  // pnpm's exports omit ./package.json; walk up from its main entry to the manifest.
+  let directory = dirname(createRequire(join(REPOSITORY, 'apps', 'desktop', 'package.json')).resolve('pnpm'))
+  while (!existsSync(join(directory, 'package.json')) && dirname(directory) !== directory) directory = dirname(directory)
+  return join(directory, JSON.parse(readFileSync(join(directory, 'package.json'), 'utf8')).bin.pnpm)
+}
+
+function pnpm(args, cwd) {
+  run(process.execPath, [pnpmEntry(), ...args], cwd)
 }
 
 function copyWithoutCaches(from, to) {
