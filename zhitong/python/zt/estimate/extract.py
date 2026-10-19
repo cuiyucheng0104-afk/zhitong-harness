@@ -33,7 +33,7 @@ WS10-B（issue #761）之后：
 - **引文核数值**（P10）：引文回原文比对改用 `evidence_check.norm_text`（保数值归一化，总纲 K26：
   全仓只此一份），不再把小数点、逗号、连字符一起删掉；另核 value 是否等于引文里某个数（按该数
   自己的万/亿倍率），两项都过才给 confidence 1.0；引文不含本位标签 / 同义词记 mapping=semantic。
-  LLM 调用改走 WS07 共用助手 `chat_json`（max_tokens=3000，截断抛 LLMTruncated → 502）。
+  （旧仓此处的模型调用经 `chat_json`；zt 没有模型调用，回答由 agent 给出，见模块头的「zt 改动」。）
 - **关键词窗口**（P12）：正文超预算时按策略锚点取窗口，不再静默截前 12000 字；响应带 text_stats。
 
 WS29-d（issue #1010）之后：

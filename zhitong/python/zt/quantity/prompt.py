@@ -6,7 +6,7 @@
 ``{"id","role","c","ex","why"}`` 写进 answers 文件，交给 ``finalize``。
 
 改任何一处措辞（系统说明、片段格式、易混淆对照、条件候选、特征摘录说明）都必须升
-:data:`QUANTITY_PROMPT_VERSION`：``tests/quantity/test_quantity_prompt.py`` 按 :func:`prompt_material`
+:data:`QUANTITY_PROMPT_VERSION`：``tests/quantity/test_quantity_pipeline.py`` 按 :func:`prompt_material`
 的指纹与版本号一起钉住。
 """
 from __future__ import annotations
