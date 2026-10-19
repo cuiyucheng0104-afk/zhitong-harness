@@ -1,4 +1,4 @@
-# 智通造价 Harness：产品 spec
+# 智通数工AI：产品 spec
 
 版本 2（2026-10-19）。版本 1 的多租户、计算节点、Python HTTP 引擎方案已废弃；本文件是当前唯一有效的 spec。勘察报告原文在 [survey/](survey/)，工单在 [tasks/README.md](tasks/README.md)。本目录是对 DeepSeek Harness 上游的全部业务增量，上游文档门禁不扫描它。
 
@@ -24,7 +24,7 @@
 | 12 | 客户配置包由你在本机整理，不进仓库 | harness 提供「导入配置包」能力与配置包格式说明 |
 | 13 | 多人同时用同一桶：开版本控制，不做锁 | 冲突靠版本回退 |
 
-品牌名待确认：旧文档写「智通数工」，你这次写的是「智数通工」。
+品牌名：**智通数工AI**。模型：DeepSeek V4.1 Flash（支持图片输入）。
 
 ## 3. 产品形态
 
@@ -95,6 +95,7 @@ tos://<bucket>/<公司前缀>/
   案例索引.md          每个项目一行：编号、工程名、业态、规模、咨询类型、关键指标、成果链接
 ```
 
+项目编号 = `YYYY-NNN`：建项目年份 + 当年三位流水号（如 `2026-007`），由 `zt-project` 在案例索引里取当年最大值加一；目录名 `<编号>-<工程名>`，工程名去掉空格与 `/\:*?"<>|`。客户自己的合同号或内部编号记在项目说明的「别名」里，不进目录名。
 `项目说明.md` 与 `案例索引.md` 是桶内唯一需要「读全」的文件。`zt-project` 开项目时读前者，`zt-archive` 归档时更新两者。本机缓存 `~/zhitong/`（Windows `%USERPROFILE%\zhitong\`）与桶同构，只拉用到的文件，上限可配。
 
 ## 6. 第一个客户的资料整理规范（NAS → TOS）
@@ -157,11 +158,10 @@ tos://<bucket>/<公司前缀>/
 ## 10. 与上游的关系
 
 - 只增 `zhitong/`，不改 `packages/`；上游通过普通 merge 合入。
-- 插件以 `link:` 本地路径装进 profile，不进上游 workspace，不受上游覆盖率与双语门禁约束；本目录自带 vitest 与 pytest。
+- `pnpm-workspace.yaml` 增加 `zhitong/bundle` 与 `zhitong/plugins/*`，插件以 `workspace:*` 引用上游包（上游 0.2.x 未发布到 npm）；插件以 `link:` 装进 profile；不受上游覆盖率与双语门禁约束，本目录自带 vitest 与 pytest。
+- Python 代码集中在 `zhitong/python/`（包 `zt`，uv 管理）；各 skill 的 `scripts/*.py` 是薄 CLI，只 import `zt`。
 - 安装包在上游 `apps/desktop` 打包流程上叠加 zhitong bundle、Python 运行时与 dwg2dxf；Windows 签名按 `apps/desktop/windows-signing/README.md`。
 
-## 11. 待定
+## 11. 已定
 
-1. 品牌名。
-2. 客户现有项目编号体系是否存在。
-3. 当前使用的 DeepSeek 模型名及其是否支持图片输入（影响扫描件与看图）。
+品牌名智通数工AI；项目编号 `YYYY-NNN`（§5）；模型 DeepSeek V4.1 Flash，图片输入可用，扫描件与看图走 `read_image`。
