@@ -257,7 +257,7 @@ def test_extract_endpoint_keeps_no_area_buildings_and_carries_the_footprint_hint
 # （一标段是 86,639.905 ㎡），页面没有任何提示，照着写入概算规模翻倍。
 
 # 测试项目的原名：带内部序号「7.」和资料说明括注
-LOT1_PROJECT = "7.北苑街道国贸大道与丹溪北路交叉口西北侧地块房地产项目一标段（软件+清单）"
+LOT1_PROJECT = "7.某街道某路与某路交叉口西北侧地块房地产项目一标段（软件+清单）"
 SCOPE_CODE = "scope_whole_site_suspect"
 
 
@@ -307,7 +307,7 @@ def test_extract_scope_project_without_lot_does_not_warn(monkeypatch):
     """项目名没有标段 → 不出这条告警，scope.project_lot 为 null。"""
     body = _extract_with_total(monkeypatch, source="总建筑面积 172389.96 ㎡",
                                quote="总建筑面积 172389.96 ㎡",
-                               project_name="北苑街道国贸大道与丹溪北路交叉口西北侧地块房地产项目（软件+清单）")
+                               project_name="某街道某路与某路交叉口西北侧地块房地产项目（软件+清单）")
     assert body["scope"] == {"project_lot": None, "lot_source": None}
     assert _scope_warnings(body) == []
 

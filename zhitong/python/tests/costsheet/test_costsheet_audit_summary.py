@@ -1,7 +1,7 @@
 # 来源：engine-service/tests/test_costsheet_audit_summary.py（zhitong-cost-ai@991ff5cd）
 """#21 [D-11] 审核汇总表格式支持 —— parse_costsheet 的第二种可识别版式。
 
-真实语料(nas-data/project/30002/3、审核汇总表(1).xlsx,金义新区中心医院)的结构:
+真实语料(nas-data/project/30002/3、审核汇总表(1).xlsx,某新区医院项目)的结构:
 
     行0  「2024年8月进度款审核对比表」(标题)
     行1  编号：032
@@ -112,7 +112,7 @@ def test_detail_format_not_affected():
 
 @pytest.mark.skipif(not REAL_SAMPLE.exists(), reason="真实语料不入仓；设置 ZT_NAS_DATA 指向 nas-data 目录后才跑")
 def test_real_30002_audit_summary_parses():
-    """真实金义样例:此前 parse=0 条(issue #21 实测)。修复后应解析出 18 条明细区行,
+    """真实 A15 样例:此前 parse=0 条(issue #21 实测)。修复后应解析出 18 条明细区行,
     且派生段(行22起)不混入。"""
     out = parse_costsheet(REAL_SAMPLE.read_bytes(), REAL_SAMPLE.name)
     assert out["meta"].get("format") == "audit_summary"

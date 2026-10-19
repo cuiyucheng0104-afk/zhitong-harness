@@ -20,7 +20,7 @@ whenToUse: 用户要新建项目、打开某个已有项目、问「资料齐不
 ## 2. 新开项目
 
 1. `tos_pull 案例索引.md`（要最新的）。桶里还没有时跳过，脚本会按模板新建。
-2. 用 `user-questions` 问清：工程名称、咨询类型（全过程造价咨询 / 结算审核 / 招标控制价编制）、阶段（概算 / 招标控制价 / 施工过程 / 结算 / 审定）；业态、规模、客户合同号可选。
+2. 用 `ask_user_question` 问清：工程名称、咨询类型（全过程造价咨询 / 结算审核 / 招标控制价编制）、阶段（概算 / 招标控制价 / 施工过程 / 结算 / 审定）；业态、规模、客户合同号可选。
 3. 先算号：`scripts/new_project.py allocate --index <本机案例索引> --name <工程名> --known <tos_ls 项目/ 看到的目录名>`，把编号和目录名告诉用户确认。
 4. 建项目：`scripts/new_project.py create --index ... --root <缓存根> --name ... --consulting-type ... --stage ... [--business --scale --alias --known]`。
 5. **立刻** `tos_push` 结果里 `files_to_push` 的两个文件（项目说明、案例索引）。编号推送后才算占住；回读提示 `remoteChangedSincePull` 时，说明别人同时改了案例索引：重新 `tos_pull` 案例索引，删掉本机新建的项目目录，回到第 3 步重新分配。

@@ -35,7 +35,7 @@ PC_FEATURE = "1. 构件类型：预制楼梯\n2. 混凝土强度等级：C30\n5.
 
 
 def _r(row, name, feature="", amount=30000.0, qty=None, price=None, **kw):
-    r = {"project_id": "P", "file_id": "F1", "source_file": "北苑一标段.xlsx", "sheet": "7#楼土建", "row": row,
+    r = {"project_id": "P", "file_id": "F1", "source_file": "某街道一标段.xlsx", "sheet": "7#楼土建", "row": row,
          "item_code": f"0105130010{row:02d}", "item_name": name, "item_feature": feature, "unit": "m3",
          "submit_qty": qty, "submit_price": price, "submit_amount": amount}
     r.update(kw)
@@ -300,7 +300,7 @@ def test_costsheet_without_provisional_column_has_no_key():
 
 
 def test_run_end_to_end_provisional_column_and_weak_text():
-    out = tk_engine.run([(_book(ROWS), "北苑一标段.xlsx", "F1")], None, project_id="P")
+    out = tk_engine.run([(_book(ROWS), "某街道一标段.xlsx", "F1")], None, project_id="P")
     z = {a["item_name"]: a for a in out["anomalies"] if a["subtype"] == "zangu"}
     assert set(z) == {"PC楼梯", "铝板幕墙"}, sorted(z)
     assert (z["PC楼梯"]["confidence"], z["PC楼梯"]["marker_scope"]) == (0.3, "feature_text")

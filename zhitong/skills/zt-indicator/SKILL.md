@@ -11,7 +11,7 @@ whenToUse: 用户要算单方造价、专业/章节占比、造价构成，或�
 ## 1. 准备输入
 
 1. 读 `项目说明.md`：「关键文件指引」里的计价表（控制价、预算、结算的分部分项计价表；多个单体可以一起给），以及总建筑面积、业态、结构。
-2. 计价表不明确时：列 `资料/` 下的 `.xlsx/.xlsm` 并预检（`"$ZT_PYTHON" -m zt.costsheet.cli probe --files ...`，或 `../zt-reconcile/scripts/probe.py probe ...`），把候选列给用户用 `user-questions` 确认。`.xls` 请用户另存为 `.xlsx`。
+2. 计价表不明确时：列 `资料/` 下的 `.xlsx/.xlsm` 并预检（`"$ZT_PYTHON" -m zt.costsheet.cli probe --files ...`，或 `../zt-reconcile/scripts/probe.py probe ...`），把候选列给用户用 `ask_user_question` 确认。`.xls` 请用户另存为 `.xlsx`。
 3. 总建筑面积：只用项目说明或资料里写明的数，并记下出处（`--area-source` 写来源，例如「项目说明」「设计说明第 3 页」）；找不到就问用户，不要估。
 4. 用户给了含税总造价时用 `--total-amount`，否则脚本按「费用表合计 → 清单明细合计」取。
 

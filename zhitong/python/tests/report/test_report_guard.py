@@ -599,7 +599,7 @@ from zt.report.guard import (  # noqa: E402
 _G = json.loads((Path(__file__).parent / "fixtures" / "report_guard" / "ws24g_realrun.json").read_text(encoding="utf-8"))
 _CH = {c["id"]: c for c in _G["chapters"]}
 # spec WS24-g 测试清单里的文件名（读不出的那份 GBQ7 + 一份送入的清单说明）
-_NAMES = ["北苑街道一标段1022.GBQ7", "结构说明5.xlsx", "1200.xlsx"]
+_NAMES = ["某街道一标段1022.GBQ7", "结构说明5.xlsx", "1200.xlsx"]
 _EV_NONE = [EvidenceFile("f1", "清单.xlsx", "[R5] A:1\tB:010101002001\tC:挖一般土方\tD:3218", index=1)]
 
 
@@ -611,10 +611,10 @@ def _bl(text: str, names=_NAMES, ev=_EV_NONE):
 # ---------------------------------------------------------------- 1. 文件名里的数字（R24-07，K-R19 共用函数）
 
 @pytest.mark.parametrize("text", [
-    "资料《北苑街道一标段1022.GBQ7》无法读取。",       # 全名，带书名号
-    "北苑街道一标段1022里的工程量未能读取。",            # 主名，省略扩展名、不带书名号（模型常这么写）
+    "资料《某街道一标段1022.GBQ7》无法读取。",       # 全名，带书名号
+    "某街道一标段1022里的工程量未能读取。",            # 主名，省略扩展名、不带书名号（模型常这么写）
     "《结构说明5.xlsx》载明的做法见附表。",
-    "结构说明5.xlsx 与 北苑街道一标段1022.GBQ7 均为本项目资料。",
+    "结构说明5.xlsx 与 某街道一标段1022.GBQ7 均为本项目资料。",
 ])
 def test_filename_numbers_are_not_flagged_and_names_stay_whole(text):
     out, flags = _bl(text)
@@ -633,7 +633,7 @@ def test_text_that_is_not_a_file_name_is_still_backlinked(text, raw):
 
 def test_filename_exemption_needs_the_name_list():
     """不传文件名（旧调用方）时行为与改前相同：文件名里的数照查。"""
-    _, flags = _bl("资料《北苑街道一标段1022.GBQ7》无法读取。", names=())
+    _, flags = _bl("资料《某街道一标段1022.GBQ7》无法读取。", names=())
     assert flags == [("unbacked_number", "1022")]
 
 

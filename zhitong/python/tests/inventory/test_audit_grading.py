@@ -4,13 +4,13 @@ WS13-P13 / P18 / P19（issue #759）：核查层按证据定级、三档要求�
 
 复现基线（origin/dev 02f27170）—— check_checklist_detailed 只要类目或别名对上就算命中：
   - 42008 施工合同只被一份 LLM 错标的「勘察外业见证合同」命中 → 已备（QA P3 施工过程 rate 0.5，两条命中全是假的）；
-  - 「22 进度款…/…清单审计」文件命中 42005 工程量清单 → 控制价阶段 rate=1.0（QA A15 金义，人工口径 0.0）；
+  - 「22 进度款…/…清单审计」文件命中 42005 工程量清单 → 控制价阶段 rate=1.0（QA A15，人工口径 0.0）；
   - requirement_level=important 与 optional 同样处理：缺了不报、不进分母（42016 竣工图纸 26 次运行一次都没报过缺）；
   - files_with_tags=[] 照样给出「0% + 全部缺件」。
 
 定级口径（spec P13）：confirmed（人工确认 / source=manual）> strong（evidence=filename_rule）> weak（其余，
 含缺 evidence 的旧行）。**不按 needs_manual 定级** —— 「施工合同.pdf 待 OCR」needs_manual=True 但它是文件名
-强规则命中，是真证据（QA 龙芯的施工合同.pdf，GT 判定存在）。
+强规则命中，是真证据（QA A21 的施工合同.pdf，GT 判定存在）。
 """
 from __future__ import annotations
 

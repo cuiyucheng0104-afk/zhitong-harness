@@ -205,9 +205,9 @@ rules:
   # ============ Step4 入RAG白名单(复合词小号,修正#3 有序化) ============
   # —— 成果件(xlsx L1) ——
   - { kind: whitelist, match: contains, pattern: 审定单, doc_category: 审定单, cost_stage: 审定, priority: 8, note: 复合词先于裸「审定」 }
-  - { kind: whitelist, match: contains, pattern: 审定表, doc_category: 审定单, cost_stage: 审定, priority: 8, note: 北苑试点标定:真实叫法「审定表」=审定单(xlsx 备注 审定表/审定单) }
+  - { kind: whitelist, match: contains, pattern: 审定表, doc_category: 审定单, cost_stage: 审定, priority: 8, note: 试点项目标定:真实叫法「审定表」=审定单(xlsx 备注 审定表/审定单) }
   - { kind: whitelist, match: contains, pattern: 定案表, doc_category: 审定单, cost_stage: 审定, priority: 8, note: WS13-P14 结算定案表=审定单(原被裸「结算」截成结算价文件,命不中 42017) }
-  - { kind: whitelist, match: contains, pattern: 目录, doc_category: 目录, cost_stage: null, stage_policy: context, priority: 11, note: 北苑试点标定补漏:xlsx 规则库原有(含目录,769 命中);WS13-P09 阶段按语境(原写死审定) }
+  - { kind: whitelist, match: contains, pattern: 目录, doc_category: 目录, cost_stage: null, stage_policy: context, priority: 11, note: 试点项目标定补漏:xlsx 规则库原有(含目录,769 命中);WS13-P09 阶段按语境(原写死审定) }
   - { kind: whitelist, match: contains, pattern: 封面, doc_category: 封面, cost_stage: null, stage_policy: context, priority: 9, note: WS13-P09 阶段按语境(原写死审定) }
   - { kind: whitelist, match: contains, pattern: 扉页, doc_category: 扉页, cost_stage: null, stage_policy: context, priority: 10, note: WS13-P09 阶段按语境(原写死审定) }
   - { kind: whitelist, match: contains, pattern: 汇总, doc_category: 汇总表, cost_stage: null, stage_policy: context, tier: bare, require_any: [审核, 结算, 审定, 造价], priority: 85, note: 评审修复:裸词退到全部复合词/四算词之后;WS13-P01 裸词须有审核/结算/审定/造价语境;WS13-P09 阶段按语境 }

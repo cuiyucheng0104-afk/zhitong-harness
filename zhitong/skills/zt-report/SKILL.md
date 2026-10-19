@@ -11,7 +11,7 @@ whenToUse: 用户要写、生成、起草某个项目的报告、说明、审定
 ## 1. 选模板
 
 1. 读 `项目说明.md`（咨询类型、阶段、关键文件指引）。
-2. `scripts/report.py templates` 列 24 套；按咨询类型挑，房建 / 市政 / 园林有变体。拿不准就用 `user-questions` 让用户选，不要猜。
+2. `scripts/report.py templates` 列 24 套；按咨询类型挑，房建 / 市政 / 园林有变体。拿不准就用 `ask_user_question` 让用户选，不要猜。
 3. `scripts/report.py templates --template <码>`：章节、`claims_to_confirm`、`fact_keys`、可套的正式 docx。
 
 ## 2. 取材与金额事实
@@ -26,7 +26,7 @@ whenToUse: 用户要写、生成、起草某个项目的报告、说明、审定
 
 ## 3. 确认程序性事项
 
-把 `claims_to_confirm` 里每条（如「全过程审核」「现场踏勘」「实地丈量」）用 `user-questions` 多选问用户「本项目实际执行过哪些」，一次问完。选中的 key 写进 `W/确认事项.json`（`{"confirmed": [...], "asked": "<日期>"}`），每章 prepare 都传 `--confirmed <key…>`（用户一条都没选，或 `claims_to_confirm` 为空，就整个不传 `--confirmed`，空参数会报 usage 错）。没确认的写进正文会被标【待核】。不替用户勾。`claims_to_confirm` 为空就跳过本步。
+把 `claims_to_confirm` 里每条（如「全过程审核」「现场踏勘」「实地丈量」）用 `ask_user_question` 多选问用户「本项目实际执行过哪些」，一次问完。选中的 key 写进 `W/确认事项.json`（`{"confirmed": [...], "asked": "<日期>"}`），每章 prepare 都传 `--confirmed <key…>`（用户一条都没选，或 `claims_to_confirm` 为空，就整个不传 `--confirmed`，空参数会报 usage 错）。没确认的写进正文会被标【待核】。不替用户勾。`claims_to_confirm` 为空就跳过本步。
 
 ## 4. 逐章循环（按 seq）
 

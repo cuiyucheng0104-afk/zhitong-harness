@@ -19,7 +19,7 @@ scripts/archive.py check --project-dir <本机项目目录> --index <本机案�
      `project_doc_missing` / `project_doc_incomplete` / `project_doc_undecided`（项目说明缺失、缺字段、咨询类型或阶段还是「待确认」——问用户后补）、
      `no_deliverables`（成果/ 是空的）、`deliverable_listed_but_missing`（项目说明登记的成果文件不在）。
    - `warning_items` 里 `level=warn` 的是提醒，不阻断，但要告诉用户并让他决定：`open_items`（`待确认清单.md` 还有未勾选事项——逐条问，处理不了的在项目说明里写明遗留）、`work_dir_name`（工作目录没按 `YYYY-MM-DD-任务` 命名）、`work_dir_empty`、`work_loose_files`、`deliverable_unlisted`（成果文件没登记，apply 会补）、`temp_file_in_deliverables`（临时文件不会登记）、`code_dir_mismatch`、`casebook_name_mismatch`。
-3. **向用户确认**：把成果清单、提醒项、要写进案例索引的「关键指标」（单方造价等，只写成果里已有的数，不要现算）发给用户，用 `user-questions` 问一句「按这样归档？」。用户没确认不往下做。
+3. **向用户确认**：把成果清单、提醒项、要写进案例索引的「关键指标」（单方造价等，只写成果里已有的数，不要现算）发给用户，用 `ask_user_question` 问一句「按这样归档？」。用户没确认不往下做。
 4. **推送成果与中间产物**：对 `data.push_list` 里除项目说明以外的文件逐个 `tos_push`（`local_path` 用本机绝对路径，`path` 用 `项目/<目录>/` + `rel_path`）。回读 `sha256` 要与清单里的一致；`remoteChangedSincePull` 为 true 的文件说明别人改过，告诉用户，不要悄悄覆盖。
 5. **登记**：
 ```sh

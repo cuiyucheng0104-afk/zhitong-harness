@@ -281,7 +281,7 @@ def test_v2_production_shape_run_b_every_qd_section_reads_five_files():
         r += 1
     big = "".join(rows)[:199_845]
     files = [_f(i, f"资料{i}.docx", _filler(20_800, i)) for i in range(1, 25)]
-    files.append(_f(25, "北苑街道一标段.xlsx", big))
+    files.append(_f(25, "某街道一标段.xlsx", big))
     for s in sections:
         assert all(rc.score_file(big, [w]) == rc.TERM_HIT_CAP for w in rc.query_terms(s["rag_query"])), s["code"]
         sel = select_files_for_section(files, s["rag_query"])

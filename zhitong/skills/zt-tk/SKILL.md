@@ -11,7 +11,7 @@ whenToUse: 用户要做投控检测、进度款/结算的异常排查、对照�
 ## 1. 准备输入
 
 1. 读 `项目说明.md`：「关键文件指引」里的送审计价表（本期进度款或结算送审，可多份），以及合同/中标清单。
-2. 不明确时列 `资料/` 下的 `.xlsx/.xlsm` 并预检（`"$ZT_PYTHON" -m zt.costsheet.cli probe --files ...`），把候选列给用户用 `user-questions` 确认哪些是送审、哪份是合同清单。`.xls` 请用户另存为 `.xlsx`。
+2. 不明确时列 `资料/` 下的 `.xlsx/.xlsm` 并预检（`"$ZT_PYTHON" -m zt.costsheet.cli probe --files ...`），把候选列给用户用 `ask_user_question` 确认哪些是送审、哪份是合同清单。`.xls` 请用户另存为 `.xlsx`。
 3. 没有合同/中标清单也能跑：只跑 v1 规则（重复计取、暂估、行内自洽、大额），`rules_skipped` 会写 `baseline_not_provided`。
 
 ## 2. 检测

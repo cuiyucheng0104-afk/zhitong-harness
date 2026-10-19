@@ -501,12 +501,12 @@ def test_ws24g_unreadable_and_unsent_file_names_are_not_flagged(fake):
     files = [{"file_id": "f1", "file_name": "审定单.xlsx", "text": EVIDENCE, "text_source": "text_layer"},
              {"file_id": "f2", "file_name": "结构说明5.xlsx", "text": "[R1] A:结构形式\tB:框架", "text_source": "text_layer"}]
     body = _body(files=files)
-    body["context"]["unreadable"] = [{"file_id": "g1", "file_name": "北苑街道一标段1022.GBQ7", "reason": "格式不支持"}]
-    fake("送审总造价〔F1〕[资料1]。【待补：资料《北苑街道一标段1022.GBQ7》无法读取】另据北苑街道一标段1022与"
+    body["context"]["unreadable"] = [{"file_id": "g1", "file_name": "某街道一标段1022.GBQ7", "reason": "格式不支持"}]
+    fake("送审总造价〔F1〕[资料1]。【待补：资料《某街道一标段1022.GBQ7》无法读取】另据某街道一标段1022与"
          "《结构说明5.xlsx》，结构形式为框架[资料2]。审定金额以审定单为准。")
     out = _post(_with_facts(body)).json()
     assert out["flags"] == [], out["flags"]
-    assert "北苑街道一标段1022与《结构说明5.xlsx》" in out["content"]
+    assert "某街道一标段1022与《结构说明5.xlsx》" in out["content"]
 
 
 def test_ws24g_fact_placeholders_are_stopped_at_the_endpoint(fake):

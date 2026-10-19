@@ -39,7 +39,7 @@ whenToUse: 用户要做投资估算 / 设计概算、按规模估总投资、出
 
 ## 2. 用户确认
 
-把 `candidates`（值、引文、置信）、`unresolved`（not_found / ambiguous 列出全部候选 / total_only_no_partition / unmapped_building）、单体归位逐项用 `user-questions` 请用户确认或改值。**只有用户确认过的数才进计算**；`derived` 推算值要用户点头才填，来源记 `derived`。11 个必填位：D4 用地面积、D7/D8 地下室、D10–D12 地上单体、D13 构筑物、D15/D16 占地、D19/D20 地面 / 地下机动车位（均在「经济技术指标」表）。
+把 `candidates`（值、引文、置信）、`unresolved`（not_found / ambiguous 列出全部候选 / total_only_no_partition / unmapped_building）、单体归位逐项用 `ask_user_question` 请用户确认或改值。**只有用户确认过的数才进计算**；`derived` 推算值要用户点头才填，来源记 `derived`。11 个必填位：D4 用地面积、D7/D8 地下室、D10–D12 地上单体、D13 构筑物、D15/D16 占地、D19/D20 地面 / 地下机动车位（均在「经济技术指标」表）。
 
 ## 3. 正向推算（可选，零模型）
 

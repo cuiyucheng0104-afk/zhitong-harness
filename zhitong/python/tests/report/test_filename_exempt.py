@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from zt.report.filename_exempt import exempt_forms, exempt_spans, stem_of
 
-_GBQ = "北苑街道一标段1022.GBQ7"
+_GBQ = "某街道一标段1022.GBQ7"
 
 
 def _exempted(text: str, names: list[str]) -> list[str]:
@@ -23,9 +23,9 @@ def test_pure_digit_stem_is_not_exempt():
 
 
 def test_full_name_and_qualified_stem_are_exempt():
-    """「《北苑街道一标段1022.GBQ7》」与不带书名号、不带扩展名的「北苑街道一标段1022」都豁免。"""
+    """「《某街道一标段1022.GBQ7》」与不带书名号、不带扩展名的「某街道一标段1022」都豁免。"""
     assert _exempted(f"见《{_GBQ}》", [_GBQ]) == [_GBQ]
-    assert _exempted("北苑街道一标段1022 的合同价", [_GBQ]) == ["北苑街道一标段1022"]
+    assert _exempted("某街道一标段1022 的合同价", [_GBQ]) == ["某街道一标段1022"]
 
 
 def test_half_of_a_stem_is_not_exempt():
