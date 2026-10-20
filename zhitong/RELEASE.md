@@ -102,3 +102,17 @@ git merge upstream/master
 | `stage` 报 already exists with different contents | 这个版本号已经放过别的文件，换版本号 |
 | `git push origin master` 被拒（期间有人合入） | `git pull --rebase origin master` 后 `--from stage` |
 | deploy.sh 失败 | 见 runbook.md；修好后 `--from deploy` |
+
+## 与云端 Claude 会话协作时的分工
+
+云端会话（能改代码、跑测试、推 GitHub，连不到你的 Mac 与服务器）负责到「Windows 包已在 Actions 构建」为止；你的 Mac 负责 Mac 包与上线。固定分工：
+
+| 步骤 | 谁做 | 做什么 |
+|---|---|---|
+| 1 改代码 | 云端 | 在 `fix/…` 或 `feat/…` 分支实现；跑相关测试（Python `uv run pytest`、插件 `vitest`、桌面与客户端测试、`verify-client-ui-i18n`）；变异验收 |
+| 2 合入 | 云端 | 推到 `master`（快进），更新 `zhitong/STATUS.md` |
+| 3 触发 Windows | 云端 | 推 `v1.0.x` 标签 → Actions 打包并发布 Release；把版本号与运行链接告诉你 |
+| 4 Mac 包 + 上线 | 你的 Mac | `git switch master && git pull && bash zhitong/scripts/release.sh 1.0.x --from mac`：打 Mac 包 → 等/下载 Windows 包 → 登记 → 提交清单 → 部署门户 |
+| 5 验收 | 你 | 装新包看效果；有问题截图发回云端，回到第 1 步 |
+
+只改网站文案、不发新包：云端改完推 `master`，你跑 `bash zhitong/portal/deploy/deploy.sh --skip-verify zt-prod`（或完整 `deploy.sh zt-prod`）。
