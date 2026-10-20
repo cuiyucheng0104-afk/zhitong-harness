@@ -9,8 +9,8 @@
 - **无出处的数字**：答案里的金额 / 费率 / 其它数，在传入的资料文本里找不到同值（含 ``万元`` ↔ ``元`` 换算）。
   不检查的数：引用括号内、反引号内、15 位以上的 ID、``1.2.3`` 这类三级以上条文号、0 打头的编码段、
   规范编号（``GB 50854-2013``）、文件名；日期与「第 N」序号由 ``find_numbers`` 自己跳过；
-- **引用问题**：``〔路径 位置〕`` 形式的引用，路径不在读过的资料里（``citation_not_read``）；位置写成 ``pN`` 或
-  ``RN`` 而资料文本里没有对应的 ``[pN]`` / ``[RN]`` 锚点（``citation_locator_missing``）。
+- **引用问题**：``〔路径 位置〕`` 形式的引用（路径可含空格），路径不在读过的资料里（``citation_not_read``）；
+  位置写成 ``pN`` 或 ``RN`` 而资料文本里没有对应的 ``[pN]`` / ``[RN]`` 锚点（``citation_locator_missing``）。
 
 资料文本通常是 ``textextract extract --text-out`` 写出的文件。传入的文本里没有的内容，一律视为「没读过」。
 """
@@ -19,16 +19,16 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 from zt.amounts.amounts import NumberIndex, find_numbers
 
 CITATION = re.compile(r"〔([^〕\n]{1,200})〕")
 _BACKTICK = re.compile(r"`[^`\n]*`")
+_FILE_EXT = r"\.(?:pdf|docx?|xlsx?|xlsm|txt|md|pptx)"
 _EXCLUDE = (
     CITATION,
     _BACKTICK,
-    re.compile(r"[^\s，。；、,;：:（）()「」“”《》【】]+\.(?:pdf|docx?|xlsx?|xlsm|txt|md|pptx)\b", re.IGNORECASE),
+    re.compile(r"[^\s，。；、,;：:（）()「」“”《》【】]+" + _FILE_EXT + r"\b", re.IGNORECASE),
     re.compile(r"\d+(?:\.\d+){2,}"),
     re.compile(r"\d{15,}"),
     re.compile(r"(?<![\dA-Za-z])[Zz]?\d{9}(?:\d{3})?(?!\d)"),
@@ -38,6 +38,7 @@ _EXCLUDE = (
 _CONTEXT_CHARS = 14
 _PAGE_LOC = re.compile(r"(?:^|\s)p(\d+)(?:\b|$)")
 _ROW_LOC = re.compile(r"(?:^|!|\s)R(\d+)(?:\b|$)")
+_CITED_FILE = re.compile(r"(.+" + _FILE_EXT + r")(?=\s|$)", re.IGNORECASE)
 
 
 @dataclass
@@ -89,13 +90,29 @@ def _masked(answer: str) -> str:
     return out
 
 
-def _match_source(path: str, sources: list[Source]) -> Optional[Source]:
-    norm = path.strip().replace("\\", "/")
-    for s in sources:
-        if s.rel_path == norm:
-            return s
-    by_name = [s for s in sources if s.rel_path.rsplit("/", 1)[-1] == norm.rsplit("/", 1)[-1]]
-    return by_name[0] if len(by_name) == 1 else None
+def _split_citation(body: str, sources: list[Source]) -> tuple[str, Source | None, str]:
+    """把引用括号里的内容拆成路径、对应的资料与位置。
+
+    路径可含空格（``资料/1 合同及协议/…``），所以按读过的资料认路径：在空白处切出的前缀从长到短，先找相对路径
+    相同的资料，再找文件名相同的资料（同名不止一份时不猜，资料为 ``None``）；命中的前缀是路径，其余是位置。
+    都不命中时资料为 ``None``，路径取到最后一个已知扩展名为止，没有扩展名时取第一段。
+
+    :param body: 引用括号里的内容，已去掉首尾空白。
+    :param sources: 读过的资料。
+    :returns: ``(路径, 资料或 None, 位置)``。
+    """
+    norm = body.replace("\\", "/")
+    prefixes = [norm] + [norm[:m.start()] for m in reversed(list(re.finditer(r"\s+", norm)))]
+    for p in prefixes:
+        for s in sources:
+            if s.rel_path == p:
+                return p, s, norm[len(p):].strip()
+    for p in prefixes:
+        by_name = [s for s in sources if s.rel_path.rsplit("/", 1)[-1] == p.rsplit("/", 1)[-1]]
+        if by_name:
+            return p, by_name[0] if len(by_name) == 1 else None, norm[len(p):].strip()
+    file = _CITED_FILE.match(norm)
+    return (file.group(1) if file else prefixes[-1]), None, ""
 
 
 def check_answer(answer: str, sources: list[Source]) -> AnswerCheck:
@@ -116,8 +133,7 @@ def check_answer(answer: str, sources: list[Source]) -> AnswerCheck:
     for cm in CITATION.finditer(answer):
         res.citations_total += 1
         body = cm.group(1).strip()
-        path, _, loc = body.partition(" ")
-        src = _match_source(path, sources)
+        path, src, loc = _split_citation(body, sources)
         if src is None:
             res.citation_issues.append(CitationIssue(cm.group(0), "citation_not_read",
                                                      f"引用的 {path} 不在读过的资料里"))

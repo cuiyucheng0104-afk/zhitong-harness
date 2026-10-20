@@ -72,6 +72,33 @@ def test_duplicate_basenames_do_not_guess():
     assert check_answer("〔资料/甲/合同.pdf p1〕", [a, b]).citation_issues == []
 
 
+SPACED_DOCX = Source("资料/1 合同及协议/施工合同及补充协议.docx", "[p1]\n合同价款……\n[p3]\n工期 365 日历天。")
+SPACED_XLSX = Source("资料/4 结算资料/送审计价表.xlsx", "[工作表] 土建\n[R28] A:土方\tB:120.00")
+
+
+def test_citation_path_may_contain_spaces():
+    """``资料/<n> <类别>/`` 目录名带空格：路径按读过的资料认出，不在第一个空格处截断。"""
+    res = check_answer("工期 365 日历天〔资料/1 合同及协议/施工合同及补充协议.docx p3〕。", [SPACED_DOCX])
+    assert res.citation_issues == [] and res.passed
+    assert check_answer("〔资料/1 合同及协议/施工合同及补充协议.docx〕", [SPACED_DOCX]).citation_issues == []
+    missing = check_answer("〔资料/1 合同及协议/施工合同及补充协议.docx p9〕", [SPACED_DOCX]).citation_issues
+    assert [i.problem for i in missing] == ["citation_locator_missing"]
+
+
+def test_unread_spaced_path_is_reported_whole():
+    issues = check_answer("〔资料/1 合同及协议/施工合同及补充协议.docx p3〕", [CONTRACT]).citation_issues
+    assert [i.problem for i in issues] == ["citation_not_read"]
+    assert issues[0].detail == "引用的 资料/1 合同及协议/施工合同及补充协议.docx 不在读过的资料里"
+
+
+def test_sheet_row_locator_after_spaced_path():
+    ans = "土方 120.00〔资料/4 结算资料/送审计价表.xlsx 土建!R28〕，错行〔资料/4 结算资料/送审计价表.xlsx 土建!R99〕。"
+    res = check_answer(ans, [SPACED_XLSX])
+    assert [(i.cite, i.problem) for i in res.citation_issues] == [
+        ("〔资料/4 结算资料/送审计价表.xlsx 土建!R99〕", "citation_locator_missing")]
+    assert res.unattributed == []
+
+
 def test_read_source_forms(tmp_path):
     f = tmp_path / "文本 1.txt"
     f.write_text("正文", encoding="utf-8")
