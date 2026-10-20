@@ -48,7 +48,7 @@ h1{margin:0;font-size:60px;line-height:1.18;letter-spacing:-.03em;white-space:no
 @media (max-width:767px){.container{width:calc(100% - 40px)}.site-header nav{display:none}.hero{padding:48px 0 64px}
   .hero-grid{grid-template-columns:1fr}h1{font-size:40px}.demo-slot{min-height:300px}}
 
-/* ---------- D1 BlueprintGrid (component styles) ---------- */
+/* ---------- D1 DecoHeroGrid (component styles) ---------- */
 .bp-grid{position:absolute;inset:0;z-index:0;pointer-events:none}
 /* Paper = static minor grid (CSS, present in prerendered HTML) + static canvas; fades out toward the bottom. */
 .bp-paper{position:absolute;inset:0;
@@ -62,7 +62,7 @@ h1{margin:0;font-size:60px;line-height:1.18;letter-spacing:-.03em;white-space:no
 </head>
 <body>
 <header class="refbar">
-  <a href="index.html">← 动效参考</a><b>D1 · BlueprintGrid</b><span class="desc">首屏底稿网格 · 轴号 · 吸附定位十字</span>
+  <a href="index.html">← 动效参考</a><b>D1 · DecoHeroGrid</b><span class="desc">首屏底稿网格 · 轴号 · 吸附定位十字</span>
   <span class="sp"></span><output id="stat">—</output>
   <button id="replay" type="button">重播</button><button id="still" type="button" aria-pressed="false">静态终帧</button>
 </header>
@@ -352,7 +352,8 @@ function paintStill(withCross) {
   drawStatic(Infinity, mode !== 'touch');
   Object.assign(cross, { x: home.x, y: home.y, tx: home.x, ty: home.y, vx: 0, vy: 0, alpha: withCross ? 0.6 : 0, pulse: 0 });
   lens.a = 0; trail = []; hiV.fill(0); hiH.fill(0);
-  if (withCross && vx.length && hy.length) { hiV[0] = 1; hiH[hy.length - 1] = 1; } // parked on axis 1 / A
+  if (!withCross) { cvL.width = 0; cvL.height = 0; return; } // touch: no live layer, release its memory
+  if (vx.length && hy.length) { hiV[0] = 1; hiH[hy.length - 1] = 1; } // parked on axis 1 / A
   drawLive(Infinity);
 }
 

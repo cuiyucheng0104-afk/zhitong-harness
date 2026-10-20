@@ -889,7 +889,7 @@ export const SUPPORT_CONTACT: ContactChannel | null; // = contactChannels(siteCo
 | # | 事项 | 状态 |
 |---|---|---|
 | 1 | `legal.company`、`legal.icp`、`legal.privacyHref` 未填写 | 阻断（§5.4，`ZT_LAUNCH=1` 构建失败） |
-| 2 | 隐私说明页不存在：须新增预渲染路由（建议 `/docs/privacy/`，进 06 章路由表）并由运营方提供正文 | 阻断 |
+| 2 | 隐私说明页不存在：预渲染路由 `/privacy/`（00 章 §3.1），正文由运营方提供；`privacyHref` 填 `/privacy/` | 阻断 |
 | 3 | 服务方联系方式未填写 | 阻断（01 章 §8.4） |
 | 4 | 仓库缺 `public/downloads/releases.json`，构建失败 | 阻断，按 §3.4 提交初始清单 |
 | 5 | Mac / Windows 安装包未在目标机器打包与验收（`STATUS.md` W9） | 不阻断；未上架的平台显示"即将发布" |
