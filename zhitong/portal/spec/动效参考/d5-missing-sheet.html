@@ -59,6 +59,8 @@ button{font:inherit}
   0%,10%{transform:translate(318px,92px)} 18%,30%{transform:translate(372px,118px)} 38%,50%{transform:translate(334px,176px)}
   58%,70%{transform:translate(380px,186px)} 78%,90%{transform:translate(308px,140px)} 100%{transform:translate(318px,92px)}}
 .ms.paused *{animation-play-state:paused !important}
+/* Phones: crop to the right half (match line, cloud, stamp) so the punchline stays legible. */
+@media (max-width:767px){.ms-wrap{overflow:hidden}.ms-wrap .ms{width:172%;margin-left:-70%}}
 @media (prefers-reduced-motion:reduce){.ms *{animation:none !important}}
 .ms.still *{animation:none !important}
 @media print{.ms *{animation:none !important}}
@@ -79,7 +81,7 @@ button{font:inherit}
       <div class="actions"><a class="primary" href="#">回到首页</a><a class="ghost" href="#">查看文档</a></div>
     </div>
     <!-- D5: generated at build time in production (static SVG in the prerendered 404.html) -->
-    <div id="sheet-host" aria-hidden="true"></div>
+    <div id="sheet-host" class="ms-wrap" aria-hidden="true"></div>
   </div>
 </main>
 
@@ -145,7 +147,7 @@ add(`<g class="f" ${st(1.35)} fill="${CFG.ink}" fill-opacity=".7" font-size="3.8
 //    Openings are gaps between segments. Everything stops at the match line.
 const M = CFG.matchX;
 const walls = [
-  'M70 214V200', 'M70 170V100', 'M70 70V52H84', 'M118 52H146', 'M180 52H208', `M242 52H${M}`,          // left + top (window gaps)
+  'M70 214V196', 'M70 166V100', 'M70 70V52H84', 'M118 52H146', 'M180 52H208', `M242 52H${M}`,          // left + top (window gaps)
   'M70 214H146', `M180 214H208`, `M242 214H${M}`,                                                     // bottom
   'M70 124H100', 'M112 124H160', 'M172 124H220', `M232 124H${M}`,                                      // corridor north wall (door gaps)
   'M70 142H160', 'M172 142H220', `M232 142H${M}`,                                                     // corridor south wall
@@ -154,7 +156,7 @@ const walls = [
 walls.forEach((d, i) => draw(d, 1.15 + i * 0.045, 0.45, `stroke="${CFG.ink}" stroke-width="2.6" stroke-linecap="square"`));
 walls.forEach((d, i) => draw(d, 1.15 + i * 0.045, 0.45, `stroke="${NAVY}" stroke-width="1.5" stroke-linecap="square"`));
 // windows: three thin lines in each exterior opening
-[['M84 52H118', 'h'], ['M146 52H180', 'h'], ['M208 52H242', 'h'], ['M146 214H180', 'h'], ['M208 214H242', 'h'], ['M70 100V170', 'v'], ['M70 200V214', 'v']]
+[['M84 52H118', 'h'], ['M146 52H180', 'h'], ['M208 52H242', 'h'], ['M146 214H180', 'h'], ['M208 214H242', 'h'], ['M70 70V100', 'v'], ['M70 166V196', 'v']]
   .forEach(([d, o], i) => { [-0.9, 0, 0.9].forEach((k) => draw(d, 2.15 + i * 0.04, 0.3, `stroke="${CFG.ink}" stroke-opacity=".6" stroke-width=".25" transform="translate(${o === 'v' ? k : 0} ${o === 'h' ? k : 0})"`)); });
 // columns at axis intersections inside the drawn half
 AX.filter((x) => x < M).forEach((x, i) => AY.forEach((y, j) => add(`<rect class="p" ${st(1.95 + (i + j) * 0.03)} x="${x - 2.5}" y="${y - 2.5}" width="5" height="5" fill="${CFG.ink}" fill-opacity=".9"/>`)));
@@ -164,13 +166,13 @@ AX.filter((x) => x < M).forEach((x, i) => AY.forEach((y, j) => add(`<rect class=
   draw(`M${x} ${y + s * 12}A12 12 0 0 ${s > 0 ? 0 : 1} ${x + 12} ${y}`, 2.3 + i * 0.05, 0.35, `stroke="${CFG.ink}" stroke-opacity=".5" stroke-width=".25"`);
 });
 // stair in bay 1-2 / A-B
-const tread = []; for (let y = 152; y <= 204; y += 4) tread.push(`M80 ${y}H122`);
+const tread = []; for (let y = 160; y <= 204; y += 4) tread.push(`M80 ${y}H122`);
 draw(tread.join(''), 2.35, 0.5, `stroke="${CFG.ink}" stroke-opacity=".45" stroke-width=".25"`);
-draw('M101 206V152M98 157L101 152L104 157', 2.6, 0.4, `stroke="${CFG.ink}" stroke-opacity=".7" stroke-width=".3"`);
+draw('M101 206V160M98 165L101 160L104 165', 2.6, 0.4, `stroke="${CFG.ink}" stroke-opacity=".7" stroke-width=".3"`);
 add(`<g class="f" ${st(2.5)} fill="${CFG.ink}" fill-opacity=".55" font-size="4.6">
   <text x="101" y="92" text-anchor="middle">办公室</text><text x="163" y="92" text-anchor="middle">办公室</text><text x="225" y="92" text-anchor="middle">会议室</text>
   <text x="178" y="135" text-anchor="middle">走廊</text><text x="163" y="182" text-anchor="middle">办公室</text><text x="225" y="182" text-anchor="middle">办公室</text>
-  <text x="270" y="182" text-anchor="middle">资料室</text><text x="101" y="217.5" text-anchor="middle" font-size="3.6">楼梯间</text></g>`);
+  <text x="270" y="182" text-anchor="middle">资料室</text><text x="101" y="154" text-anchor="middle" font-size="4">楼梯间</text></g>`);
 
 // 5. Match line (接合线): heavy dash-dot; the plan continues on sheet A-404, which is missing.
 add(`<line class="f" ${st(2.7)} x1="${M}" y1="40" x2="${M}" y2="230" stroke="#ffffff" stroke-opacity=".85" stroke-width=".8" stroke-dasharray="9 2 1.5 2"/>`);
@@ -201,7 +203,7 @@ add(`<g class="stamp" ${st(3.75)}><g transform="translate(345 134) rotate(-8)">
   <rect x="-25" y="-11" width="50" height="22" rx="2.5" fill="none" stroke="${CFG.warm}" stroke-width=".9"/>
   <rect x="-22.5" y="-8.5" width="45" height="17" rx="1.5" fill="none" stroke="${CFG.warm}" stroke-width=".35"/>
   <text x="0" y="2.6" text-anchor="middle" font-size="9" font-weight="700" letter-spacing="3" fill="${CFG.warm}">缺 页</text>
-  <text class="mono" x="0" y="7.3" text-anchor="middle" font-size="2.8" letter-spacing=".6" fill="${CFG.warm}">A-404 · NOT FOUND</text></g></g>`);
+  <text class="mono" x="0" y="7.3" text-anchor="middle" font-size="2.8" letter-spacing=".6" fill="${CFG.warm}">图号 A-404 · 未找到</text></g></g>`);
 
 // 8. Searching crosshair (same vocabulary as D1): hairlines fade with userSpaceOnUse gradients.
 add(`<defs><linearGradient id="msh" gradientUnits="userSpaceOnUse" x1="-34" y1="0" x2="34" y2="0"><stop offset="0" stop-color="#8fc0ff" stop-opacity="0"/><stop offset=".5" stop-color="#8fc0ff" stop-opacity=".9"/><stop offset="1" stop-color="#8fc0ff" stop-opacity="0"/></linearGradient>

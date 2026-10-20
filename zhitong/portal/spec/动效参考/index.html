@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>装饰动效参考</title>
+<style>
+:root{
+  --ink:#162943;--navy:#0b347d;--navy-900:#082457;--blue:#0666f5;--green:#12c68b;--muted:#5c6d82;
+  --grid-line:#dce8f4;--grid-line-strong:#c5d6ea;--line:#d9e4f0;--canvas:#f5f8fd;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:"PingFang SC","Microsoft YaHei","Noto Sans SC","WenQuanYi Zen Hei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:15px/1.75 var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased;
+  background:#fff linear-gradient(to right,rgba(220,232,244,.55) 1px,transparent 1px) 0 0/24px 24px,
+             linear-gradient(to bottom,rgba(220,232,244,.55) 1px,transparent 1px) 0 0/24px 24px}
+.wrap{width:min(1080px,calc(100% - 40px));margin:0 auto;padding:56px 0 72px}
+header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;padding-bottom:20px;border-bottom:1.5px solid var(--navy)}
+h1{margin:0;font-size:32px;line-height:1.3;letter-spacing:-.01em}
+.sub{margin:6px 0 0;color:var(--muted);font-size:14px}
+.sheet{font:12px/1.6 var(--mono);color:var(--muted);text-align:right}
+.sheet b{color:var(--navy);font-weight:600}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:28px}
+.card{position:relative;display:grid;grid-template-columns:72px minmax(0,1fr);gap:16px;padding:18px 18px 16px;background:#fff;border:1px solid var(--line);border-radius:12px;color:inherit;text-decoration:none;transition:border-color .16s,box-shadow .16s,transform .16s}
+.card:hover{border-color:rgba(6,102,245,.45);box-shadow:0 10px 28px rgba(11,52,125,.08);transform:translateY(-1px)}
+.card:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(6,102,245,.35)}
+.thumb{width:72px;height:72px;border-radius:8px;background:var(--canvas);border:1px solid var(--grid-line);display:grid;place-items:center}
+.thumb.dark{background:var(--navy-900);border-color:var(--navy-900)}
+.id{font:600 12px var(--mono);color:var(--blue)}
+.card h2{margin:2px 0 4px;font-size:17px;line-height:1.4}
+.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.7}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font:12px var(--mono);color:#6f86a6}
+.meta span b{color:var(--navy);font-weight:600}
+.notes{margin-top:32px;padding:18px 20px;background:#fff;border:1px solid var(--line);border-radius:12px;font-size:13px;color:var(--muted)}
+.notes h3{margin:0 0 6px;font-size:14px;color:var(--ink)}
+.notes ul{margin:0;padding-left:18px}
+@media (max-width:767px){.cards{grid-template-columns:1fr}h1{font-size:26px}.sheet{text-align:left}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>装饰动效参考实现</h1>
+      <p class="sub">07-装饰动效.md 的可运行参考。每页零依赖、零外部请求，可直接双击打开或经本地静态服务查看。</p>
+    </div>
+    <div class="sheet"><b>ZT-DECO</b> · 共 6 项<br>实测：Chromium headless · 1440×900 / 390×844</div>
+  </header>
+
+  <main class="cards">
+    <a class="card" href="d1-blueprint-grid.html">
+      <span class="thumb" aria-hidden="true"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><path d="M0 12H48M0 24H48M0 36H48M12 0V48M24 0V48M36 0V48" stroke="#dce8f4"/><path d="M0 24H48M24 0V48" stroke="#0666f5" stroke-opacity=".55"/><rect x="20.5" y="20.5" width="7" height="7" fill="#fff" stroke="#0666f5"/><circle cx="12" cy="5" r="4" fill="#fff" stroke="#b9cbe3"/></svg></span>
+      <span><span class="id">D1</span><h2>BlueprintGrid 首屏底稿网格</h2>
+        <p>轴网与轴号自原点画出；精确指针下 CAD 十字光标吸附网格交点，压线时轴号点亮。</p>
+        <span class="meta"><span>Canvas2D ×2 + CSS</span><span>脚本 <b>0.18</b> ms/帧</span><span>峰值 2.0 ms</span></span></span>
+    </a>
+    <a class="card" href="d2-code-field-mark.html">
+      <span class="thumb dark" aria-hidden="true"><svg width="48" height="48" viewBox="0 0 48 48" font-family="monospace" font-size="7"><g fill="#3b78e6"><text x="4" y="10">0105</text><text x="4" y="19">0101</text><text x="4" y="28">0109</text><text x="4" y="37">0117</text></g><g fill="#fff" font-weight="700"><text x="26" y="19">01</text><text x="18" y="28">0</text></g><text x="26" y="37" fill="#12d99f" font-weight="700">05</text></svg></span>
+      <span><span class="id">D2</span><h2>CodeFieldMark 清单编码字符场</h2>
+        <p>安装区深色面板：12 位清单编码流由中心向外落定，汇成品牌图形；指针经过处局部“解码”。</p>
+        <span class="meta"><span>Canvas2D 字形图集</span><span>脚本 <b>0.48</b> ms/帧</span><span>峰值 1.9 ms</span></span></span>
+    </a>
+    <a class="card" href="d3-wireframe-building.html">
+      <span class="thumb" aria-hidden="true"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#0b347d" stroke-width="1"><path d="M8 34L22 40L40 32L26 27Z" fill="#f6f9fd"/><path d="M8 34V28L22 34V40M22 34L40 26V32" /><path d="M16 29V10L26 13V33M26 13L36 9V27M16 10L26 7L36 9" fill="none"/><path d="M4 38L22 46" stroke="#b9cbe3" stroke-dasharray="3 1.5 1 1.5"/></svg></span>
+      <span><span class="id">D3</span><h2>WireframeBuilding 页脚线框办公楼</h2>
+        <p>示例项目滨江综合办公楼：轴网、地下室虚线、逐层升起，标高符号落定，之后缓慢摆动。</p>
+        <span class="meta"><span>Canvas2D 透视投影</span><span>脚本 <b>0.24</b> ms/帧</span><span>峰值 2.0 ms</span></span></span>
+    </a>
+    <a class="card" href="d4-dimension-divider.html">
+      <span class="thumb" aria-hidden="true"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><path d="M6 16V34M42 16V34" stroke="#c5d6ea"/><path d="M6 28H42" stroke="#9db4d3"/><path d="M3 31L9 25M39 31L45 25" stroke="#0b347d" stroke-width="1.5"/><text x="24" y="23" font-family="monospace" font-size="8" fill="#0b347d" text-anchor="middle">1248</text></svg></span>
+      <span><span class="id">D4</span><h2>DimensionDivider 尺寸线分隔</h2>
+        <p>相邻同底色章节之间：尺寸线随滚动自中点向两端标注，数字实测容器宽度。</p>
+        <span class="meta"><span>SVG + 滚动阻尼</span><span>脚本 <b>0.10</b> ms/帧</span><span>峰值 1.2 ms</span></span></span>
+    </a>
+    <a class="card" href="d5-missing-sheet.html">
+      <span class="thumb dark" aria-hidden="true"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><path d="M5 8H22V40H5Z" stroke="#cfe0ff" stroke-width="1.2"/><path d="M24 6V42" stroke="#fff" stroke-dasharray="4 1.5 1 1.5"/><path d="M28 12a3 3 0 0 1 5 0a3 3 0 0 1 5 0a3 3 0 0 1 4 4a3 3 0 0 1 0 5a3 3 0 0 1 0 5a3 3 0 0 1-4 4a3 3 0 0 1-5 0a3 3 0 0 1-5 0a3 3 0 0 1-2-4a3 3 0 0 1 0-5a3 3 0 0 1 0-5a3 3 0 0 1 2-4Z" stroke="#ffb48a"/></svg></span>
+      <span><span class="id">D5</span><h2>MissingSheet 404 图纸缺页</h2>
+        <p>平面图画到接合线为止，A-404 缺页：修订云线圈出空白，审核章落下，十字光标在空白处搜寻。</p>
+        <span class="meta"><span>静态 SVG + CSS 动画</span><span>脚本 <b>0</b> ms/帧</span><span>SVG 2.9 KB gzip</span></span></span>
+    </a>
+    <a class="card" href="d6-navy-grid.html">
+      <span class="thumb dark" aria-hidden="true"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><path d="M0 8H48M0 16H48M0 24H48M0 32H48M0 40H48M8 0V48M16 0V48M24 0V48M32 0V48M40 0V48" stroke="#fff" stroke-opacity=".08"/><path d="M0 24H48M24 0V48" stroke="#fff" stroke-opacity=".2"/><path d="M0 48V44M8 48V46M16 48V46M24 48V43M32 48V46M40 48V46" stroke="#fff" stroke-opacity=".35"/></svg></span>
+      <span><span class="id">D6</span><h2>deco-navy-grid 深色区底稿网格</h2>
+        <p>安装面板、文档首页深色区、404 共用的细线网格与比例尺刻度。静态：文档路由不放装饰动画。</p>
+        <span class="meta"><span>纯 CSS</span><span>无脚本</span><span>&lt; 0.5 KB</span></span></span>
+    </a>
+  </main>
+
+  <section class="notes">
+    <h3>使用说明</h3>
+    <ul>
+      <li>每页顶栏：「重播」从头播放；「静态终帧」模拟减少动效时的画面；右侧显示本组件每帧脚本耗时（只计组件自身代码）。</li>
+      <li>系统开启“减少动态效果”时，各页直接显示静态终帧，不运行动画循环。</li>
+      <li>参考实现为演示把脚本内联在页面里；生产实现按 07 章放进 <code>src/components/deco/</code> 打包，满足 <code>script-src 'self'</code>。</li>
+    </ul>
+  </section>
+</div>
+</body>
+</html>

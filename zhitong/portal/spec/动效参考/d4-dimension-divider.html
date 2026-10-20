@@ -92,7 +92,7 @@ function makeDivider(host) {
     const n = mobile ? CFG.columns.mobile : innerWidth < 1024 ? CFG.columns.tablet : CFG.columns.desktop, gut = mobile ? 16 : 24, cw = (W - (n - 1) * gut) / n;
     const ticks = [];
     for (let k = 1; k < n; k++) for (const x of [k * (cw + gut) - gut, k * (cw + gut)])
-      ticks.push(el('line', { x1: x - 2.5, y1: y + 3, x2: x + 2.5, y2: y - 2, stroke: '#a9bfdc', opacity: 0 }, svg));
+      ticks.push({ x, node: el('line', { x1: x - 2.5, y1: y + 3, x2: x + 2.5, y2: y - 2, stroke: '#a9bfdc', opacity: 0 }, svg) });
     const ends = [0, W].map((x) => el('line', { x1: x - CFG.tick, y1: y + CFG.tick, x2: x + CFG.tick, y2: y - CFG.tick, stroke: '#0b347d', 'stroke-width': 1.5, 'stroke-linecap': 'round', opacity: 0 }, svg));
     const text = el('text', { x: W / 2, y: y - 9, 'text-anchor': 'middle' }, svg);
     const bubs = [];
@@ -114,14 +114,17 @@ function makeDivider(host) {
     parts.line.setAttribute('x1', W / 2 - half); parts.line.setAttribute('x2', W / 2 + half);
     parts.text.textContent = fmt(W * e);
     parts.text.setAttribute('opacity', clamp01(p * 4));
-    for (const t of parts.ticks) { const x = +t.getAttribute('x1') + 2.5; t.setAttribute('opacity', Math.abs(x - W / 2) <= half ? 1 : 0); }
+    for (const t of parts.ticks) t.node.setAttribute('opacity', Math.abs(t.x - W / 2) <= half ? 1 : 0);
     const endP = clamp01((p - 0.9) / 0.1);
     for (const l of parts.ext) { l.setAttribute('y1', parts.y + 10 - 32 * endP); }
     for (const l of parts.ends) l.setAttribute('opacity', endP);
     for (const b of parts.bubs) b.setAttribute('opacity', clamp01((p - 0.96) / 0.04));
   }
-  build();
-  return { host, build: () => { build(); lastKey = ''; }, set, shown: 0, inView: false };
+  const api = { host, set, shown: 0, inView: false, top: 0,
+    // Cache the document offset so the scroll loop never reads layout (no forced reflow per frame).
+    build: () => { build(); lastKey = ''; api.top = host.getBoundingClientRect().top + scrollY; } };
+  api.build();
+  return api;
 }
 
 const dividers = [...document.querySelectorAll('.dim')].map(makeDivider);
@@ -132,15 +135,17 @@ const stats = { frames: 0, total: 0, max: 0, winFrames: 0, winTotal: 0,
   reset() { this.frames = this.total = this.max = this.winFrames = this.winTotal = 0; } };
 window.__deco = { stats };
 let raf = 0, prev = 0, still = false, forcedStill = false;
-const target = (d) => { const r = d.host.getBoundingClientRect(); return clamp01((innerHeight * CFG.start - r.top) / (innerHeight * CFG.span)); };
+let vh = innerHeight;
+const target = (d, sy) => clamp01((vh * CFG.start - (d.top - sy)) / (vh * CFG.span));
 
 function frame(now) {
   raf = 0;
   const dt = prev ? Math.min(0.05, (now - prev) / 1000) : 1 / 60; prev = now;
   const t0 = performance.now();
   let busy = false;
+  const sy = scrollY;
   for (const d of dividers) {
-    const tg = target(d);
+    const tg = target(d, sy);
     // Offscreen dividers jump to their scroll state; only visible ones animate.
     if (!d.inView) { if (d.shown !== tg) { d.shown = tg; d.set(tg); } continue; }
     // Exponential catch-up: ~95% of the gap closes in CFG.scrub seconds.
@@ -156,7 +161,7 @@ const io = new IntersectionObserver((es) => { for (const e of es) { const d = di
 dividers.forEach((d) => io.observe(d.host));
 addEventListener('scroll', wake, { passive: true });
 document.addEventListener('visibilitychange', wake);
-new ResizeObserver(() => { dividers.forEach((d) => { d.build(); d.set(still ? 1 : d.shown); }); }).observe(document.body);
+new ResizeObserver(() => { vh = innerHeight; dividers.forEach((d) => { d.build(); d.set(still ? 1 : d.shown); }); }).observe(document.body);
 
 function init() {
   still = forcedStill || mqReduce.matches;

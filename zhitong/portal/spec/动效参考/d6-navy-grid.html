@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D6 深色区底稿网格</title>
+<style>
+:root{
+  --ink:#162943;--navy:#0b347d;--navy-900:#082457;--blue:#0666f5;--muted:#5c6d82;
+  --grid-line:#dce8f4;--grid-line-strong:#c5d6ea;--line:#d9e4f0;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:"PingFang SC","Microsoft YaHei","Noto Sans SC","WenQuanYi Zen Hei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:16px/1.8 var(--sans);color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+/* ---------- reference chrome ---------- */
+.refbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;height:40px;padding:0 16px;background:rgba(255,255,255,.95);border-bottom:1px solid var(--grid-line);font:12px/1 var(--mono);color:var(--muted)}
+.refbar a{color:var(--navy);text-decoration:none}.refbar b{color:var(--ink);font-weight:600}.refbar .sp{flex:1}
+@media (max-width:767px){.refbar .desc{display:none}}
+/* ---------- page mock: docs home navy area (06 §4.4) ---------- */
+.site-header{height:64px;display:flex;align-items:center;padding:0 max(20px,calc((100% - 1248px)/2));border-bottom:1px solid var(--line);font-weight:700}
+.container{width:min(1248px,calc(100% - 192px));margin-inline:auto}
+.docs-hero{color:#fff;padding:80px 0}
+.docs-hero h1{margin:0;font-size:44px;line-height:1.25}
+.docs-hero p{margin:14px 0 0;color:rgba(255,255,255,.8);font-size:18px;max-width:640px}
+.search{display:flex;align-items:center;justify-content:space-between;max-width:560px;height:48px;margin-top:28px;padding:0 16px;border-radius:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.7);font-size:15px}
+.search kbd{font:12px var(--mono);padding:2px 6px;border-radius:4px;border:1px solid rgba(255,255,255,.3)}
+.body{padding:48px 0;color:var(--muted);font-size:14px}
+@media (max-width:1023px){.container{width:calc(100% - 96px)}}
+@media (max-width:767px){.container{width:calc(100% - 40px)}.docs-hero{padding:48px 0}.docs-hero h1{font-size:30px}.docs-hero p{font-size:16px}}
+
+/* ---------- D6 deco-navy-grid (utility class, src/styles/deco.css) ---------- */
+/* Static by design: docs routes carry no decorative motion (06 §9). Zero JS, zero requests. */
+.deco-navy-grid{
+  position:relative;isolation:isolate;
+  background-color:var(--navy-900);
+  background-image:
+    linear-gradient(to right,rgba(255,255,255,.075) 1px,transparent 1px),   /* major 120px */
+    linear-gradient(to bottom,rgba(255,255,255,.075) 1px,transparent 1px),
+    linear-gradient(to right,rgba(255,255,255,.035) 1px,transparent 1px),   /* minor 24px */
+    linear-gradient(to bottom,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:120px 120px,120px 120px,24px 24px,24px 24px;
+  /* A vertical major line sits on the content column's left edge (container margins from 00 §4.4). */
+  --gx-major:20px;--gx-minor:20px;
+  background-position:var(--gx-major) 0,0 -1px,var(--gx-minor) 0,0 -1px;
+}
+@media (min-width:768px){.deco-navy-grid{--gx-major:48px;--gx-minor:48px}}
+@media (min-width:1024px){.deco-navy-grid{--gx-major:96px;--gx-minor:96px}}
+/* ≥1440: container is centred; background % offsets are relative to (width − tile), hence +tile/2. */
+@media (min-width:1440px){.deco-navy-grid{--gx-major:calc(50% - 564px);--gx-minor:calc(50% - 612px)}}
+/* Optional scale ruler along the bottom edge: ticks every 24px, taller every 120px. */
+.deco-navy-grid[data-ruler]::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:10px;pointer-events:none;
+  background-image:
+    linear-gradient(to right,rgba(255,255,255,.32) 1px,transparent 1px),
+    linear-gradient(to right,rgba(255,255,255,.2) 1px,transparent 1px);
+  background-size:120px 10px,24px 4px;background-repeat:repeat-x;background-position:var(--gx-major) 100%,var(--gx-minor) 100%;
+}
+</style>
+</head>
+<body>
+<header class="refbar">
+  <a href="index.html">← 动效参考</a><b>D6 · deco-navy-grid</b><span class="desc">深色区底稿网格（静态，CSS，供安装面板 / 文档首页 / 404 共用）</span>
+  <span class="sp"></span><span>静态 · 无脚本</span>
+</header>
+<div class="site-header">智通数工AI</div>
+<section class="docs-hero deco-navy-grid" data-ruler>
+  <div class="container">
+    <h1>文档</h1>
+    <p>安装、导入配置包、按任务找能力、看懂结果状态与告警。</p>
+    <div class="search" aria-hidden="true"><span>搜索安装、配置包、核对、需人工确认…</span><kbd>Ctrl K</kbd></div>
+  </div>
+</section>
+<div class="body container">文档首页正文（06 章）</div>
+</body>
+</html>
