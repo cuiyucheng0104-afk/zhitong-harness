@@ -30,7 +30,7 @@ button{font:inherit}
 .site-footer{position:relative;overflow:hidden;border-top:1px solid var(--line);padding:80px 0 32px;background:#fff}
 .footer-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px}
 .fb{grid-column:span 4}.fp{grid-column:span 2}.fd,.fc{grid-column:span 3}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
+.footer-grid .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;line-height:1.4}
 .brand svg{width:36px;height:36px;border-radius:10px}
 .fb p{margin:14px 0 0;font-size:15px;line-height:1.8;color:var(--muted)}
 .fb .cta{margin-top:18px;height:44px;padding:0 18px;border:0;border-radius:10px;background:var(--blue);color:#fff;font-size:15px}
@@ -41,10 +41,12 @@ button{font:inherit}
 .legal .top{border:0;background:none;color:var(--navy);font-size:14px}
 /* ---------- D3 DecoFooterMark (component styles) ---------- */
 /* 05 §5.3: background slot at the footer's bottom-right, 240×120, aria-hidden, pointer-events none. */
-.deco-footer{position:absolute;right:0;bottom:0;z-index:0;width:var(--deco-w,240px);height:var(--deco-h,120px);pointer-events:none}
+.deco-footer{position:absolute;right:0;bottom:0;z-index:0;width:240px;height:120px;pointer-events:none}
 .deco-footer canvas{position:absolute;inset:0;width:100%;height:100%}
-.site-footer.big{--deco-w:480px;--deco-h:240px}
+/* 07 recommendation: a footer row of its own after the legal row, right-aligned (no content above or below it). */
+.site-footer.row .deco-footer{position:relative;right:auto;bottom:auto;width:min(440px,100%);height:200px;margin:12px 0 -32px auto}
 @media (max-width:1023px){.container{width:calc(100% - 96px)}.fb{grid-column:1 / -1;margin-bottom:24px}.fp,.fd,.fc{grid-column:span 4}}
+@media (max-width:1023px){.site-footer.row .deco-footer{height:160px;width:min(360px,100%)}}
 @media (max-width:767px){.container{width:calc(100% - 40px)}.fp,.fd,.fc{grid-column:1 / -1}.legal{flex-direction:column;align-items:flex-start}
   .deco-footer{display:none}}
 </style>
@@ -53,14 +55,12 @@ button{font:inherit}
 <header class="refbar">
   <a href="index.html">← 动效参考</a><b>D3 · DecoFooterMark</b><span class="desc">页脚右下装饰位 · 滨江综合办公楼线框逐层搭起</span>
   <span class="sp"></span><output id="stat">—</output>
-  <button id="big" type="button" aria-pressed="false">放大装饰位</button><button id="replay" type="button">重播</button><button id="still" type="button" aria-pressed="false">静态终帧</button>
+  <button id="big" type="button" aria-pressed="false">05 现稿角落位</button><button id="replay" type="button">重播</button><button id="still" type="button" aria-pressed="false">静态终帧</button>
 </header>
 <main>
   <section class="prev container"><h2>常见问题</h2><p>（上一节占位：05 章 #faq）</p></section>
 </main>
-<footer class="site-footer">
-  <!-- D3: 05 §5.3 optional slot <DecoFooterMark> -->
-  <div class="deco-footer" data-deco-host aria-hidden="true"><canvas></canvas></div>
+<footer class="site-footer row">
   <div class="container footer-grid">
     <div class="fb">
       <span class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bm" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#00B3EC"/><stop offset="1" stop-color="#0666F5"/></linearGradient></defs><rect width="64" height="64" rx="17" fill="url(#bm)"/><g transform="rotate(-43 32 32)" stroke-linecap="round"><path d="M15 32h10m14 0h10M32 15v10m0 14v10" stroke="#FFF" stroke-width="7.5"/><path d="M17 19h5m20 0h5M17 45h5m20 0h5" stroke="#12D99F" stroke-width="5"/></g></svg>智通数工AI</span>
@@ -72,6 +72,8 @@ button{font:inherit}
     <div class="fc"><b>联系</b><span>服务方（占位）</span><span>电话（占位）</span></div>
   </div>
   <div class="container legal"><div>© 2026 运营主体（占位）<small>基于 DeepSeek Harness 构建 · 页面中的项目、金额与文件均为示例数据</small></div><button class="top" type="button">回到顶部 ↑</button></div>
+  <!-- D3 <DecoFooterMark>: class "row" = 07 recommendation; without it = 05 §5.3 corner slot 240×120 -->
+  <div class="container"><div class="deco-footer" data-deco-host aria-hidden="true"><canvas></canvas></div></div>
 </footer>
 
 <script>
@@ -130,6 +132,7 @@ const MONO = getComputedStyle(document.documentElement).getPropertyValue('--mono
 const LIGHT = norm([-0.45, 0.8, 0.55]);
 
 const host = document.querySelector('.deco-footer');
+const footer = host.closest('footer');
 const cv = host.querySelector('canvas');
 const ctx = cv.getContext('2d');
 const mqReduce = matchMedia('(prefers-reduced-motion: reduce)');
@@ -164,7 +167,7 @@ function project(x, y, z) {
 }
 
 /* ---------------- layout & fit ---------------- */
-let W = 0, H = 0, dpr = 1, markerX = 0, compact = false;
+let W = 0, H = 0, dpr = 1, markerX = 0, compact = false, boxX = 0, hidden = false;
 function fit() {
   // Fit the whole model over every yaw the sway and pointer can reach, so the scale never changes.
   cam.f = 1; cam.ox = 0; cam.oy = 0;
@@ -178,20 +181,27 @@ function fit() {
     setYaw(rad(CFG.yaw0 - span + (2 * span * k) / 6));
     for (const p of pts) { const [sx, sy] = project(...p); x0 = Math.min(x0, sx); x1 = Math.max(x1, sx); y0 = Math.min(y0, sy); y1 = Math.max(y1, sy); }
   }
-  const pad = compact ? 6 : CFG.pad, aw = W - 2 * pad - (compact ? 0 : CFG.markerW), ah = H - 2 * pad;
+  const pad = compact ? 6 : CFG.pad, aw = W - boxX - 2 * pad - (compact ? 0 : CFG.markerW), ah = H - 2 * pad;
   cam.f = Math.min(aw / (x1 - x0), ah / (y1 - y0));
-  cam.ox = pad + (aw - cam.f * (x1 - x0)) / 2 - cam.f * x0;
+  cam.ox = boxX + pad + (aw - cam.f * (x1 - x0)) / 2 - cam.f * x0;
   cam.oy = pad + (ah - cam.f * (y1 - y0)) / 2 - cam.f * y0;
   markerX = Math.round(cam.ox + cam.f * x1) + 10;
   setYaw(rad(CFG.yaw0));
 }
 function layout() {
-  const r = cv.getBoundingClientRect();
+  const r = host.getBoundingClientRect();
   W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
   dpr = Math.min(CFG.dprCap, window.devicePixelRatio || 1);
   cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   compact = W < CFG.compactBelow;
+  // Corner slot (05 §5.3): draw only right of the content container, never under the legal row or its button.
+  boxX = 0; hidden = false;
+  if (getComputedStyle(host).position === 'absolute') {
+    const contentRight = footer.querySelector('.legal').getBoundingClientRect().right;
+    boxX = Math.max(0, Math.round(contentRight - r.left) + 8);
+    hidden = W - boxX < 64;
+  }
   cv.style.opacity = compact ? String(CFG.compactInk) : '1'; // background slot behind the legal row: lighter ink
   fit();
 }
@@ -301,6 +311,7 @@ function buildHeight(t) {
 }
 function render(t) {
   ctx.clearRect(0, 0, W, H);
+  if (hidden) return;
   ctx.globalAlpha = 1;
   const bubbles = drawAxes(t), occluder = new Path2D();
   drawBasement(t);
@@ -369,7 +380,6 @@ function init() {
   ctx.clearRect(0, 0, W, H); wake();
 }
 
-const footer = host.closest('footer');
 footer.addEventListener('pointermove', (e) => {
   if (mode !== 'live' || e.pointerType === 'touch') return;
   const r = host.getBoundingClientRect(); pointer.x = Math.min(W, Math.max(0, e.clientX - r.left)); pointer.active = true; wake();
@@ -401,7 +411,7 @@ const stillBtn = document.getElementById('still');
 stillBtn.onclick = () => { forcedStill = !forcedStill; stillBtn.setAttribute('aria-pressed', String(forcedStill)); init(); };
 window.__deco.replay = init;
 const bigBtn = document.getElementById('big');
-bigBtn.onclick = () => { const on = bigBtn.getAttribute('aria-pressed') !== 'true'; bigBtn.setAttribute('aria-pressed', String(on)); footer.classList.toggle('big', on); };
+bigBtn.onclick = () => { const on = bigBtn.getAttribute('aria-pressed') !== 'true'; bigBtn.setAttribute('aria-pressed', String(on)); footer.classList.toggle('row', !on); };
 })();
 </script>
 </body>
