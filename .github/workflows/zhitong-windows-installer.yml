@@ -1,6 +1,7 @@
 # zhitong increment: 智通数工AI 的 Windows x64 安装包（未签名），在 GitHub 托管的 windows-latest 上打。
 #
-# 用法见 zhitong/INSTALL.md 第三部分「用 GitHub Actions 打包」。产物命名与
+# 用法见 zhitong/INSTALL.md 第三部分「用 GitHub Actions 打包」；日常发布由 zhitong/scripts/release.sh 推 tag 触发
+# （zhitong/RELEASE.md）。产物命名与
 # zhitong/portal/site/public/downloads/releases.json 一致：ztsgai-<version>-win-x64-setup.exe 与同名 .sha256
 # （`<hex>  <文件名>` 格式）。<version> 是发行版本；安装后的应用仍报告 apps/desktop/package.json 的产品版本
 # （作为 base 写进运行摘要与 Release 说明），因为 DSH_DESKTOP_BUILD_VERSION 只接受延伸产品版本的写法
@@ -11,6 +12,8 @@
 # 发布 job 在 ubuntu-latest 上约 1 分钟。超时 120 分钟封顶（计费上限 240 分钟）。
 # macOS 安装包在用户自己的 Mac 上打（10 倍计费），这里没有 macOS job。
 name: zhitong · Windows installer
+# 标题以「 v<version>」结尾：zhitong/scripts/release.sh 按它找到本次发布的运行（release-state.mjs pick-run）。
+run-name: "zhitong · Windows installer ${{ github.event_name == 'push' && github.ref_name || format('v{0}', inputs.version) }}"
 
 on:
   workflow_dispatch:

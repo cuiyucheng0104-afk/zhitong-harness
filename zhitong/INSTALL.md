@@ -181,6 +181,8 @@ DMG: /…/zhitong-harness/apps/desktop/.desktop-build/targets/mac-arm64/unsigned
 
 然后按第四部分做首次运行与验收。
 
+日常发布（本机打 Mac 包、Actions 打 Windows 包、登记并部署到门户）用一条命令完成，见 [RELEASE.md](RELEASE.md)。
+
 ## 三、Windows x64：打出安装程序并安装
 
 在 Windows 10/11 x64 上构建（上游不支持交叉打包）。以下命令在 PowerShell 里执行。
