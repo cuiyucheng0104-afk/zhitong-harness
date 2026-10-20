@@ -165,7 +165,7 @@ bash zhitong/portal/deploy/deploy.sh zt-prod
 
 ### Windows x64 安装包（必须在 Windows 机器上打）
 
-这个 GitHub 账号的 Actions 额度已耗尽，不能用仓库里的 `windows-package.yml` 在 CI 打包。在一台 Windows 10/11 x64 上按 `zhitong/INSTALL.md` 的 Windows 打包一节准备依赖（含 `dwg2dxf.exe` 与 DLL），然后：
+Windows 安装包由 GitHub Actions 的「zhitong · Windows installer」构建（推 `v*` 标签或手动运行；日常发布由 `zhitong/scripts/release.sh` 全自动完成，见 `zhitong/RELEASE.md`）。没有 Actions 额度时的备选：在一台 Windows 10/11 x64 上按 `zhitong/INSTALL.md` 的 Windows 打包一节准备依赖（含 `dwg2dxf.exe` 与 DLL），然后：
 
 ```powershell
 pnpm run package:desktop:win:x64:unsigned --check

@@ -122,7 +122,7 @@ node --test zhitong/scripts/tests/*.test.mjs   # 在仓库根目录：打包脚�
 ```sh
 git clone https://github.com/cuiyucheng0104-afk/zhitong-harness.git
 cd zhitong-harness
-git checkout claude/quirky-gates-woud76
+git checkout master
 corepack enable
 pnpm install --frozen-lockfile
 ```
@@ -199,7 +199,7 @@ DMG: /…/zhitong-harness/apps/desktop/.desktop-build/targets/mac-arm64/unsigned
 ```powershell
 git clone https://github.com/cuiyucheng0104-afk/zhitong-harness.git
 cd zhitong-harness
-git checkout claude/quirky-gates-woud76
+git checkout master
 pnpm install --frozen-lockfile
 powershell -NoProfile -ExecutionPolicy Bypass -File zhitong\plugins\tool-cad\scripts\fetch-dwg2dxf-win64.ps1
 ```
