@@ -2,6 +2,8 @@
 
 English | [中文](README.zh.md)
 
+> **This repository is the 智通数工AI distribution fork.** It turns DeepSeek Harness, the upstream project described below and released under the [MIT License](LICENSE), into a desktop workbench for construction cost consulting firms. The product spec is [zhitong/README.md](zhitong/README.md), and installation and packaging steps are in [zhitong/INSTALL.md](zhitong/INSTALL.md). Everything below this paragraph is the upstream README.
+
 DeepSeek Harness (`dsh`) is an open-source agent harness developed by [DeepSeek AI](https://deepseek.com).
 
 It is built on an **everything-is-a-plugin** architecture and powered by [Cordis](https://github.com/cordiverse/cordis), whose design is described in [_A Programming Paradigm for Spatiotemporal Composability_](https://arxiv.org/abs/2608.25512).

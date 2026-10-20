@@ -233,6 +233,16 @@ node zhitong\scripts\verify-desktop-app.mjs "$env:LOCALAPPDATA\Programs\DeepSeek
 
 Windows 用户名含中文时，`%USERPROFILE%\.dsh` 与 `%TEMP%` 都在中文路径下：官方 win64 的 dwg2dxf 用 ANSI `fopen`，tool-cad 已把输入拷成 ASCII 文件名，但临时目录本身仍在 `%TEMP%`；遇到 DWG 打不开时，先把用户环境变量 `TEMP`、`TMP` 改到纯英文路径（如 `C:\Temp`）再重启应用。
 
+### 5. 用 GitHub Actions 打包
+
+没有 Windows 构建机时，用仓库里的 `zhitong · Windows installer` workflow（`.github/workflows/zhitong-windows-installer.yml`）在 GitHub 托管的 `windows-latest` 上打同样的未签名安装包。它按上面 1–4 步执行：装依赖、写只含占位的 `.env.windows`（应用 ID 与 `https://update.invalid`，不含密钥）、取 dwg2dxf、`--check` 后打包，再对 `win-unpacked` 跑 `verify-desktop-app.mjs`。
+
+1. 打开仓库的 **Actions** 页，左侧选 **zhitong · Windows installer**，点 **Run workflow**。
+2. 「Use workflow from」选要打包的分支；`version` 填发行版本（如 `1.0.0`，不带 `v`）；`ref` 留空即打所选分支；要同时发 Release 就勾 `publish`。
+3. 运行约 40–60 分钟。完成后在运行页底部 **Artifacts** 下载 `ztsgai-<version>-win-x64-setup`（zip 内是 `ztsgai-<version>-win-x64-setup.exe` 与同名 `.sha256`，保留 7 天）；勾了 `publish` 的也可以到 **Releases** 的 `v<version>` 下载。推送 `v*` tag（如 `git push origin v1.0.0`）同样会打包并发布 Release。
+
+下载后在 PowerShell 里用 `(Get-FileHash -Algorithm SHA256 .\ztsgai-1.0.0-win-x64-setup.exe).Hash.ToLower()` 与 `.sha256` 文件第一列核对，再按第 4 步安装。文件名与 `zhitong/portal/site/public/downloads/releases.json` 的约定一致；安装后应用报告的版本仍是 `apps/desktop/package.json` 的产品版本，运行摘要与 Release 说明里记为「应用内版本」。私有仓的 Windows 分钟按 2 倍计费，一次运行约占 80–120 分钟额度；fork 里上游的 CI、CI master、Sandbox、E2E、Release (dsh) 已改成只手动触发，不会自动消耗额度。打包失败时下载 `ztsgai-windows-packaging-logs-*` 查看各阶段日志。
+
 ## 四、首次运行与验收清单
 
 ### 1. 首次运行

@@ -2,6 +2,8 @@
 
 [English](README.md) | 中文
 
+> **本仓是智通数工AI 的发行版 fork。** 它把下文介绍的上游项目 DeepSeek Harness（[MIT 许可](LICENSE)）做成造价咨询公司的桌面工作台。产品 spec 见 [zhitong/README.md](zhitong/README.md)，安装与打包步骤见 [zhitong/INSTALL.md](zhitong/INSTALL.md)。本段以下是上游 README 原文。
+
 DeepSeek Harness（`dsh`）是由 [DeepSeek AI](https://deepseek.com) 开发的开源 agent harness（智能体框架）。
 
 它构建于**一切皆插件**的架构之上，由 [Cordis](https://github.com/cordiverse/cordis) 驱动，其设计参见论文 [_A Programming Paradigm for Spatiotemporal Composability_](https://arxiv.org/abs/2608.25512)。
