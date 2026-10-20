@@ -21,7 +21,7 @@ import { en, zh, type BrandKey } from './locales.ts'
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
-    /** 智通数工AI product name, mark glyph, and recommended-model label. */
+    /** 智通数工AI product name and recommended-model label. */
     'zhitong-brand': BrandKey
   }
 }

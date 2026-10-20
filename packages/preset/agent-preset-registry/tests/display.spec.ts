@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { presetDisplayText, type BuiltInPresetCopyKey } from '../src/display.ts'
+import { isBuiltInPreset, presetDisplayText, type BuiltInPresetCopyKey } from '../src/display.ts'
 
 const t = (key: BuiltInPresetCopyKey): string => `t:${key}`
 
@@ -14,6 +14,16 @@ describe('presetDisplayText', () => {
       name: 't:presetStandardName',
       description: 't:presetStandardDescription',
     })
+  })
+
+  // zhitong increment: the 智通数工AI preset row publishes no name and resolves as a shipped preset.
+  it('resolves the 智通数工AI preset through its dictionary keys and files it as built-in', () => {
+    expect(isBuiltInPreset({ id: 'zhitong' })).toBe(true)
+    expect(presetDisplayText({ id: 'zhitong' }, t)).toEqual({
+      name: 't:presetZhitongName',
+      description: 't:presetZhitongDescription',
+    })
+    expect(isBuiltInPreset({ id: 'zhitong', name: '智通数工AI' })).toBe(false)
   })
 
   it('keeps user-authored metadata untranslated', () => {

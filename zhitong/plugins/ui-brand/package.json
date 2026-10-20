@@ -1,6 +1,6 @@
 {
   "name": "@zhitong/ui-brand",
-  "description": "智通数工AI：Web 客户端侧栏与新会话页的品牌占位（文字标，可由设计师替换），以及模型选择器里 DeepSeek V4.1 Flash 的「官方推荐」标记",
+  "description": "智通数工AI：Web 客户端侧栏与新会话页的品牌图形与字标，以及模型选择器里 DeepSeek V4.1 Flash 的「官方推荐」标记",
   "version": "0.1.0",
   "private": true,
   "type": "module",

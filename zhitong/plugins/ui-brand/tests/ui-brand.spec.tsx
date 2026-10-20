@@ -80,19 +80,36 @@ describe('智通数工AI browser-brand plugin', () => {
     for (const hole of HOLES) expect(subject.slots.entries(hole)).toHaveLength(1)
   })
 
-  it('renders the mark at the requested size and the wordmark from the dictionary', () => {
-    const mark = render(<ZhitongBrandMark size={34} className="hero" t={t} />)
+  it('draws the brand mark inline at the requested size, with no asset URL or theme-token colors', () => {
+    const mark = render(<ZhitongBrandMark size={34} className="hero" />)
     const svg = mark.container.querySelector('svg')!
     expect(svg.getAttribute('width')).toBe('34')
     expect(svg.getAttribute('class')).toBe('hero')
-    expect(svg.textContent).toBe('智')
-    mark.rerender(<ZhitongBrandMark size={24} t={t} />)
+    expect(svg.querySelector('image, use')).toBeNull()
+    expect(svg.outerHTML).not.toContain('var(--')
+    const stops = [...svg.getElementsByTagName('stop')].map(stop => stop.getAttribute('stop-color'))
+    expect(stops).toEqual(['#00B3EC', '#0666F5'])
+    const strokes = [...svg.querySelectorAll('path')].map(path => path.getAttribute('stroke'))
+    expect(strokes).toEqual(['#FFF', '#12D99F'])
+    expect(svg.textContent).toBe('')
+    mark.rerender(<ZhitongBrandMark size={24} />)
     expect(mark.container.querySelector('svg')?.getAttribute('width')).toBe('24')
     mark.unmount()
 
     const name = render(<ZhitongBrandName t={t} />)
     expect(name.container.textContent).toBe('智通数工AI')
     expect(name.container.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  it('gives every mark its own gradient so a hidden duplicate cannot blank the visible one', () => {
+    const view = render(<><ZhitongBrandMark size={24} /><ZhitongBrandMark size={24} /></>)
+    const marks = [...view.container.querySelectorAll('svg')]
+    const ids = marks.map(svg => svg.getElementsByTagName('linearGradient')[0]?.getAttribute('id'))
+    expect(new Set(ids).size).toBe(2)
+    for (const [index, svg] of marks.entries()) {
+      expect(ids[index]).toMatch(/^[A-Za-z0-9_-]+$/)
+      expect(svg.querySelector('rect')?.getAttribute('fill')).toBe(`url(#${ids[index]})`)
+    }
   })
 
   it('recommends only deepseek-flash on the official DeepSeek routes', () => {

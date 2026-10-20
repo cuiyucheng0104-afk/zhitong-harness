@@ -20,7 +20,8 @@ export const zh = {
   'placeholder.default': '发消息或创建任务, / 调用指令, @ 文件或对话',
   'placeholder.unavailable': '会话不可用',
   'placeholder.parentOffline': '父会话已离线，无法继续发送；仍可停止当前运行',
-  'placeholder.hero': '描述你想要构建的内容, / 调用指令, @ 文件或对话',
+  // zhitong increment: 智通数工AI new-session placeholder (zhitong/STATUS.md「W14」).
+  'placeholder.hero': '描述你要做的造价任务，/ 调用指令，@ 文件或对话',
   'placeholder.workspace': '选择一个工作区开始',
   'placeholder.steerQueue': 'Cmd/Ctrl+Enter 插话发送全部排队消息',
   'input.commands': '添加文件或调用指令',
@@ -74,7 +75,8 @@ export const zh = {
   'settings.enter.description': '智能体运行时 Enter 键和发送按钮的行为；Cmd/Ctrl+Enter 使用另一行为',
   'settings.enter.queue': '排队发送',
   'settings.enter.steer': '插话发送',
-  'hero.headline': '探索未至之境',
+  // zhitong increment: 智通数工AI new-session headline (zhitong/STATUS.md「W14」).
+  'hero.headline': '造价咨询工作台',
   'hero.preview': '预览版',
   'hero.chooseWorkspace': '选择工作区',
   'session.hierarchy': '会话层级',

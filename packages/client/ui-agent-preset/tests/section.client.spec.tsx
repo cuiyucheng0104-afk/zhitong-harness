@@ -69,6 +69,16 @@ it('updates visible settings choices without writing defaults from the renderer'
   expect(screen.getByRole('button', { name: `${en.inUse}: ${en.presetMinimalName}` })).toBeTruthy()
   expect(rowFor('ptc')).toBeTruthy()
 })
+// zhitong increment: the 智通数工AI preset row publishes no name, so it is filed under Built-in as the new task default.
+it('files the 智通数工AI preset under Built-in as the new task default', () => {
+  view({ rows: [{ id: 'zhitong', isDefault: true }, { id: 'standard', isDefault: false }, { id: 'mine', name: 'Mine', isDefault: false }] })
+  const groups = [...document.querySelectorAll('section section')]
+  const builtIn = groups.find(group => group.querySelector('h3')?.textContent === en.builtInGroup)
+  const custom = groups.find(group => group.querySelector('h3')?.textContent === en.customGroup)
+  expect(builtIn?.querySelector('[data-agent-preset-id="zhitong"]')).toBeTruthy()
+  expect(custom?.querySelector('[data-agent-preset-id="zhitong"]')).toBeNull()
+  expect(screen.getByRole<HTMLButtonElement>('button', { name: `${en.inUse}: ${en.presetZhitongName}` }).disabled).toBe(true)
+})
 it.each(['ptc', 'minimal'])('keeps a named custom %s override selectable with Coding Tools off', (id) => {
   const actions = view({ rows: [{ id, name: 'My mode', isDefault: false }] }, undefined, undefined, false)
   fireEvent.click(screen.getByRole('button', { name: `${en.setDefault}: My mode` }))

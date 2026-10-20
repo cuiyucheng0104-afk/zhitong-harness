@@ -21,6 +21,8 @@ export type AgentPresetSettingsKey =
   | 'presetMinimalDescription'
   | 'presetCordisName'
   | 'presetCordisDescription'
+  | 'presetZhitongName'
+  | 'presetZhitongDescription'
   | 'inUse'
   | 'noDescription'
   | 'brokenBadge'
@@ -59,6 +61,10 @@ export const en: Record<AgentPresetSettingsKey, string> = {
   presetCordisName: 'Creator mode',
   presetCordisDescription:
     'Customize DSH through conversation. Let the agent write plugins that add features or UI, or combine tools and prompts to create your own mode.',
+  // zhitong increment: the 智通数工AI preset (`zhitong/bundle/cordis.patch.yml`, id `zhitong`); the product name is not translated.
+  presetZhitongName: '智通数工AI',
+  presetZhitongDescription:
+    'Cost consulting workbench: reconciliation, indicators, investment control, bills of quantities, estimates, reports, drawings, and Q&A.',
 
   inUse: 'New task default',
 
@@ -83,7 +89,8 @@ export const en: Record<AgentPresetSettingsKey, string> = {
 export const zh: Record<AgentPresetSettingsKey, string> = {
   ...guideZh,
   builtInGroup: '内置', customGroup: '自定义',
-  sectionIntro: '选择 Agent 的工具和工作方式。日常任务用「标准模式」，扩展 DSH 的能力用「创造模式」。',
+  // zhitong increment: Chinese copy names the harness ZTH (zhitong/STATUS.md「W14」).
+  sectionIntro: '选择 Agent 的工具和工作方式。日常任务用「标准模式」，扩展 ZTH 的能力用「创造模式」。',
 
   seatHint: '选择新任务使用的 Agent 预设',
   headerHint: '本任务的 Agent 预设，在任务开始时确定',
@@ -99,7 +106,11 @@ export const zh: Record<AgentPresetSettingsKey, string> = {
   presetMinimalName: '极简模式',
   presetMinimalDescription: 'Agent 使用终端和图片读取工具，并支持上下文压缩，适合测试和对比其基础表现。',
   presetCordisName: '创造模式',
-  presetCordisDescription: '用对话定制 DSH：让 Agent 编写插件，添加新功能或界面；也能组合工具和提示词，创建自己的模式。',
+  // zhitong increment: ZTH, as in sectionIntro.
+  presetCordisDescription: '用对话定制 ZTH：让 Agent 编写插件，添加新功能或界面；也能组合工具和提示词，创建自己的模式。',
+  // zhitong increment: the 智通数工AI preset (`zhitong/bundle/cordis.patch.yml`, id `zhitong`).
+  presetZhitongName: '智通数工AI',
+  presetZhitongDescription: '造价咨询工作台：核对、指标、投控、清单、概算、报告、看图、问答',
 
   inUse: '新任务默认',
 
@@ -113,7 +124,8 @@ export const zh: Record<AgentPresetSettingsKey, string> = {
 
   creatorDraft: '让 Agent 帮我创建预设模式',
   createPlugin: '让 Agent 创建插件',
-  createPluginDescription: '进入创造模式，制作属于你的 DSH 插件',
+  // zhitong increment: ZTH, as in sectionIntro.
+  createPluginDescription: '进入创造模式，制作属于你的 ZTH 插件',
   createPluginChecking: '正在确认创造模式是否可用',
   createPluginUnavailable: '暂时不可用，请重新打开菜单重试',
   createPluginMissing: '当前配置未提供创造模式',

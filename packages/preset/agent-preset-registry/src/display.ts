@@ -13,6 +13,8 @@ export type BuiltInPresetCopyKey =
   | 'presetPtcName' | 'presetPtcDescription'
   | 'presetMinimalName' | 'presetMinimalDescription'
   | 'presetCordisName' | 'presetCordisDescription'
+  // zhitong increment: the 智通数工AI preset row of `zhitong/bundle/cordis.patch.yml` publishes no name, so it is shipped.
+  | 'presetZhitongName' | 'presetZhitongDescription'
 
 /** Preset roster fields needed to resolve display copy. */
 export interface PresetDisplaySource {
@@ -42,6 +44,8 @@ const BUILT_IN_PRESET_KEYS: Readonly<Partial<Record<string, PresetLocaleKeys>>> 
   ptc: { name: 'presetPtcName', description: 'presetPtcDescription' },
   minimal: { name: 'presetMinimalName', description: 'presetMinimalDescription' },
   cordis: { name: 'presetCordisName', description: 'presetCordisDescription' },
+  // zhitong increment: see BuiltInPresetCopyKey.
+  zhitong: { name: 'presetZhitongName', description: 'presetZhitongDescription' },
 }
 
 /**
