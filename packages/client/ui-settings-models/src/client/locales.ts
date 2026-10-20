@@ -1,4 +1,6 @@
 /** Copy dictionaries for the Models settings section. */
+// zhitong increment: the preview notice is 智通数工AI's own text (zhitong/README.md §2), with the product site; the
+// first-run key step names the default endpoint and the recommended model.
 
 /** English strings (the key-set source of truth for this pair). */
 export const en = {
@@ -127,11 +129,11 @@ export const en = {
   create: 'Create provider',
   creating: 'Creating\u2026',
   welcomeTitle: 'Preview Notice',
-  welcomeBody: 'DeepSeek Harness 0.2 is still in preview, and many areas need continued improvement and refinement. We welcome feedback and suggestions from all developers and users. The new desktop app now targets a broad range of users, while developer-related advanced features can be enabled in the settings. DeepSeek Harness’s product features and plugin APIs are expected to continue rapid iteration and evolution, and will gradually stabilize over time.\n\nWe look forward to exploring the limits of intelligence together with users and developers around the world, building on open-source, reusable, and composable infrastructure. We welcome everyone to bring their ideas to life with DeepSeek Harness and participate in the community to enrich the plugin ecosystem.',
+  welcomeBody: '智通数工AI is an AI workbench for construction cost consulting firms, built on DeepSeek Harness, and is currently in preview. Amounts and quantities that the skill scripts calculate always need manual review before they go into a formal deliverable.\n\nFor problems and suggestions, contact us at https://ztsgai.com.',
   welcomeContinue: 'Continue',
   welcomeError: 'The acknowledgement could not be saved. Please try again.',
-  onboardingTitle: 'Add an API key to get started',
-  onboardingDescription: 'Configure the official DeepSeek provider to start building.',
+  onboardingTitle: 'Add your model API key to get started',
+  onboardingDescription: 'Uses the official DeepSeek API (https://api.deepseek.com) with DeepSeek V4.1 Flash (recommended). To use another OpenAI-compatible endpoint, add it later in Settings → Models.',
   onboardingLater: 'Configure later',
   onboardingSave: 'Save and continue',
   onboardingSaving: 'Saving…',
@@ -268,11 +270,11 @@ export const zh: { [Key in keyof typeof en]: string } = {
   create: '创建提供商',
   creating: '创建中\u2026',
   welcomeTitle: '预览版说明',
-  welcomeBody: 'DeepSeek Harness 目前的 0.2 版本仍处于预览阶段，还有许多地方需要持续改进和打磨，希望听取广大开发者和用户的反馈建议。现在，新的桌面端面向广泛用户，开发者相关的进阶功能可在配置中开启使用。预计 DeepSeek Harness 的产品功能以及插件 API 都会继续快速迭代、持续演化，并逐渐趋于稳定。\n\n我们期待与全球用户和开发者一起，在开源、可复用、可组合的基础设施之上，共同探索智能上限。欢迎大家用 DeepSeek Harness 将想法变成现实，与社区一起丰富插件生态。',
+  welcomeBody: '智通数工AI是面向造价咨询公司的 AI 工作台，基于 DeepSeek Harness 构建，目前处于预览阶段。skill 脚本算出的金额与数量都需要人工复核后再进入正式成果。\n\n使用中遇到问题或有改进建议，请通过 https://ztsgai.com 联系我们。',
   welcomeContinue: '继续',
   welcomeError: '暂时无法保存确认状态，请重试。',
-  onboardingTitle: '添加一个 API Key 开始使用',
-  onboardingDescription: '配置 DeepSeek 官方模型，即可开始使用。',
+  onboardingTitle: '填写模型 API Key 开始使用',
+  onboardingDescription: '默认连接 DeepSeek 官方接口（https://api.deepseek.com），使用 DeepSeek V4.1 Flash（官方推荐）。要改用其他 OpenAI 兼容地址，可稍后在“设置 → 模型”中添加。',
   onboardingLater: '稍后配置',
   onboardingSave: '保存并继续',
   onboardingSaving: '保存中…',

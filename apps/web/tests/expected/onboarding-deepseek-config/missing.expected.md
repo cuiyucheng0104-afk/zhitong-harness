@@ -1,6 +1,6 @@
-- dialog "添加一个 API Key 开始使用":
-  - heading "添加一个 API Key 开始使用" [level=2]
-  - paragraph: 配置 DeepSeek 官方模型，即可开始使用。
+- dialog "填写模型 API Key 开始使用":
+  - heading "填写模型 API Key 开始使用" [level=2]
+  - paragraph: 默认连接 DeepSeek 官方接口（https://api.deepseek.com），使用 DeepSeek V4.1 Flash（官方推荐）。要改用其他 OpenAI 兼容地址，可稍后在“设置 → 模型”中添加。
   - text: API 密钥
   - button "认证说明": "?"
   - textbox "API 密钥":

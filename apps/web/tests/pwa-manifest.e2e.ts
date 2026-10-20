@@ -13,9 +13,10 @@ it('ships install metadata with the built web application', async () => {
   // No `id`: a browser resolves an explicit `id` against the start URL's origin,
   // so only an absent `id`, which defaults to the resolved `start_url`, gives
   // each mount its own identity. `public-mount.e2e.ts` reads the resolved form.
+  // zhitong increment: the installed Web app is named 智通数工AI.
   expect(manifest).toEqual({
-    name: 'DeepSeek Harness',
-    short_name: 'DSH',
+    name: '智通数工AI',
+    short_name: '智通数工AI',
     start_url: './',
     scope: './',
     display: 'fullscreen',

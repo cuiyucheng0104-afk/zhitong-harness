@@ -19,7 +19,8 @@ export const CLIENT_BUILD_PROFILE_SELECTOR = 'DSH_BUILD_CLIENT_PROFILE'
 /** Public client environment required by official DSH artifacts. */
 const OFFICIAL_CLIENT_BUILD_ENVIRONMENT = {
   DSH_CLIENT_BUILD_PROFILE: 'official',
-  DSH_CLIENT_TITLE: 'DeepSeek Harness',
+  // zhitong increment: the packaged Web and Desktop document title is the product name 智通数工AI.
+  DSH_CLIENT_TITLE: '智通数工AI',
 } as const
 
 /** Public variable carrying the source commit embedded in client artifacts. */

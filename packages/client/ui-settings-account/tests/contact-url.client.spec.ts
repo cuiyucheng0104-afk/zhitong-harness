@@ -9,11 +9,10 @@ it('prefills the available support context and hides every context field', () =>
     uid: 'account-user' as AccountUserId, version: '1.2.3',
     deviceInfo: 'Mozilla/5.0 (Macintosh) Harness/1.2.3', width: 1512, height: 982, pixelRatio: 2,
   }))
-  expect(url.origin).toBe('https://trtgsjkv6r.feishu.cn')
-  expect(url.pathname).toBe('/share/base/form/shrcnlCoGElW7MQznGy9r3YYXcg')
-  expect(Object.fromEntries(new URL(ContactConfig({}).contactFormUrl).searchParams)).toEqual({
-    hide_uid: '1', hide_device_info: '1', hide_harness_version: '1',
-  })
+  // zhitong increment: the default destination is the 智通数工AI site.
+  expect(url.origin).toBe('https://ztsgai.com')
+  expect(url.pathname).toBe('/')
+  expect(Object.fromEntries(new URL(ContactConfig({}).contactFormUrl).searchParams)).toEqual({})
   expect(Object.fromEntries(url.searchParams)).toEqual({
     hide_uid: '1', prefill_uid: 'account-user',
     hide_source: '1', prefill_source: 'app_harness',
