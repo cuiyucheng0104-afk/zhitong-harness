@@ -87,13 +87,13 @@ needs_gh() {
 
 # ── 预检 ───────────────────────────────────────────────────────────────
 preflight() {
-  step "预检（v$V）"
+  step "预检（v${V}）"
   dry && say "（dry-run：只打印命令）"
   local tools='git node' tool
   if needs_gh; then tools="$tools gh"; fi
   if rl_should_run mac; then tools="$tools pnpm"; fi
   if rl_should_run deploy; then tools="$tools rsync ssh curl npm"; fi
-  for tool in $tools; do command -v "$tool" >/dev/null 2>&1 || fail "本机缺少 $tool（见 zhitong/RELEASE.md「一次性设置」）"; done
+  for tool in $tools; do command -v "$tool" >/dev/null 2>&1 || fail "本机缺少 ${tool}（见 zhitong/RELEASE.md「一次性设置」）"; done
 
   node "$STATE_TOOL" check-version "$V" || fail "版本号不能比 releases.json 里的旧"
   if [ -n "$REL_NOTES_FILE" ] && [ ! -f "$REL_NOTES_FILE" ]; then fail "--notes-file $REL_NOTES_FILE 不存在"; fi
@@ -128,12 +128,12 @@ $dirty"
       local local_tag remote_tag
       local_tag="$(git rev-parse -q --verify "refs/tags/$TAG^{commit}" || true)"
       if [ -n "$local_tag" ] && [ "$local_tag" != "$(git rev-parse HEAD)" ]; then
-        fail "本地已有 tag $TAG 且不指向 HEAD：换一个版本号，或删掉本地 tag（git tag -d $TAG）"
+        fail "本地已有 tag $TAG 且不指向 HEAD：换一个版本号，或删掉本地 tag（git tag -d ${TAG}）"
       fi
       if dry; then run git ls-remote --tags origin "refs/tags/$TAG"
       else
         remote_tag="$(git ls-remote --tags origin "refs/tags/$TAG")" || die "git ls-remote origin 失败"
-        [ -z "$remote_tag" ] || fail "远端已有 tag $TAG：这个版本已经触发过。上次中断的续跑用 $(rl_resume_cmd mac)；要在 master 上重新打 Windows 包用 --no-tag；否则换一个版本号"
+        [ -z "$remote_tag" ] || fail "远端已有 tag ${TAG}：这个版本已经触发过。上次中断的续跑用 $(rl_resume_cmd mac)；要在 master 上重新打 Windows 包用 --no-tag；否则换一个版本号"
       fi
     else
       local assets
@@ -145,7 +145,7 @@ $dirty"
   fi
   if mac_build_needed; then
     { [ "$(uname -s)" = Darwin ] && [ "$(uname -m)" = arm64 ]; } || fail "Mac 包只能在 Apple Silicon Mac 上打（当前 $(uname -s) $(uname -m)）；别的机器上用 --skip-mac"
-    [ -x "$DWG2DXF" ] || fail "缺少 $DWG2DXF：先运行 sh zhitong/plugins/tool-cad/scripts/build-dwg2dxf.sh \"\$HOME/.cache/zhitong/dwg2dxf-build\""
+    [ -x "$DWG2DXF" ] || fail "缺少 ${DWG2DXF}：先运行 sh zhitong/plugins/tool-cad/scripts/build-dwg2dxf.sh \"\$HOME/.cache/zhitong/dwg2dxf-build\""
   fi
   if rl_should_run deploy; then
     run ssh -o BatchMode=yes -o ConnectTimeout=15 "$REL_SSH" true || fail "ssh $REL_SSH 不通（需要 ~/.ssh/config 别名与免密登录）"
@@ -177,13 +177,13 @@ find_run() {
     try=$((try + 1))
     sleep "$LOOKUP_SECONDS"
   done
-  die "在 Actions 里找不到 $TAG 的「zhitong · Windows installer」运行${sha:+（提交 $sha）}；到仓库 Actions 页确认它已启动，再用 --run-id <运行 id> 续跑"
+  die "在 Actions 里找不到 $TAG 的「zhitong · Windows installer」运行${sha:+（提交 ${sha}）}；到仓库 Actions 页确认它已启动，再用 --run-id <运行 id> 续跑"
 }
 
 # wait_run <运行 id> —— 等运行结束；成功返回，失败或超时退出。每 PROGRESS_SECONDS 秒打印一行进度。
 wait_run() {
   local id="$1" start now last=0 info status conclusion current minutes errors=0
-  step "等待 Windows 运行 $id（上限 $REL_WIN_TIMEOUT 分钟，每 $((PROGRESS_SECONDS / 60)) 分钟报告一次）"
+  step "等待 Windows 运行 ${id}（上限 $REL_WIN_TIMEOUT 分钟，每 $((PROGRESS_SECONDS / 60)) 分钟报告一次）"
   if dry; then
     printf '+ %s   （每 %s 秒轮询，直到 status=completed）\n' "$(rl_quote gh run view "$id" --json status,conclusion,jobs)" "$POLL_SECONDS"
     return 0
@@ -202,7 +202,7 @@ EOF
     now="$(date +%s)"
     minutes=$(((now - start) / 60))
     if [ "$status" = completed ]; then
-      [ "$conclusion" = success ] || die "Windows 运行 $id 结束：$conclusion。看日志：gh run view $id --log-failed；只重跑失败的 job：gh run rerun $id --failed，跑完后续跑"
+      [ "$conclusion" = success ] || die "Windows 运行 $id 结束：${conclusion}。看日志：gh run view $id --log-failed；只重跑失败的 job：gh run rerun $id --failed，跑完后续跑"
       say "  ✓ 运行 $id 成功（本次等待 $minutes 分钟）"
       return 0
     fi
@@ -211,7 +211,7 @@ EOF
       last="$now"
     fi
     [ $((now - start)) -lt $((REL_WIN_TIMEOUT * 60)) ] \
-      || die "等了 $REL_WIN_TIMEOUT 分钟运行 $id 仍是 $status；它在 Actions 上继续跑，结束后续跑（可加 --win-timeout）"
+      || die "等了 $REL_WIN_TIMEOUT 分钟运行 $id 仍是 ${status}；它在 Actions 上继续跑，结束后续跑（可加 --win-timeout）"
     sleep "$POLL_SECONDS"
   done
 }
@@ -223,7 +223,7 @@ step_trigger() {
   sha="$(git rev-parse HEAD)"
   since="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   if [ "$REL_NO_TAG" = 0 ]; then
-    step "触发 Windows 打包：推送 tag $TAG（$sha）"
+    step "触发 Windows 打包：推送 tag ${TAG}（${sha}）"
     git rev-parse -q --verify "refs/tags/$TAG" >/dev/null || run git tag -a "$TAG" -m "智通数工AI $TAG" "$sha"
     run git push origin "refs/tags/$TAG"
   else
@@ -249,15 +249,15 @@ step_mac() {
   CURRENT=mac
   local published="$DOWNLOADS/ztsgai-$V-mac-arm64.dmg" log="$STATE_DIR/mac-build.log" dmg
   step "Mac 安装包"
-  if staged mac-arm64; then say "  已 stage：$published，跳过打包"; return 0; fi
+  if staged mac-arm64; then say "  已 stage：${published}，跳过打包"; return 0; fi
   if [ -f "$published" ]; then
-    say "  复用已放置的 $published（不重新打包）"
+    say "  复用已放置的 ${published}（不重新打包）"
     stage_file mac-arm64 "$published"
     return 0
   fi
   run pnpm install --frozen-lockfile
   run pnpm run package:desktop:mac:arm64:unsigned --check
-  step "打包 DMG（首次约 20–40 分钟；日志 $log）"
+  step "打包 DMG（首次约 20–40 分钟；日志 ${log}）"
   if dry; then
     printf '+ %s 2>&1 | tee %s\n' "$(rl_quote pnpm run package:desktop:mac:arm64:unsigned)" "$(rl_quote "$log")"
     dmg='<日志末行 DMG: 的路径>'
@@ -274,15 +274,15 @@ step_win() {
   CURRENT=win
   local published="$DOWNLOADS/ztsgai-$V-win-x64-setup.exe" dir="$STATE_DIR/win" id exe tag_sha
   step "Windows 安装包"
-  if staged win-x64; then say "  已 stage：$published，跳过下载"; return 0; fi
+  if staged win-x64; then say "  已 stage：${published}，跳过下载"; return 0; fi
   if [ -n "$REL_WIN_EXE" ]; then
-    say "  登记本机安装包 $REL_WIN_EXE（不经过 Actions）"
+    say "  登记本机安装包 ${REL_WIN_EXE}（不经过 Actions）"
     if [ -f "$REL_WIN_EXE.sha256" ]; then run node "$STATE_TOOL" verify-sidecar "$REL_WIN_EXE"; fi
     stage_file win-x64 "$REL_WIN_EXE"
     return 0
   fi
   if [ -f "$published" ]; then
-    say "  复用已放置的 $published（不重新下载）"
+    say "  复用已放置的 ${published}（不重新下载）"
     stage_file win-x64 "$published"
     return 0
   fi
@@ -348,7 +348,7 @@ finish() {
   if dry; then say "（dry-run：没有执行任何改动）"; return 0; fi
   node "$STATE_TOOL" summary --version "$V" --site-url "$SITE_URL"
   if url="$(gh release view "$TAG" --json url --jq .url 2>/dev/null)"; then say "Release：$url"
-  else say "Release：取不到（gh release view $TAG）"; fi
+  else say "Release：取不到（gh release view ${TAG}）"; fi
   if ! rl_should_run deploy; then say "门户未部署；部署：bash $DEPLOY $REL_SSH"; fi
 }
 

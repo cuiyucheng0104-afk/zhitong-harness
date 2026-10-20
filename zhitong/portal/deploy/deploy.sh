@@ -57,7 +57,7 @@ for tool in node npm rsync ssh curl; do
 done
 
 # ── 1. 安装包与清单一致 ────────────────────────────────────────────────
-step "核对安装包与 releases.json（$DOWNLOADS）"
+step "核对安装包与 releases.json（${DOWNLOADS}）"
 node "$DEPLOY_DIR/release-manifest.mjs" verify --downloads "$DOWNLOADS" \
   || die "安装包与清单不一致；用 release-manifest.mjs stage 重新放置安装包（见 runbook.md「上传安装包」）"
 # 清单列出的安装包，每行「文件名<TAB>字节数」。
@@ -156,7 +156,7 @@ restore() {
 if ! "${compose[@]}" run --rm --no-deps -T nginx nginx -t; then restore; exit 1; fi
 owner="$(docker inspect -f '{{ index .Config.Labels "com.docker.compose.project" }}' zt-nginx 2>/dev/null || true)"
 if [ -n "$owner" ] && [ "$owner" != ztsgai ]; then
-  echo "zt-nginx 仍属于旧 compose 项目「$owner」：先按 runbook.md 第 3 步停掉旧服务，再重跑" >&2
+  echo "zt-nginx 仍属于旧 compose 项目「${owner}」：先按 runbook.md 第 3 步停掉旧服务，再重跑" >&2
   restore; exit 1
 fi
 "${compose[@]}" up -d
