@@ -55,9 +55,7 @@ h1{margin:0;font-size:60px;line-height:1.18;letter-spacing:-.03em;white-space:no
   background-image:linear-gradient(to right,rgba(220,232,244,.72) 1px,transparent 1px),linear-gradient(to bottom,rgba(220,232,244,.72) 1px,transparent 1px);
   background-size:24px 24px;background-position:var(--gx,0) var(--gy,0);
   -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 62%,transparent 100%);mask-image:linear-gradient(to bottom,#000 0,#000 62%,transparent 100%)}
-/* No canvas (no JS yet, or it failed): major lines come from CSS so the prerendered frame matches the end frame. */
-.bp-grid:not(.has-canvas) .bp-paper{background-image:linear-gradient(to right,#d3e0ef 1px,transparent 1px),linear-gradient(to bottom,#d3e0ef 1px,transparent 1px),linear-gradient(to right,rgba(220,232,244,.72) 1px,transparent 1px),linear-gradient(to bottom,rgba(220,232,244,.72) 1px,transparent 1px);
-  background-size:120px 120px,120px 120px,24px 24px,24px 24px}
+/* Prerendered / no-JS frame = minor grid only; major lines and axis bubbles arrive with the canvas (no flash, no double draw). */
 .bp-grid canvas{position:absolute;left:0;top:0}
 @media (max-width:767px){.bp-paper{opacity:.75}}
 </style>
@@ -365,6 +363,8 @@ function decideMode() {
 }
 function init(replay = false) {
   sleep(); layout(); mode = decideMode(); layer.classList.add('has-canvas');
+  // Resolve canvas fonts once here so the first animation frame does not pay for it.
+  for (const c of [ctxS, ctxL]) for (const f of [`500 10px ${MONO}`, `500 10.5px ${MONO}`]) { c.font = f; c.measureText('0X'); }
   if (mode !== 'live') { paintStill(mode === 'still'); return; }
   if (replay || clock === 0) {
     clock = 0; ctxS.clearRect(0, 0, W, H);

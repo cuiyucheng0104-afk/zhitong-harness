@@ -130,6 +130,7 @@ const CODES = ['010101001001','010101002001','010101004001','010103001001','0104
  * @property {number} pointerR      decode radius under a fine pointer, px (never under content)
  * @property {number} dprCap
  * @property {number} budgetMs      per-frame script budget; sustained overrun drops DPR to 1
+ * @property {number} drawBudgetMs  per-frame draw budget; changed cells beyond it are drawn next frame
  */
 /** @type {CodeFieldConfig} */
 const CFG = {
@@ -138,7 +139,7 @@ const CFG = {
   safeSelector: 'h2, h3, p, li, a, button, .card', safePad: 8,
   safeCap: { field: 0.08, body: 0.22, light: 0.18, acc: 0.2, overlay: 0.05 },
   lockStart: 0.45, lockSpanIn: 0.95, lockSpanOut: 0.8, lockJitter: 0.25, flashDur: 0.55,
-  twinkleRate: 0.012, glintPeriod: 8, glintDur: 1.6, pointerR: 40, dprCap: 2, budgetMs: 3,
+  twinkleRate: 0.012, glintPeriod: 8, glintDur: 1.6, pointerR: 40, dprCap: 2, budgetMs: 3, drawBudgetMs: 2.2,
 };
 const FIELD_COLOR = '#5f8bd8';
 const GLYPHS = '0123456789·■'; // the last entry is the tile, drawn as a rect
@@ -257,10 +258,11 @@ function measureSafe() {
   });
   for (let i = 0; i < N; i++) {
     const x0 = RX + (i % cols) * CW, y0 = RY + ((i / cols) | 0) * CH, x1 = x0 + CW, y1 = y0 + CH;
-    safe[i] = boxes.some((b) => x0 < b[2] && x1 > b[0] && y0 < b[3] && y1 > b[1]) ? 1 : 0;
+    const v = boxes.some((b) => x0 < b[2] && x1 > b[0] && y0 < b[3] && y1 > b[1]) ? 1 : 0;
+    if (v !== safe[i]) { safe[i] = v; last[i] = -1; } // only cells whose flag changed are redrawn
   }
-  last.fill(-1);
 }
+const idle = (fn) => ('requestIdleCallback' in window ? requestIdleCallback(fn, { timeout: 500 }) : setTimeout(fn, 50));
 
 function layout() {
   const pr = panel.getBoundingClientRect();
@@ -306,13 +308,18 @@ function layout() {
 const scramble = (i, t) => (Math.imul(i + 1, 2654435761) ^ Math.imul(Math.floor(t * 15 + rnd[i] * 15) + 7, 40503)) >>> 0;
 const CAP = [CFG.safeCap.field, CFG.safeCap.body, CFG.safeCap.light, CFG.safeCap.acc];
 let mode = 'live';
+/** Rotating start index: cells deferred by the draw budget are drawn first on the next frame. */
+let cursor = 0;
 
 function render(t, still) {
+  const until = still ? Infinity : performance.now() + CFG.drawBudgetMs;
+  let drawn = 0;
   const cwD = Math.round(CW * dpr), chD = Math.round(CH * dpr);
   const fade = still ? 1 : clamp01(t / 0.35);
   const glintOn = !still && mode === 'live' && t > introEnd;
   const gpos = glintOn ? ((t - introEnd) % CFG.glintPeriod) / CFG.glintDur * 1.4 - 0.2 : -9;
-  for (let i = 0; i < N; i++) {
+  for (let n = 0; n < N; n++) {
+    const i = (cursor + n) % N;
     let g, row, a, o = 0, orow = ROW_FLASH;
     const c = cls[i];
     if (!still && t < lockAt[i]) {                         // still scrambling: dim random digits
@@ -330,8 +337,8 @@ function render(t, still) {
     }
     if (safe[i]) { a = Math.min(a, CAP[c]); o = Math.min(o, CFG.safeCap.overlay); } // contrast guard under content
     if (g === BLANK) a = 0;
-    const aq = Math.round(clamp01(a) * 63), oq = aq ? Math.round(clamp01(o) * 31) : 0;
-    const key = g | row << 4 | aq << 9 | oq << 15 | (orow === ROW_FLASH_BOLD ? 1 << 20 : 0);
+    const aq = Math.round(clamp01(a) * 63), oq = aq ? Math.round(clamp01(o) * 15) : 0; // 16 overlay levels: fewer redraws while flashes fade
+    const key = g | row << 4 | aq << 9 | oq << 15 | (orow === ROW_FLASH_BOLD ? 1 << 19 : 0);
     if (key === last[i]) continue;
     last[i] = key;
     const x = (i % cols) * CW, y = ((i / cols) | 0) * CH;
@@ -339,7 +346,8 @@ function render(t, still) {
     if (!aq) continue;
     if (c !== CLS_OUT && row !== ROW_FIELD) { ctx.globalAlpha = aq / 63 * CFG.tileAlpha[c - 1]; ctx.drawImage(atlas, TILE * cwD, row * chD, cwD, chD, x, y, CW, CH); }
     ctx.globalAlpha = aq / 63; ctx.drawImage(atlas, g * cwD, row * chD, cwD, chD, x, y, CW, CH);
-    if (oq) { ctx.globalAlpha = oq / 31; ctx.drawImage(atlas, g * cwD, orow * chD, cwD, chD, x, y, CW, CH); }
+    if (oq) { ctx.globalAlpha = oq / 15; ctx.drawImage(atlas, g * cwD, orow * chD, cwD, chD, x, y, CW, CH); }
+    if (++drawn % 24 === 0 && performance.now() > until) { cursor = (i + 1) % N; break; }
   }
   ctx.globalAlpha = 1;
 }
@@ -353,8 +361,8 @@ let raf = 0, prev = 0, clock = 0, inView = false, started = false, forcedStill =
 const pointer = { x: 0, y: 0, active: false, dirty: false };
 
 function tick(t, dt) {
-  // Content reveals (useReveal, ≤ 24px) have settled by now: re-measure the content boxes once.
-  if (!remeasured && t > 1.2) { remeasured = true; measureSafe(); }
+  // Content reveals (useReveal, ≤ 24px) have settled by now: re-measure the content boxes once, off the frame.
+  if (!remeasured && t > 1.2) { remeasured = true; idle(measureSafe); }
   if (mode === 'live' && t > introEnd) {
     let n = N * CFG.twinkleRate * dt;                  // idle twinkle
     for (; n > 0; n--) if (n >= 1 || Math.random() < n) { const i = (Math.random() * N) | 0; scrUntil[i] = t + 0.25 + 0.35 * Math.random(); }

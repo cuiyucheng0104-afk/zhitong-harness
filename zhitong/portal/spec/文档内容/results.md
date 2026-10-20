@@ -328,7 +328,7 @@ CAD 工具直接返回表格，不带上面的状态字段。需要注意两类�
 
 - [送审审定核对](/docs/features/check/)
 - [造价指标](/docs/features/metrics/)
-- [全过程投控检查](/docs/features/control/)
+- [投控异常检测与复核](/docs/features/control/)
 - [概算编制辅助](/docs/features/estimate/)
 - [报告撰写](/docs/features/report/)
 - [GB50854 清单框架](/docs/features/bills/)

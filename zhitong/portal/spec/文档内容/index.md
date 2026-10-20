@@ -32,7 +32,7 @@ sources:
 | 新建一个项目，或看看资料缺什么 | [开项目与资料盘点](/docs/features/project/) |
 | 核对送审和审定计价表，看核增核减 | [送审审定核对](/docs/features/check/) |
 | 算单方造价、各章占比，和同类项目对比 | [造价指标](/docs/features/metrics/) |
-| 查送审清单里的重复计取、超合同单价等异常 | [全过程投控检查](/docs/features/control/) |
+| 查送审清单里的重复计取、超合同单价等异常 | [投控异常检测与复核](/docs/features/control/) |
 | 从设计说明抽规模量，出带公式的概算表 | [概算编制辅助](/docs/features/estimate/) |
 | 写结算审核报告等文书 | [报告撰写](/docs/features/report/) |
 | 根据设计说明生成 GB50854 清单框架 | [GB50854 清单框架](/docs/features/bills/) |
