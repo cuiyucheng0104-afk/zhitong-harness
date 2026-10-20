@@ -1,0 +1,26 @@
+{
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["tos:ListBucket", "tos:GetBucketLocation", "tos:GetBucketVersioning"],
+      "Resource": ["trn:tos:::__BUCKET__"],
+      "Condition": {
+        "StringLike": {
+          "tos:prefix": ["__PREFIX__/*", "__PREFIX__/", "__PREFIX__"]
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "tos:GetObject",
+        "tos:GetObjectVersion",
+        "tos:PutObject",
+        "tos:DeleteObject",
+        "tos:AbortMultipartUpload",
+        "tos:ListMultipartUploadParts"
+      ],
+      "Resource": ["trn:tos:::__BUCKET__/__PREFIX__/*"]
+    }
+  ]
+}

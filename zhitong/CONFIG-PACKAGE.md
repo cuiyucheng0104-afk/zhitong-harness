@@ -2,6 +2,8 @@
 
 配置包把一家客户公司的桶地址与访问密钥交给工程师的安装。由你在本机整理，不进仓库；工程师把它拖进对话（或给出本机路径），agent 调用 `config_import` 导入。
 
+制作流程（建策略、建子用户、生成并探测 zip、发放纪律）见 [CONFIG-PACKAGE-GUIDE.md](CONFIG-PACKAGE-GUIDE.md)；生成脚本 `zhitong/scripts/make-config-package.ts`。
+
 ## 文件形态
 
 - 单个 `zhitong.config.json`（UTF-8，可带 BOM），或
