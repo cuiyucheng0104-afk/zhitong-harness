@@ -1,0 +1,257 @@
+# zhitong increment: 智通数工AI 的 Windows x64 安装包（未签名），在 GitHub 托管的 windows-latest 上打。
+#
+# 用法见 zhitong/INSTALL.md 第三部分「用 GitHub Actions 打包」。产物命名与
+# zhitong/portal/site/public/downloads/releases.json 一致：ztsgai-<version>-win-x64-setup.exe 与同名 .sha256
+# （`<hex>  <文件名>` 格式）。<version> 是发行版本；安装后的应用仍报告 apps/desktop/package.json 的产品版本
+# （作为 base 写进运行摘要与 Release 说明），因为 DSH_DESKTOP_BUILD_VERSION 只接受延伸产品版本的写法
+# （apps/desktop/scripts/desktop-build-version.mjs），而 dsh 与 Desktop Host 包必须与它同版本。
+#
+# 计费：私有仓的 Windows runner 按 2 倍计分钟。一次运行预计墙钟 40–60 分钟（依赖安装 5–10、build:official
+# 10–15、打包与运行时准备 15–25、electron-builder/NSIS 5–10、自检 2–5；缓存命中时取下限），即计费 80–120 分钟；
+# 发布 job 在 ubuntu-latest 上约 1 分钟。超时 120 分钟封顶（计费上限 240 分钟）。
+# macOS 安装包在用户自己的 Mac 上打（10 倍计费），这里没有 macOS job。
+name: zhitong · Windows installer
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '发行版本，如 1.0.0（不带 v）；决定文件名 ztsgai-<version>-win-x64-setup.exe 与 Release v<version>'
+        type: string
+        default: '1.0.0'
+        required: true
+      ref:
+        description: '打包的分支、tag 或提交；留空用上方「Use workflow from」选中的分支'
+        type: string
+        default: ''
+        required: false
+      publish:
+        description: '打完后创建或更新 Release v<version> 并附上 exe 与 .sha256'
+        type: boolean
+        default: false
+        required: false
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+# 同一时间只跑一个打包；不取消正在跑的，新的排队（只保留最新一个待运行）。
+concurrency:
+  group: zhitong-windows-installer
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Package Windows x64 installer
+    runs-on: windows-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      DSH_TELEMETRY_DISABLED: '1'
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      commit: ${{ steps.checkout.outputs.commit }}
+      hash: ${{ steps.collect.outputs.hash }}
+      base: ${{ steps.collect.outputs.base }}
+    steps:
+      # 先校验版本，避免打完 40 分钟才发现文件名不合法。
+      - name: Resolve distribution version
+        id: version
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          TAG_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          $version = if ($env:EVENT_NAME -eq 'push') { $env:TAG_NAME } else { $env:INPUT_VERSION }
+          $version = "$version".Trim() -replace '^v', ''
+          if ($version -cnotmatch '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$') {
+            throw "version '$version' must look like 1.0.0 or 1.0.1-rc.1"
+          }
+          "version=$version" >> $env:GITHUB_OUTPUT
+          Write-Output "distribution version $version"
+
+      - uses: actions/checkout@v7.0.1
+        id: checkout
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
+
+      - name: Enable Developer Mode (symlink support)
+        run: >-
+          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock"
+          /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"
+
+      # 版本取自根 package.json 的 packageManager（pnpm@11.28.5），与 corepack 选中的一致。
+      - uses: pnpm/action-setup@v5.0.0
+        with:
+          dest: ${{ runner.temp }}/setup-pnpm-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: '24'
+
+      # store 与 checkout 在同一盘符，pnpm 才能硬链接而不是逐个复制。
+      - name: Configure pnpm store path
+        run: |
+          "PNPM_CONFIG_STORE_DIR=${{ runner.temp }}\pnpm-store" >> $env:GITHUB_ENV
+
+      - name: Cache pnpm store
+        uses: actions/cache@v6.1.0
+        with:
+          path: ${{ runner.temp }}\pnpm-store
+          key: zt-win-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            zt-win-pnpm-
+
+      # Electron zip（@electron/get 的 cacheRoot）与 primary runtime 的 Node / Python / wheel 下载
+      # （scripts/primary-runtime/prepare.ts 按 sha256 命名）都在 apps/desktop/.desktop-build/downloads。
+      - name: Cache Electron and primary-runtime downloads
+        uses: actions/cache@v6.1.0
+        with:
+          path: apps/desktop/.desktop-build/downloads
+          key: zt-win-desktop-downloads-${{ hashFiles('scripts/primary-runtime/lock.json', 'apps/desktop/package.json') }}
+          restore-keys: |
+            zt-win-desktop-downloads-
+
+      # electron-builder 自己下载的 NSIS 与 winCodeSign 工具。
+      - name: Cache electron-builder tools
+        uses: actions/cache@v6.1.0
+        with:
+          path: ~\AppData\Local\electron-builder\Cache
+          key: zt-win-electron-builder-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            zt-win-electron-builder-
+
+      - name: Install locked dependencies
+        run: |
+          pnpm install --frozen-lockfile
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      # 未签名包仍要求应用 ID 与强制更新服务地址（zhitong/INSTALL.md 第三部分「本机打包配置」）。
+      # 只写占位：update.invalid 不存在，应用定期查询失败、不阻塞使用。不含任何密钥。
+      - name: Write placeholder packaging settings
+        run: |
+          [IO.File]::WriteAllLines((Join-Path $env:GITHUB_WORKSPACE 'apps\desktop\.env.windows'), [string[]]@(
+            '# Written by .github/workflows/zhitong-windows-installer.yml: placeholders only, no credentials.',
+            'DSH_DESKTOP_APP_ID=com.ztsgai.harness',
+            'DSH_DESKTOP_AUTO_UPDATE_ENV=production',
+            'DSH_DESKTOP_MANDATORY_UPDATE_PROD_ORIGIN=https://update.invalid'
+          ))
+
+      # LibreDWG 官方 0.14 win64 zip（sha256 钉死），装进 zhitong/plugins/tool-cad/bin/win32-x64/。
+      - name: Fetch dwg2dxf
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File zhitong\plugins\tool-cad\scripts\fetch-dwg2dxf-win64.ps1 -Work "${{ runner.temp }}\libredwg-0.14-win64"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Check packaging configuration and toolchain
+        run: |
+          pnpm run package:desktop:win:x64:unsigned --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build unsigned installer
+        timeout-minutes: 90
+        run: |
+          pnpm run package:desktop:win:x64:unsigned
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Name installer and write checksum
+        id: collect
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          node zhitong/scripts/collect-windows-installer.mjs --version $env:VERSION --out "${{ runner.temp }}\ztsgai-dist"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      # 离线自检 win-unpacked：运行时描述、ztsgai.exe、12 个 skill、内置 Python 跑 skill 脚本、dwg2dxf。
+      - name: Verify unpacked application offline
+        env:
+          UNPACKED: ${{ steps.collect.outputs.unpacked }}
+        run: |
+          node zhitong/scripts/verify-desktop-app.mjs $env:UNPACKED
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Write run summary
+        env:
+          INSTALLER: ${{ steps.collect.outputs.installer }}
+          HASH: ${{ steps.collect.outputs.hash }}
+          BASE: ${{ steps.collect.outputs.base }}
+          SOURCE: ${{ steps.collect.outputs.source }}
+          COMMIT: ${{ steps.checkout.outputs.commit }}
+        run: |
+          $size = (Get-Item -LiteralPath $env:INSTALLER).Length
+          @(
+            "### $(Split-Path -Leaf $env:INSTALLER)",
+            '',
+            "- sha256: ``$env:HASH``",
+            "- size: $size bytes",
+            "- 应用内版本 (base): $env:BASE",
+            "- electron-builder artifact: $env:SOURCE",
+            "- commit: $env:COMMIT"
+          ) | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: ztsgai-${{ steps.version.outputs.version }}-win-x64-setup
+          path: |
+            ${{ steps.collect.outputs.installer }}
+            ${{ steps.collect.outputs.sha256 }}
+          if-no-files-found: error
+          # exe 已压缩；私有仓免费额度的产物存储只有 500 MB（按时间平均），保留 7 天。
+          compression-level: 0
+          retention-days: 7
+
+      - name: Upload packaging logs
+        if: failure() && steps.checkout.outcome == 'success'
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: ztsgai-windows-packaging-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          include-hidden-files: true
+          path: apps/desktop/.desktop-build/packaging-runs/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  publish:
+    name: Publish GitHub Release
+    needs: build
+    if: github.event_name == 'push' || inputs.publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: ztsgai-${{ needs.build.outputs.version }}-win-x64-setup
+          path: dist
+
+      # GITHUB_TOKEN 建的 tag 不会再触发本 workflow 的 push: tags。
+      - name: Create or update Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          VERSION: ${{ needs.build.outputs.version }}
+          COMMIT: ${{ needs.build.outputs.commit }}
+          HASH: ${{ needs.build.outputs.hash }}
+          BASE: ${{ needs.build.outputs.base }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          tag="v${VERSION}"
+          file="ztsgai-${VERSION}-win-x64-setup.exe"
+          test -f "dist/${file}" && test -f "dist/${file}.sha256"
+          if gh release view "$tag" --repo "$REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag" "dist/${file}" "dist/${file}.sha256" --repo "$REPOSITORY" --clobber
+          else
+            notes=$(printf '智通数工AI %s\n\nWindows x64 安装包（未签名）：%s\nsha256: %s\n应用内版本：%s\n提交：%s\n' \
+              "$VERSION" "$file" "$HASH" "$BASE" "$COMMIT")
+            args=(--repo "$REPOSITORY" --title "智通数工AI ${VERSION}" --notes "$notes")
+            if [ "$EVENT_NAME" = push ]; then args+=(--verify-tag); else args+=(--target "$COMMIT"); fi
+            case "$VERSION" in *-*) args+=(--prerelease) ;; esac
+            gh release create "$tag" "dist/${file}" "dist/${file}.sha256" "${args[@]}"
+          fi
+          gh release view "$tag" --repo "$REPOSITORY" --json url,assets --jq '.url, (.assets[].name)'
