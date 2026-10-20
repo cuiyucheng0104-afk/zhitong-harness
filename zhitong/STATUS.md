@@ -17,6 +17,7 @@
 | W8 迁移 | 未开始 | — | `zhitong/migration/` 不存在 |
 | W9 安装包 | 代码与文档已合入；Mac / Windows 实机打包与 M0 验收待用户在目标机器上执行（[INSTALL.md](INSTALL.md) 第二至四部分） | `8f2201c28` `71ca9f9a7` `25872c4e4` `e987013f9` `6a5ecbf66` `810fba853` `67a1a2953` `9f45c916f` 及文档提交 | 见下「W9 验证」 |
 | W10 门户文案 | 已合入 | `d4a7fa2dc` | 无测试 |
+| W11 品牌替换 | 代码与文档已提交；打包后的应用名、Finder / 开始菜单显示与首次运行待目标机器验证 | 见 git log `feat(zhitong/brand)` | 见下「W11 上游改动」与交付报告 |
 
 ## 测试原始结果
 
@@ -100,6 +101,60 @@ zhitong/plugins/config-import$ pnpm exec tsc --noEmit -p .   → exit 0
 | `apps/desktop/scripts/smoke-runtime.ts` | Host 冒烟用与新 profile 相同的 bundle 列表 |
 | `apps/desktop/tests/{desktop-build-paths,prepare-package-set,project-manager}.spec.ts`、`runtime-fixture.ts` | 对应断言与夹具 |
 | `pnpm-lock.yaml` | config-import 新增两个 workspace 依赖；bundle 补 tool-cad |
+
+## W11 上游改动
+
+品牌替换（产品名 **智通数工AI**，ASCII 标识 `ztsgai`，官网 https://ztsgai.com）与首次运行只引导模型 API Key。合并上游时逐项核对；代码里每处都有 `zhitong increment` 注释（JSON、Markdown、测试期望文件除外）。
+
+### 桌面壳（`apps/desktop`）
+
+| 文件 | 改动 | 面向 |
+|---|---|---|
+| `scripts/electron-builder-config.mjs`、`electron-builder.config.d.mts` | `productName` 智通数工AI（macOS `智通数工AI.app`）；协议显示名智通数工AI（`dsh://` 不变）；`win.executableName` `ztsgai`（安装到 `%LOCALAPPDATA%\Programs\ztsgai\ztsgai.exe`；非 ASCII 产品名会让 electron-builder 退回包名作目录名，且 `dsh.cmd` 按控制台代码页解析）；两个 `mac.extendInfo` 键合成一个——原对象字面量里第二个 `extendInfo` 覆盖了第一个，`CFBundleLocalizations` 一直没进 Info.plist；麦克风说明换产品名 | 最终用户 |
+| `scripts/desktop-package-environment.mjs`、`.env.{macos,windows}.example`、`config/*-packaging/{production,test}.env.example`、`packaging/README{,.zh}.md` | 本机未签名包与模板的应用 ID `com.ztsgai.harness` | 打包者 |
+| `scripts/smoke-packaged-runtime.ts`、`package-macos.ts`、`package-target.ts`、`verify-retained-desktop.ts` | `.app` 与可执行文件名跟随新产品名 | 打包流程 |
+| `scripts/installed-update-builder.ts`、`test-windows-installer.mjs` | 上游 Windows 更新资格测试与安装器测试按 `${productName}.exe` 找程序，这两处去掉 `executableName` | 上游 CI |
+| `cli/dsh`、`cli/dsh.cmd` | 启动器指向 `MacOS/智通数工AI` 与 `ztsgai.exe` | 最终用户（`dsh` 命令） |
+| `scripts/command-path.ps1` | `dsh` 命令 PATH 所有权记录 `HKCU\Software\Ztsgai\Command`、互斥体 `Global\Ztsgai.Command.<sid>`，与上游安装互不覆盖 | Windows |
+| `src/locale.ts`、`src/main.ts` | 中英两套壳文案（关于、菜单隐藏 / 退出、托盘、退出确认、启动失败、恢复对话框、更新标题、欢迎窗口）换成智通数工AI；欢迎语「造价咨询的 AI 工作台」；API Key 页写明默认 `https://api.deepseek.com` 与 DeepSeek V4.1 Flash（官方推荐）；关于面板 `applicationName` | 最终用户 |
+| `src/client/WelcomePage.tsx`、`src/client/welcome.tsx` | `Welcome` 新增 `accountSignIn`（默认 true，上游行为不变）；打包入口传 false：欢迎窗口第一页就是 API Key 表单，没有「登录」与「返回登录」 | 最终用户 |
+| `renderer/assets/welcome-brand.svg` | 欢迎窗口顶部换成占位文字标（不再是 DeepSeek 鲸鱼与字标） | 最终用户 |
+| `installer/strings.nsh`、`installer/extract-report.h` | Windows 安装界面中英文案；解压失败报告头 `ztsgai installer` | 最终用户 |
+| `tests/…` 与 `tests/expected/…` | 断言产品名、应用 ID、可执行文件名、命令路径的用例与期望输出；新增 `welcome/{zh-CN,en}-key-only.expected.txt` | — |
+
+### Web 客户端与脚本
+
+| 文件 | 改动 |
+|---|---|
+| `scripts/client-build-environment.ts`（及 `.client.spec.ts`） | official 构建（桌面打包走 `build:official`）的文档标题 `DSH_CLIENT_TITLE` = 智通数工AI |
+| `apps/web/public/manifest.webmanifest`（及 `tests/pwa-manifest.e2e.ts`） | PWA 名称智通数工AI |
+| `packages/client/ui-settings-account/src/client/locales{,/onboarding}.ts` | 产品名换成智通数工AI；「登录 DeepSeek Harness 账号」改为「DeepSeek 账号」（该账号是 DeepSeek 的账号）。本 bundle 已禁用该行，改它是为了重新启用时文案也正确 |
+| `packages/client/ui-settings-account/src/contact-config.ts`（及 `contact-url.client.spec.ts`） | 「反馈」默认打开 `https://ztsgai.com/`（原为上游飞书问卷）。注意 `contactUrl` 会附加 `prefill_uid`（DeepSeek 账号 uid）、版本与设备描述查询参数 |
+| `packages/client/ui-settings-models/src/client/locales.ts` | 预览版说明换成智通数工AI 自己的文字（含官网）；首次运行 API Key 步骤标题与说明（默认接口、推荐模型、自定义 OpenAI 兼容地址的位置） |
+| `packages/client/ui-plugin-manager`、`ui-shortcuts`、`ui-sidebar-documentpreview` 的 `locales.ts` | 插件安装安全提示、快捷键「重新启动 / 升级」、Office 预览不可用提示中的产品名 |
+| `apps/cli/src/plugin.ts`（及 `tests/plugin.spec.ts`） | `dsh plugin --profile desktop` 的报错改成让用户先打开「智通数工AI」桌面应用 |
+| `apps/web/tests/…` | Web e2e 里对应文案的期望（Linux 上未运行，见下） |
+| `pnpm-lock.yaml` | 新 importer `zhitong/plugins/ui-brand`；bundle 依赖它 |
+
+### zhitong 侧（不是上游改动，列出备查）
+
+- `@zhitong/ui-brand`（`zhitong/plugins/ui-brand/`）：填 `sidebar.brand.mark`、`sidebar.brand.name`、`conversation.hero.brand.mark`（占位文字标，主题 token 取色，深浅两色自动切换）与 `conversation.input.model.label`（`deepseek-flash` 显示「DeepSeek V4.1 Flash」+「官方推荐」）。
+- `bundle/cordis.patch.yml`：禁用 `ui-brand-official`、`ui-deepseek-model-label-1017`、`ui-settings-account`，插入 `zhitong-ui-brand`。禁用 `ui-settings-account` 后 `settings.models.sign-in` 无占位者，Web 首次运行的 `DeepSeekOnboardingDialog` 直接显示 `deepseek-official` 的 API Key 表单（复用设置页 `ProviderEditor`），设置页没有「账号」页，侧栏设置按钮回到上游默认样式。Host 侧 `deepseek-account`、`authorization`、`account-controller` 保留：桌面主进程启动时读账号状态（`welcome-backend.ts` 的 `account.state()`），禁用会让欢迎流程失败。
+- `scripts/pack-desktop.mjs` 构建并打包 ui-brand，检查 `lib/client.js` 与 `exports["./client"]`；`scripts/verify-desktop-app.mjs` 检查五个 `@zhitong/*` 包、可执行文件名与 `app.asar` 里的品牌客户端包。
+
+### 有意保留的「DeepSeek Harness」
+
+| 位置 | 原因 |
+|---|---|
+| `LICENSE`、第三方声明、`BRAND_GUIDELINES*`、`vendor/` | 版权行与许可要求 |
+| 包名 `@deepseek-ai/dsh-*`、`dsh` 命令、`dsh://`、`$DSH_HOME` / `~/.dsh`、Electron userData `@deepseek-ai/dsh-desktop` | 技术标识与数据位置，改名会丢数据或破坏升级 |
+| 安装包文件名 `deepseek-harness-<版本>-<平台>.dmg/.exe`（`artifactName`） | 上游发布 / 上传 / 版本发现 / 资格测试约 30 个脚本与用例按这个前缀匹配；换前缀要连同上游发布链一起改，留作后续 |
+| `packages/core/system-prompt` 的 `You are an AI agent powered by DeepSeek Harness.`、`harness-dev-context` | 模型可见的描述性身份（「基于 DeepSeek Harness」），改动要重录快照与两套 SDK 期望；智通人设在 `personaPrefix` 里 |
+| `apps/cli/src/args.ts` 的 `--help` 描述、`docs/cli-help*.md` | 开发者命令行帮助，描述上游 `dsh` |
+| 欢迎页 / 引导页文字中的「基于 DeepSeek Harness 构建」、`llm-pi-ai` 插件描述 | 描述性用法，品牌规范允许 |
+| `apps/desktop/scripts/development-app.ts`（Harness Dev） | 只在开发机上出现的开发版应用 |
+| 启动冲突提示里的「DSH」 | 上游缩写，品牌规范允许 |
+| `docs/`、`.agents/`、各包 README 与 `package.json` 描述 | 开发者文档 |
 
 ## W9 验证（Linux 容器，2026-10-19）
 

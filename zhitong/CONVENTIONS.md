@@ -9,6 +9,7 @@ zhitong/
   bundle/                 @zhitong/bundle：cordis.patch.yml + package.json(dsh.bundle)        W0
   plugins/tool-tos/       @zhitong/tool-tos                                                   W0
   plugins/config-import/  @zhitong/config-import                                              W0
+  plugins/ui-brand/       @zhitong/ui-brand（Web 客户端品牌位与推荐模型标签）                  W11
   python/                 uv 项目，包名 zt；pyproject.toml 只有 W0 能改                        W0 建骨架
     zt/common/            结果信封、JSON 读写、CLI 基类、路径工具                                W0
     zt/textextract/ zt/sidecar/ zt/inventory/                                                 W1

@@ -24,16 +24,18 @@
 | 12 | 客户配置包由你在本机整理，不进仓库 | harness 提供「导入配置包」能力与配置包格式说明 |
 | 13 | 多人同时用同一桶：开版本控制，不做锁 | 冲突靠版本回退 |
 
-品牌名：**智通数工AI**。模型：DeepSeek V4.1 Flash（支持图片输入）。
+品牌名：**智通数工AI**（ASCII 标识 `ztsgai`，桌面应用 ID `com.ztsgai.harness`），官网 **https://ztsgai.com**。模型：DeepSeek V4.1 Flash（支持图片输入），界面上标为「官方推荐」。
+
+品牌替换既是产品需要也是合规需要：上游 MIT 许可允许改名，上游 `BRAND_GUIDELINES.md` 要求衍生产品不用「DeepSeek Harness」做产品名、不用官方品牌素材。用户可见的产品名一律是「智通数工AI」；描述性文字可以写「基于 DeepSeek Harness 构建」；`LICENSE` 与第三方声明里的 DeepSeek 版权行保留；包名 `@deepseek-ai/dsh-*`、`dsh` 命令、`dsh://` scheme、`$DSH_HOME`/`~/.dsh` 是上游技术标识，不改。不提供 DeepSeek 账号登录：首次运行只引导填模型 API Key（默认 `deepseek-official`、`https://api.deepseek.com`、`deepseek-flash`），自定义 OpenAI 兼容地址走设置页的自定义模型 API。改动清单见 [STATUS.md](STATUS.md)「W11 上游改动」。
 
 ## 3. 产品形态
 
 ```text
 安装包（Mac .dmg / Windows .exe，基于上游 apps/desktop）
-├─ DeepSeek Harness 桌面版，profile = desktop（Web 模板 + @zhitong/bundle；开发时用 zhitong profile）
+├─ 智通数工AI 桌面版（基于 DeepSeek Harness 桌面版构建），profile = desktop（Web 模板 + @zhitong/bundle；开发时用 zhitong profile）
 ├─ 内置 Python 运行时（上游桌面版 primary runtime，Python 3.12，lock.json 加锁 zt 依赖：openpyxl、pypdf、PyYAML、python-docx、pydantic…）
 ├─ 内置 dwg2dxf（LibreDWG，GPL 进程边界，asar 外）
-├─ plugins/   tool-tos · tool-cad · config-import（随 @zhitong/bundle 进 app.asar/dsh，新 profile 默认启用）
+├─ plugins/   tool-tos · tool-cad · config-import · ui-brand（随 @zhitong/bundle 进 app.asar/dsh，新 profile 默认启用）
 └─ skills/    zt-project · zt-reconcile · zt-indicator · zt-tk · zt-report · zt-quantity
               zt-estimate · zt-ask · zt-archive · zt-knowledge · zt-volc · zt-cad
 
@@ -164,4 +166,4 @@ tos://<bucket>/<公司前缀>/
 
 ## 11. 已定
 
-品牌名智通数工AI；项目编号 `YYYY-NNN`（§5）；模型 DeepSeek V4.1 Flash，图片输入可用，扫描件与看图走 `read_image`。
+品牌名智通数工AI（`ztsgai`，官网 https://ztsgai.com，无 DeepSeek 账号登录）；项目编号 `YYYY-NNN`（§5）；模型 DeepSeek V4.1 Flash，图片输入可用，扫描件与看图走 `read_image`。

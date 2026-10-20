@@ -17,9 +17,10 @@
 ```sh
 pnpm install
 pnpm run build
+pnpm --dir zhitong/plugins/ui-brand run build
 ```
 
-`pnpm-workspace.yaml` 已包含 `zhitong/bundle` 与 `zhitong/plugins/*`，一次 `pnpm install` 同时链接两个插件与 bundle。源码启动 Web 需要 `pnpm run build` 产出的前端与 Host 产物。
+`pnpm-workspace.yaml` 已包含 `zhitong/bundle` 与 `zhitong/plugins/*`，一次 `pnpm install` 同时链接各插件与 bundle。源码启动 Web 需要 `pnpm run build` 产出的前端与 Host 产物。品牌插件 `@zhitong/ui-brand` 是 Web 客户端插件，浏览器加载的是它构建出的 `lib/client.js`（根目录的 `pnpm run build` 不构建 `zhitong/`），所以第三条命令不能省；改了它的源码要重跑。
 
 > 网络受限的环境里，`cdn.sheetjs.com` 不可达会让整仓 `pnpm install` 失败（`packages/client/ui-sidebar-documentpreview` 依赖它的 xlsx 包）。只跑 zhitong 插件测试时可用 `pnpm install --frozen-lockfile --filter '!@deepseek-ai/dsh-client-ui-sidebar-documentpreview'`；启动 Web 仍需要完整安装。
 
@@ -60,6 +61,7 @@ bundle 做了这些事（详见 `zhitong/bundle/cordis.patch.yml`）：
 - 挂 `zhitong-tool-tos`（`tos_ls`/`tos_stat`/`tos_pull`/`tos_push`）与 `zhitong-config-import`（`config_import`）。
 - 挂只读 `zhitong/skills` 的 skill 目录（provider 名 `zhitong`）。
 - 新增默认预设「智通数工AI」（`preset-zhitong`），系统提示词使用造价人设；沙箱沿用 `workspace-write + ask`。
+- 品牌：禁用上游 `ui-brand-official`，由 `zhitong-ui-brand` 显示「智通数工AI」文字标（侧栏与新会话页），模型选择器里 `deepseek-flash` 显示为「DeepSeek V4.1 Flash 官方推荐」；禁用 `ui-settings-account`（没有 DeepSeek 账号登录、账号菜单与充值页），首次运行直接弹出模型 API Key 表单。
 
 开发 profile 里插件以源码（`src/index.ts`）入口运行，依赖源码启动的 tsx 加载器。安装包用的是 `pnpm --dir zhitong/plugins/<插件> run build`（tsdown）产出的 `lib/index.js`，由打包流程自动构建（见第二部分）。
 
@@ -166,15 +168,15 @@ DMG: /…/zhitong-harness/apps/desktop/.desktop-build/targets/mac-arm64/unsigned
 
 ### 5. 安装与第一次打开
 
-1. 双击 DMG，把「DeepSeek Harness」拖进「应用程序」（应用名沿用上游，打开后默认预设是「智通数工AI」）。
-2. 第一次打开：在「应用程序」里**右键 → 打开 → 打开**。本机构建的包没有隔离属性，多数情况下直接双击也能开；若提示「无法验证开发者」，到「系统设置 → 隐私与安全性」底部点「仍要打开」。把 DMG 拷到别的 Mac 上安装时如果提示「已损坏」，在终端执行 `xattr -dr com.apple.quarantine "/Applications/DeepSeek Harness.app"` 后再右键打开。
+1. 双击 DMG，把「智通数工AI」拖进「应用程序」（DMG 文件名仍是 `deepseek-harness-…`，见 [STATUS.md](STATUS.md)「W11 上游改动」）。
+2. 第一次打开：在「应用程序」里**右键 → 打开 → 打开**。本机构建的包没有隔离属性，多数情况下直接双击也能开；若提示「无法验证开发者」，到「系统设置 → 隐私与安全性」底部点「仍要打开」。把 DMG 拷到别的 Mac 上安装时如果提示「已损坏」，在终端执行 `xattr -dr com.apple.quarantine "/Applications/智通数工AI.app"` 后再右键打开。
 3. 可选的离线自检（不启动应用）：
 
    ```sh
-   node zhitong/scripts/verify-desktop-app.mjs "/Applications/DeepSeek Harness.app"
+   node zhitong/scripts/verify-desktop-app.mjs "/Applications/智通数工AI.app"
    ```
 
-   逐项检查：运行时描述里有四个 `@zhitong/*` 包、12 个 skill 与 `python/zt` 在 asar 外、内置 Python 能导入 zt 的依赖并以 `--help` 跑通每个 skill 脚本、`dwg2dxf` 可执行且带 GPL 文件。最后一行应为「全部 20 项通过」。
+   逐项检查：运行时描述里有五个 `@zhitong/*` 包、应用可执行文件名是「智通数工AI」且 `app.asar` 里有品牌插件的 `lib/client.js`、12 个 skill 与 `python/zt` 在 asar 外、内置 Python 能导入 zt 的依赖并以 `--help` 跑通每个 skill 脚本、`dwg2dxf` 可执行且带 GPL 文件。最后一行应为「全部 21 项通过」。
 
 然后按第四部分做首次运行与验收。
 
@@ -247,7 +249,7 @@ Windows 用户名含中文时，`%USERPROFILE%\.dsh` 与 `%TEMP%` 都在中文�
 
 ### 1. 首次运行
 
-1. 欢迎窗口里填 DeepSeek API key（或「稍后设置」，之后在设置页填）。
+1. 欢迎窗口直接是「填写模型 API Key 开始使用」：默认连接 DeepSeek 官方接口 `https://api.deepseek.com`，模型 DeepSeek V4.1 Flash（官方推荐）。填 DeepSeek API Key 保存后进入工作区（密钥进本机凭据存储 `~/.dsh/.credentials.yaml`）；或「稍后配置」。没有 DeepSeek 账号登录入口。要改用公司网关或其他 OpenAI 兼容地址，进入工作区后在「设置 → 模型 → 添加模型提供商 → 自定义模型 API」填 Provider ID、Base URL、协议（OpenAI Chat Completions）、API Key 与模型，再在输入框的模型选择器里选它。
 2. 进入工作区后新建会话，确认预设是「智通数工AI」。
 3. 导入公司配置包：把 `zhitong.config.json` 或含它的 `.zip`（格式见 [CONFIG-PACKAGE.md](CONFIG-PACKAGE.md)）拖进对话，或告诉 agent 它的本机路径；agent 调用 `config_import`。TOS 密钥进本机凭据存储，桶设置写进桌面 profile 的 `~/.dsh/profiles/desktop/cordis.patch.yml`，配置包里的 SSH 主机写进 `~/.ssh/config` 开头的受管块，火山 ve profile 名写进 `~/.dsh/zhitong/volc.config.json`。用 zt-volc 前在终端里按 CONFIG-PACKAGE.md「火山引擎 ve profile」建好 `ve` 的 profile。
 4. 没有真实桶时让 TOS 工具读本机目录：完全退出应用，在 `~/.dsh/profiles/desktop/cordis.patch.yml`（Windows `%USERPROFILE%\.dsh\profiles\desktop\cordis.patch.yml`）追加下面几行再打开应用：
@@ -261,14 +263,18 @@ Windows 用户名含中文时，`%USERPROFILE%\.dsh` 与 `%TEMP%` 都在中文�
 
 5. 让 agent 列出 `项目/`，打开样例项目。
 
+应用名与数据位置：应用叫「智通数工AI」（macOS `/Applications/智通数工AI.app`；Windows 装在 `%LOCALAPPDATA%\Programs\ztsgai\ztsgai.exe`，开始菜单与「应用和功能」里显示「智通数工AI」），应用 ID `com.ztsgai.harness`，与上游 DeepSeek Harness 桌面版（`com.deepseek.harness`）是两个独立安装，可以并存、互不覆盖。数据位置没有随品牌改名：harness 数据仍在 `$DSH_HOME`（默认 `~/.dsh`）；Electron userData 仍是 `~/Library/Application Support/@deepseek-ai/dsh-desktop`（Windows `%APPDATA%\@deepseek-ai\dsh-desktop`），它由包名决定、不随产品名变化，所以与上游桌面版共用窗口快捷键与桌面设置文件。Electron 的单实例锁也放在这个 userData 里，所以两个版本不会同时运行：一个已在运行时打开另一个，只会把正在运行的那个窗口调到前台（按代码推断，未在实机验证）。
+
 桌面版使用的 profile 名是 `desktop`（不是第一部分开发用的 `zhitong`）。如果这台机器以前装过上游 DeepSeek Harness 桌面版，`~/.dsh/profiles/desktop` 已经存在，新版本不会改它的 bundle 列表：在完全退出应用后把旧的 `~/.dsh/profiles/desktop` 改名（例如加后缀 `.bak`），再打开应用让它按新模板重建 profile；旧 profile 里装过的第三方插件需要重新安装。
 
 ### 2. 验收清单
 
 | 检查 | 期望 |
 |---|---|
+| 品牌 | 窗口标题、Dock / 任务栏、关于、托盘、菜单（隐藏 / 退出）都是「智通数工AI」；侧栏左上角与新会话页是「智通数工AI」文字标，不是 deepseek 鲸鱼与 HARNESS 字标；设置里没有「账号」页 |
+| 首次运行 | 欢迎窗口第一页就是 API Key 表单，没有「登录」按钮；保存后直接进入工作区 |
 | 新会话的预设 | 「智通数工AI」（预设列表第一个，造价人设） |
-| 默认模型 | DeepSeek-V4.1-Flash（`deepseek-official` / `deepseek-flash`；设置页另选的模型优先） |
+| 默认模型 | 模型选择器里显示「DeepSeek V4.1 Flash 官方推荐」（`deepseek-official` / `deepseek-flash`；设置页另选的模型优先） |
 | 问 agent「列出可用的 skill」，或看 `skill` 工具的目录 | 12 个：zt-project、zt-ask、zt-archive、zt-reconcile、zt-indicator、zt-tk、zt-report、zt-quantity、zt-estimate、zt-knowledge、zt-volc、zt-cad；没有 `_shared` |
 | 工具 | `tos_ls`、`tos_stat`、`tos_pull`、`tos_push`、`config_import`、`cad_open` 等 10 个 `cad_*`，以及上游的 `load_workspace_dependencies` |
 | Python | 让 agent 跑任一 skill 脚本（例如「用 zt-tk 看一下帮助」）：它先调 `load_workspace_dependencies` 取 `python`，再运行 `<python> <skill 目录>/scripts/tk.py --help`，输出子命令列表；不应出现 `zt_not_importable` |
