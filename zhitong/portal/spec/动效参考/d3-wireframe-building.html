@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D3 页脚线框办公楼</title>
+<style>
+:root{
+  --ink:#162943;--navy:#0b347d;--blue:#0666f5;--green:#12c68b;--muted:#5c6d82;
+  --grid-line:#dce8f4;--grid-line-strong:#c5d6ea;--canvas:#f5f8fd;--line:#d9e4f0;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:"PingFang SC","Microsoft YaHei","Noto Sans SC","WenQuanYi Zen Hei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:16px/1.8 var(--sans);color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+button{font:inherit}
+/* ---------- reference chrome ---------- */
+.refbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;height:40px;padding:0 16px;background:rgba(255,255,255,.95);border-bottom:1px solid var(--grid-line);font:12px/1 var(--mono);color:var(--muted)}
+.refbar a{color:var(--navy);text-decoration:none}.refbar b{color:var(--ink);font-weight:600}.refbar .sp{flex:1}
+.refbar button{height:26px;padding:0 10px;border:1px solid var(--grid-line-strong);border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font:12px var(--mono)}
+.refbar button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.refbar output{min-width:190px;text-align:right}
+@media (max-width:767px){.refbar .desc,.refbar output{display:none}}
+/* ---------- page mock ---------- */
+.container{width:min(1248px,calc(100% - 192px));margin-inline:auto}
+.prev{padding:72px 0 64px;color:var(--muted);font-size:14px}
+.prev h2{margin:0 0 8px;color:var(--ink);font-size:28px}
+.prev p{margin:0;font-family:var(--mono);font-size:12px}
+.site-footer{border-top:1px solid var(--line)}
+.footer-grid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,4fr) minmax(0,4fr);gap:24px;align-items:end;padding-top:48px}
+.footer-brand{align-self:start}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
+.brand svg{width:32px;height:32px;border-radius:9px}
+.footer-brand p{margin:14px 0 0;font-size:13px;line-height:1.9;color:var(--muted)}
+.footer-links{align-self:start;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;font-size:13px}
+.footer-links b{display:block;margin-bottom:8px;font-size:12px;color:var(--ink)}
+.footer-links span{display:block;color:var(--muted);line-height:2.2}
+.footer-meta{display:flex;justify-content:space-between;gap:16px;padding:16px 0;border-top:1px solid #e8eef7;font-size:12px;color:#647995}
+/* ---------- D3 WireframeBuilding (component styles) ---------- */
+.wb{position:relative;height:300px;margin-bottom:-1px}
+.wb canvas{position:absolute;left:0;top:0;width:100%;height:calc(100% - 22px)}
+.wb-caption{position:absolute;left:0;right:0;bottom:0;margin:0;height:22px;font:11px/22px var(--mono);color:#7d92ae;text-align:right;letter-spacing:.02em}
+@media (max-width:1023px){.container{width:calc(100% - 96px)}.footer-grid{grid-template-columns:1fr 1fr}.wb{grid-column:1 / -1;height:260px}}
+@media (max-width:767px){.container{width:calc(100% - 40px)}.footer-grid{grid-template-columns:1fr}.footer-links{grid-template-columns:repeat(2,1fr)}
+  .wb{height:240px}.footer-meta{flex-direction:column;gap:4px}}
+</style>
+</head>
+<body>
+<header class="refbar">
+  <a href="index.html">← 动效参考</a><b>D3 · WireframeBuilding</b><span class="desc">页脚 · 滨江综合办公楼线框逐层搭起</span>
+  <span class="sp"></span><output id="stat">—</output>
+  <button id="replay" type="button">重播</button><button id="still" type="button" aria-pressed="false">静态终帧</button>
+</header>
+<main>
+  <section class="prev container"><h2>常见问题</h2><p>（上一节占位：05 章 #faq）</p></section>
+</main>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <span class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bm" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#00B3EC"/><stop offset="1" stop-color="#0666F5"/></linearGradient></defs><rect width="64" height="64" rx="17" fill="url(#bm)"/><g transform="rotate(-43 32 32)" stroke-linecap="round"><path d="M15 32h10m14 0h10M32 15v10m0 14v10" stroke="#FFF" stroke-width="7.5"/><path d="M17 19h5m20 0h5M17 45h5m20 0h5" stroke="#12D99F" stroke-width="5"/></g></svg>智通数工AI</span>
+      <p>用对话处理造价咨询，<br>让资料、计算和成果有据可查。</p>
+    </div>
+    <nav class="footer-links" aria-label="页脚">
+      <div><b>产品</b><span>产品能力</span><span>使用流程</span><span>数据与复核</span></div>
+      <div><b>文档</b><span>快速开始</span><span>安装</span><span>配置包</span></div>
+      <div><b>支持</b><span>常见问题</span><span>获取安装包</span></div>
+    </nav>
+    <!-- D3: decorative, aria-hidden -->
+    <div class="wb" data-deco-host aria-hidden="true"><canvas></canvas><p class="wb-caption">滨江综合办公楼 · 示例 · 轴测示意</p></div>
+  </div>
+  <div class="container footer-meta"><span>© 2026 智通数工AI · 主体信息与备案号（占位）</span><span>工作示例 · 示例数据</span></div>
+</footer>
+
+<script>
+(() => {
+'use strict';
+
+/**
+ * Massing of the example project 2026-007 (spec 00 §8.1), all in metres:
+ * podium 3 × (50 × 32) = 4,800 m², tower 13 × (32 × 25) = 10,400 m² → above ground 15,200 m²;
+ * basement 1 × (68 × 50) = 3,400 m² → total 18,600 m².
+ * @typedef {{x0:number,x1:number,z0:number,z1:number,y0:number,h:number,levels:number[],mull:number}} Volume
+ */
+/** @type {Record<'podium'|'tower'|'roof', Volume>} */
+const VOL = {
+  podium: { x0: -25, x1: 25, z0: -16, z1: 16, y0: 0, h: 14.4, levels: [4.8, 9.6], mull: 50 / 12 },
+  tower: { x0: -14, x1: 18, z0: -13.5, z1: 11.5, y0: 14.4, h: 50.7, levels: Array.from({ length: 12 }, (_, i) => 3.9 * (i + 1)), mull: 4 },
+  roof: { x0: -4, x1: 8, z0: -7, z1: 1, y0: 65.1, h: 4.5, levels: [], mull: 0 },
+};
+const BASEMENT = { x0: -34, x1: 34, z0: -25, z1: 25, y0: -4.5, y1: 0 };
+/** Structural axes on the podium bays; letters skip I, O, Z (GB/T 50001). */
+const AXES_X = Array.from({ length: 7 }, (_, i) => -25 + i * 50 / 6);
+const AXES_Z = Array.from({ length: 5 }, (_, j) => -16 + j * 8);
+/** Axis overrun past the podium, m: numbered axes run to the front, lettered axes further to the left so bubble rows do not meet. */
+const AXIS_EXT = 9, AXIS_EXT_L = 16;
+/** Build steps (global elevations): 3 podium floors, 13 tower floors, roof plant room. */
+const LEVELS = [0, 4.8, 9.6, 14.4, ...Array.from({ length: 13 }, (_, i) => +(14.4 + 3.9 * (i + 1)).toFixed(1)), 69.6];
+/** Elevation marks shown after the build (the dashed basement already reads as below grade). */
+const MARKERS = [{ L: 65.1, vol: 'tower' }, { L: 14.4, vol: 'podium' }, { L: 0, vol: 'podium' }];
+
+/**
+ * @typedef {Object} WireframeConfig
+ * @property {number} yaw0         resting yaw, degrees (camera at front-right)
+ * @property {number} pitch        camera elevation, degrees
+ * @property {number} distance     camera distance to the target, m
+ * @property {number} targetY      look-at height, m
+ * @property {number} swayAmp      idle yaw oscillation amplitude, degrees
+ * @property {number} swayPeriod   s per idle oscillation
+ * @property {number} pointerYaw   max extra yaw from the pointer, degrees
+ * @property {number} gridDur      s for the axis grid to draw
+ * @property {number} buildStart   s when the first floor starts
+ * @property {number} floorStagger s between floor starts
+ * @property {number} floorDur     s one floor takes to rise
+ * @property {number} idleFps      redraw rate after the build (sway is slow)
+ * @property {number} pad          px padding inside the canvas
+ * @property {number} markerW      px reserved on the right for elevation marks
+ * @property {number} dprCap
+ */
+/** @type {WireframeConfig} */
+const CFG = { yaw0: 36, pitch: 24, distance: 230, targetY: 24, swayAmp: 11, swayPeriod: 26, pointerYaw: 9,
+  gridDur: 0.7, buildStart: 0.95, floorStagger: 0.12, floorDur: 0.34, idleFps: 30, pad: 14, markerW: 66, dprCap: 2 };
+const C = { ink: '11,52,125', accent: '6,102,245', axis: '#b9cbe3', bubbleText: '#7189a8', base: '#8ea5c3', mark: '#5c6d82',
+  side: ['#e8eff8', '#ffffff'], top: '#f6f9fd' };
+const MONO = getComputedStyle(document.documentElement).getPropertyValue('--mono');
+const LIGHT = norm([-0.45, 0.8, 0.55]);
+
+const host = document.querySelector('.wb');
+const cv = host.querySelector('canvas');
+const ctx = cv.getContext('2d');
+const mqReduce = matchMedia('(prefers-reduced-motion: reduce)');
+const mqFine = matchMedia('(hover: hover) and (pointer: fine)');
+
+function norm(v) { const l = Math.hypot(...v); return v.map((x) => x / l); }
+const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+const easeOutBack = (t) => { const c = 1.7; t -= 1; return 1 + (c + 1) * t * t * t + c * t * t; };
+const approach = (cur, target, rate, dt) => cur + (target - cur) * (1 - Math.exp(-rate * dt));
+const rad = (d) => d * Math.PI / 180;
+function mixHex(a, b, t) {
+  const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+  const ch = (s) => Math.round(((pa >> s) & 255) * (1 - t) + ((pb >> s) & 255) * t);
+  return `rgb(${ch(16)},${ch(8)},${ch(0)})`;
+}
+
+/* ---------------- camera ---------------- */
+const cam = { yaw: rad(CFG.yaw0), cy: 0, sy: 0, cp: Math.cos(rad(CFG.pitch)), sp: Math.sin(rad(CFG.pitch)), pos: [0, 0, 0], f: 1, ox: 0, oy: 0 };
+function setYaw(yaw) {
+  cam.yaw = yaw; cam.cy = Math.cos(yaw); cam.sy = Math.sin(yaw);
+  const D = CFG.distance;
+  cam.pos = [D * cam.sy * cam.cp, CFG.targetY + D * cam.sp, D * cam.cy * cam.cp];
+}
+/** World → screen. Yaw about +y, then pitch about +x; perspective divide. Returns [sx, sy]. */
+function project(x, y, z) {
+  const px = x - cam.pos[0], py = y - cam.pos[1], pz = z - cam.pos[2];
+  const x1 = px * cam.cy - pz * cam.sy, z1 = px * cam.sy + pz * cam.cy;
+  const y2 = py * cam.cp - z1 * cam.sp, z2 = py * cam.sp + z1 * cam.cp;
+  const depth = -z2;
+  return [cam.ox + cam.f * x1 / depth, cam.oy - cam.f * y2 / depth];
+}
+
+/* ---------------- layout & fit ---------------- */
+let W = 0, H = 0, dpr = 1, markerX = 0;
+function fit() {
+  // Fit the whole model over every yaw the sway and pointer can reach, so the scale never changes.
+  cam.f = 1; cam.ox = 0; cam.oy = 0;
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  const span = CFG.swayAmp + CFG.pointerYaw;
+  const pts = [];
+  for (const v of Object.values(VOL)) for (const x of [v.x0, v.x1]) for (const z of [v.z0, v.z1]) pts.push([x, v.y0, z], [x, v.y0 + v.h, z]);
+  for (const x of [-25 - AXIS_EXT_L - 6, 25 + AXIS_EXT + 6]) for (const z of [-16 - AXIS_EXT - 6, 16 + AXIS_EXT + 6]) pts.push([x, 0, z]);
+  for (const x of [BASEMENT.x0, BASEMENT.x1]) for (const z of [BASEMENT.z0, BASEMENT.z1]) pts.push([x, BASEMENT.y0, z]);
+  for (let k = 0; k <= 6; k++) {
+    setYaw(rad(CFG.yaw0 - span + (2 * span * k) / 6));
+    for (const p of pts) { const [sx, sy] = project(...p); x0 = Math.min(x0, sx); x1 = Math.max(x1, sx); y0 = Math.min(y0, sy); y1 = Math.max(y1, sy); }
+  }
+  const aw = W - 2 * CFG.pad - CFG.markerW, ah = H - 2 * CFG.pad;
+  cam.f = Math.min(aw / (x1 - x0), ah / (y1 - y0));
+  cam.ox = CFG.pad + (aw - cam.f * (x1 - x0)) / 2 - cam.f * x0;
+  cam.oy = CFG.pad + (ah - cam.f * (y1 - y0)) / 2 - cam.f * y0;
+  markerX = Math.round(cam.ox + cam.f * x1) + 10;
+  setYaw(rad(CFG.yaw0));
+}
+function layout() {
+  const r = cv.getBoundingClientRect();
+  W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
+  dpr = Math.min(CFG.dprCap, window.devicePixelRatio || 1);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  fit();
+}
+
+/* ---------------- drawing ---------------- */
+function seg(a, b, p = 1) { ctx.moveTo(a[0], a[1]); ctx.lineTo(a[0] + (b[0] - a[0]) * p, a[1] + (b[1] - a[1]) * p); }
+
+function drawAxes(t) {
+  ctx.lineWidth = 1; ctx.strokeStyle = C.axis; ctx.setLineDash([9, 3, 2, 3]);
+  const all = [...AXES_X.map((x, i) => ({ a: [x, 0, 16 + AXIS_EXT], b: [x, 0, -16 - AXIS_EXT], label: String(i + 1), i })),
+    ...AXES_Z.map((z, j) => ({ a: [-25 - AXIS_EXT_L, 0, z], b: [25 + AXIS_EXT, 0, z], label: 'ABCDE'[AXES_Z.length - 1 - j], i: j + 2 }))];
+  ctx.beginPath();
+  const bubbles = [];
+  for (const ax of all) {
+    const p = easeOutCubic(clamp01((t - ax.i * 0.04) / CFG.gridDur));
+    if (p <= 0) continue;
+    const A = project(...ax.a), B = project(...ax.b);
+    seg(A, B, p);
+    bubbles.push({ at: A, dir: [A[0] - B[0], A[1] - B[1]], label: ax.label, s: easeOutBack(clamp01((t - ax.i * 0.04) / 0.4)) });
+  }
+  ctx.stroke(); ctx.setLineDash([]);
+  return bubbles;
+}
+/** Axis bubbles are annotations: drawn over the model, omitted where the building hides their axis end. */
+function drawBubbles(bubbles, occluder) {
+  ctx.font = `500 9px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineWidth = 1;
+  for (const b of bubbles) {
+    if (b.s <= 0.02) continue;
+    const l = Math.hypot(...b.dir) || 1, r = 7 * b.s, cx = b.at[0] + b.dir[0] / l * 7, cy = b.at[1] + b.dir[1] / l * 7;
+    if (ctx.isPointInPath(occluder, cx * dpr, cy * dpr)) continue;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = C.axis; ctx.stroke();
+    if (b.s > 0.6) { ctx.fillStyle = C.bubbleText; ctx.fillText(b.label, cx, cy + 0.5); }
+  }
+}
+
+function drawBasement(t) {
+  const p = easeOutCubic(clamp01((t - 0.4) / 0.6));
+  if (p <= 0) return;
+  const B = BASEMENT, edges = [];
+  for (const y of [B.y0, B.y1]) edges.push([[B.x0, y, B.z0], [B.x1, y, B.z0]], [[B.x1, y, B.z0], [B.x1, y, B.z1]], [[B.x1, y, B.z1], [B.x0, y, B.z1]], [[B.x0, y, B.z1], [B.x0, y, B.z0]]);
+  for (const x of [B.x0, B.x1]) for (const z of [B.z0, B.z1]) edges.push([[x, B.y1, z], [x, B.y0, z]]);
+  ctx.strokeStyle = C.base; ctx.lineWidth = 1; ctx.setLineDash([4, 3]); ctx.beginPath();
+  for (const [a, b] of edges) seg(project(...a), project(...b), p);
+  ctx.stroke(); ctx.setLineDash([]);
+}
+
+/** Draw one volume built up to hb metres: back-face culled filled faces, floor lines, mullions, outline. */
+function drawVolume(v, hb, active, occluder) {
+  if (hb <= 0.001) return;
+  const yt = v.y0 + hb, P = cam.pos;
+  /** @type {{n:number[], pts:number[][], len:number, along:(s:number)=>number[]}[]} */
+  const faces = [];
+  if (P[0] > v.x1) faces.push({ n: [1, 0, 0], pts: [[v.x1, 0, v.z1], [v.x1, 0, v.z0]], len: v.z1 - v.z0 });
+  if (P[0] < v.x0) faces.push({ n: [-1, 0, 0], pts: [[v.x0, 0, v.z0], [v.x0, 0, v.z1]], len: v.z1 - v.z0 });
+  if (P[2] > v.z1) faces.push({ n: [0, 0, 1], pts: [[v.x0, 0, v.z1], [v.x1, 0, v.z1]], len: v.x1 - v.x0 });
+  if (P[2] < v.z0) faces.push({ n: [0, 0, -1], pts: [[v.x1, 0, v.z0], [v.x0, 0, v.z0]], len: v.x1 - v.x0 });
+  for (const f of faces) {
+    const [a, b] = f.pts, at = (s, y) => project(a[0] + (b[0] - a[0]) * s, y, a[2] + (b[2] - a[2]) * s);
+    const q = [at(0, v.y0), at(1, v.y0), at(1, yt), at(0, yt)];
+    occluder.moveTo(...q[0]); for (let k = 1; k < 4; k++) occluder.lineTo(...q[k]); occluder.closePath();
+    const shade = 0.55 + 0.45 * Math.max(0, f.n[0] * LIGHT[0] + f.n[2] * LIGHT[2]);
+    ctx.beginPath(); ctx.moveTo(...q[0]); for (let k = 1; k < 4; k++) ctx.lineTo(...q[k]); ctx.closePath();
+    ctx.fillStyle = mixHex(C.side[0], C.side[1], shade); ctx.fill();
+    // floor lines and mullions on this face
+    ctx.beginPath();
+    for (const lv of v.levels) if (lv < hb) seg(at(0, v.y0 + lv), at(1, v.y0 + lv));
+    ctx.strokeStyle = `rgba(${C.ink},.3)`; ctx.stroke();
+    if (v.mull) {
+      const n = Math.round(f.len / v.mull);
+      ctx.beginPath();
+      for (let k = 1; k < n; k++) seg(at(k / n, v.y0), at(k / n, yt));
+      ctx.strokeStyle = `rgba(${C.ink},.12)`; ctx.stroke();
+    }
+    ctx.beginPath(); ctx.moveTo(...q[0]); for (let k = 1; k < 4; k++) ctx.lineTo(...q[k]); ctx.closePath();
+    ctx.strokeStyle = `rgba(${C.ink},.78)`; ctx.stroke();
+  }
+  // top slab: highlighted in accent while this volume is still rising
+  const top = [[v.x0, yt, v.z0], [v.x1, yt, v.z0], [v.x1, yt, v.z1], [v.x0, yt, v.z1]].map((p) => project(...p));
+  ctx.beginPath(); ctx.moveTo(...top[0]); for (let k = 1; k < 4; k++) ctx.lineTo(...top[k]); ctx.closePath();
+  ctx.fillStyle = active > 0 ? mixHex(C.top, '#e3eeff', active) : C.top; ctx.fill();
+  ctx.lineWidth = 1 + 0.5 * active; ctx.strokeStyle = active > 0 ? `rgba(${C.accent},${0.78 + 0.22 * active})` : `rgba(${C.ink},.78)`; ctx.stroke(); ctx.lineWidth = 1;
+}
+
+/** Elevation mark (标高): inverted triangle on a leader, value above the extension line. */
+function drawMark(L, vol, alpha, label) {
+  if (alpha <= 0.01) return;
+  const v = vol === 'base' ? { x0: BASEMENT.x0, x1: BASEMENT.x1, z0: BASEMENT.z0, z1: BASEMENT.z1 } : VOL[vol];
+  let best = null;
+  for (const x of [v.x0, v.x1]) for (const z of [v.z0, v.z1]) { const p = project(x, L, z); if (!best || p[0] > best[0]) best = p; }
+  const mx = markerX, y = Math.round(best[1]) + 0.5;
+  ctx.globalAlpha = alpha; ctx.strokeStyle = C.mark; ctx.fillStyle = C.mark;
+  ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(best[0] + 4, y); ctx.lineTo(mx - 6, y); ctx.stroke(); ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(mx, y); ctx.lineTo(mx - 5, y - 5); ctx.lineTo(mx + 46, y - 5); ctx.moveTo(mx - 5, y - 5); ctx.lineTo(mx, y); ctx.lineTo(mx + 5, y - 5); ctx.stroke();
+  ctx.font = `10px ${MONO}`; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  ctx.fillText(label, mx - 3, y - 8); ctx.globalAlpha = 1;
+}
+const fmtLevel = (L) => (Math.abs(L) < 0.0005 ? '±0.000' : (L > 0 ? '+' : '-') + Math.abs(L).toFixed(3));
+
+let buildEnd = 0;
+/** Global build height at time t: sum of eased floor steps, monotonic. */
+function buildHeight(t) {
+  let h = 0;
+  for (let k = 0; k < LEVELS.length - 1; k++)
+    h += (LEVELS[k + 1] - LEVELS[k]) * easeOutCubic(clamp01((t - CFG.buildStart - k * CFG.floorStagger) / CFG.floorDur));
+  return h;
+}
+function render(t) {
+  ctx.clearRect(0, 0, W, H);
+  const bubbles = drawAxes(t), occluder = new Path2D();
+  drawBasement(t);
+  const h = buildHeight(t), done = t >= buildEnd;
+  const order = /** @type {const} */ (['podium', 'tower', 'roof']);
+  for (const k of order) {
+    const v = VOL[k], hb = Math.min(v.h, Math.max(0, h - v.y0));
+    const rising = !done && hb > 0 && hb < v.h - 0.001;
+    drawVolume(v, hb, rising ? 1 : 0, occluder);
+  }
+  drawBubbles(bubbles, occluder);
+  // live elevation of the rising slab, then the four fixed marks
+  if (!done && h > 0.05) {
+    const k = h <= 14.4 ? 'podium' : h <= 65.1 ? 'tower' : 'roof';
+    drawMark(h, k, 1, fmtLevel(h));
+  }
+  MARKERS.forEach((m, i) => drawMark(m.L, m.vol, done ? clamp01((t - buildEnd - i * 0.08) / 0.35) : 0, fmtLevel(m.L)));
+}
+
+/* ---------------- loop ---------------- */
+const stats = { frames: 0, total: 0, max: 0, winFrames: 0, winTotal: 0,
+  record(ms) { this.frames++; this.total += ms; this.max = Math.max(this.max, ms); this.winFrames++; this.winTotal += ms; },
+  reset() { this.frames = this.total = this.max = this.winFrames = this.winTotal = 0; } };
+window.__deco = { stats };
+let raf = 0, prev = 0, clock = 0, inView = false, started = false, mode = 'live', forcedStill = false, sinceDraw = 0, yawOff = 0, drew = false;
+const pointer = { x: 0, active: false };
+
+function tick(t, dt) {
+  const idle = t > buildEnd + 0.6;
+  if (mode === 'once' && idle) { render(t); drew = true; return false; }       // touch: build once, then rest
+  let yaw = CFG.yaw0;
+  if (mode === 'live') {
+    yawOff = approach(yawOff, pointer.active ? ((pointer.x / W) * 2 - 1) * CFG.pointerYaw : 0, 2.5, dt);
+    const s = Math.max(0, t - buildEnd);
+    yaw += CFG.swayAmp * Math.sin((2 * Math.PI * s) / CFG.swayPeriod) * Math.min(1, s / 2) + yawOff;
+  }
+  // After the build the sway is slow: redraw at idleFps to halve the cost.
+  sinceDraw += dt;
+  if (idle && sinceDraw < 1 / CFG.idleFps - 0.004) return true;
+  sinceDraw = 0; drew = true;
+  setYaw(rad(yaw));
+  render(t);
+  return true;
+}
+function frame(now) {
+  raf = 0;
+  const dt = prev ? Math.min(0.05, (now - prev) / 1000) : 1 / 60;
+  prev = now; clock += dt;
+  const t0 = performance.now();
+  drew = false;
+  const more = tick(clock, dt);
+  if (drew) stats.record(performance.now() - t0); // stats count drawn frames only
+  if (more) wake(); else prev = 0;
+}
+const allowed = () => mode !== 'still' && started && inView && !document.hidden;
+function wake() { if (!raf && allowed()) raf = requestAnimationFrame(frame); }
+function sleep() { if (raf) cancelAnimationFrame(raf); raf = 0; prev = 0; }
+function decideMode() {
+  if (forcedStill || mqReduce.matches) return 'still';
+  return mqFine.matches && innerWidth >= 768 ? 'live' : 'once';
+}
+function init() {
+  sleep(); layout(); mode = decideMode(); clock = 0; yawOff = 0;
+  buildEnd = CFG.buildStart + (LEVELS.length - 2) * CFG.floorStagger + CFG.floorDur;
+  if (mode === 'still') { setYaw(rad(CFG.yaw0)); render(Infinity); return; }
+  ctx.clearRect(0, 0, W, H); wake();
+}
+
+const footer = host.closest('footer');
+footer.addEventListener('pointermove', (e) => {
+  if (mode !== 'live' || e.pointerType === 'touch') return;
+  const r = host.getBoundingClientRect(); pointer.x = Math.min(W, Math.max(0, e.clientX - r.left)); pointer.active = true; wake();
+}, { passive: true });
+footer.addEventListener('pointerleave', () => { pointer.active = false; }, { passive: true });
+new IntersectionObserver((es) => { inView = es[es.length - 1].intersectionRatio >= 0.35; inView ? wake() : sleep(); }, { threshold: [0, 0.35] }).observe(host);
+document.addEventListener('visibilitychange', () => (document.hidden ? sleep() : wake()));
+let rw = 0;
+new ResizeObserver(() => {
+  const w = Math.round(cv.getBoundingClientRect().width); if (w === rw) return; rw = w;
+  if (!started) return;
+  const t = clock; layout(); mode = decideMode();
+  if (mode === 'still' || t > buildEnd) { setYaw(rad(CFG.yaw0)); render(Infinity); }
+  wake();
+}).observe(host);
+mqReduce.addEventListener('change', init);
+const boot = () => { started = true; init(); };
+'requestIdleCallback' in window ? requestIdleCallback(boot, { timeout: 1500 }) : setTimeout(boot, 1500);
+
+/* ---------------- reference chrome ---------------- */
+const out = document.getElementById('stat');
+setInterval(() => {
+  const f = stats.winFrames, avg = f ? stats.winTotal / f : 0;
+  out.textContent = mode === 'still' ? '静态终帧' : f ? `脚本 ${avg.toFixed(2)} ms/帧 · 绘制 ${f * 2} 帧/s · DPR ${dpr}` : `循环休眠 · DPR ${dpr}`;
+  stats.winFrames = 0; stats.winTotal = 0;
+}, 500);
+document.getElementById('replay').onclick = () => { stats.reset(); init(); };
+const stillBtn = document.getElementById('still');
+stillBtn.onclick = () => { forcedStill = !forcedStill; stillBtn.setAttribute('aria-pressed', String(forcedStill)); init(); };
+window.__deco.replay = init;
+})();
+</script>
+</body>
+</html>

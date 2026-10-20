@@ -44,15 +44,15 @@ src/components/workflow/
   scenes/SceneImport.vue  SceneOpen.vue  SceneTask.vue  SceneArchive.vue
   useWorkflowPin.ts                             钉住、吸附、当前步骤
 src/components/trust/  TrustSection.vue  TrustFlow.vue  trust-geometry.ts
-src/components/install/ InstallSection.vue  PlatformCard.vue  ConfigPackageNote.vue
+src/components/install/ InstallSection.vue  ConfigPackageNote.vue
 src/components/faq/     FaqSection.vue  FaqItem.vue
 src/components/SiteFooter.vue
-src/site.config.ts                              运营方填写的联系与法律信息（§5.4）
-src/data/site.ts                                由 site.config.ts 派生 SUPPORT_CONTACT（06 章引用）
-scripts/check-launch.mjs                        上线阻断项检查（§5.4）
+src/data/site.ts                                只导出 SUPPORT_CONTACT（由 01 章 site.config.ts 派生，06 章引用）
 ```
 
-删除现 `WorkflowSection.vue`、`TrustSection.vue`、`InstallSection.vue`、`FaqSection.vue`，以及 `content.ts` 里的 `workflowSteps`、`trustStatements`、`faqs`。`downloads.ts`、`release-manifest.mjs` 保留，只改 §3.4 列出的两处。
+复用 01 章的全局件，不另建：`src/site.config.ts`（01 章 §8.2；本章在 `SiteConfig` 上追加 `legal`，§5.4）、`src/components/acquire/PlatformCard.vue`（01 章 §7.4；本章加两个 prop，§3.4）、`lib/platform.ts`（01 章 §7.5）、`useCopy` 与 `useToast`（01 章 §14）、`downloads.ts` 的改动（01 章 §7.4）。
+
+删除现 `WorkflowSection.vue`、`TrustSection.vue`、`InstallSection.vue`、`FaqSection.vue`，以及 `content.ts` 里的 `workflowSteps`、`trustStatements`、`faqs`。
 
 ## 1. 使用流程 `#workflow`
 
@@ -587,55 +587,35 @@ export const FOCUS: Record<FocusKey, { nodes: TrustNodeId[]; paths: TrustPathId[
 | 副标题 | Mac 与 Windows 两个安装包，配置包由服务方交付。 |
 | 安装包 h3 | 安装包 |
 | 安装包正文 | 提供 Mac（.dmg，Apple 芯片）和 Windows（.exe，x64）安装包。安装包内含 Python 运行时、脚本依赖库和 DWG 转换组件，无需另行安装 Python。 |
-| 版本行 | `v{version}` · `{date} 发布`（`date` 为 null 时"发布日期待定"）· 有 `base` 时加"应用内版本 {base}"，悬停/聚焦提示"安装后「关于」中显示的版本号" |
-| 平台卡名称 | Mac · Apple 芯片；Windows · x64 |
-| 推荐徽标 | 您的系统 |
-| 文件行 | `{file}` · `{size}` |
-| SHA256 行 | 标签"SHA256"；值显示前 8 位…后 8 位（`title` 与读屏为全文）；复制按钮"复制"（`aria-label="复制 {名称} 安装包的 SHA256 校验值"`）；链接"下载 .sha256 文件" |
-| 下载按钮 | 下载 Mac 安装包 / 下载 Windows 安装包 |
-| 首次打开切换 | 首次打开（展开后 `aria-expanded="true"`） |
-| 校验小标题 | 校验下载 |
-| 校验命令 | Mac：`shasum -a 256 {file}`；Windows（PowerShell）：`(Get-FileHash .\{file} -Algorithm SHA256).Hash.ToLower()`；命令旁复制按钮（`aria-label="复制校验命令"`） |
-| 校验说明 | 在"下载"文件夹里运行，输出应与上面的 SHA256 一致。更多方法见 `/docs/install/#校验安装包` |
-| 即将发布 | 状态"即将发布"；说明"该平台的安装包尚未上架。" |
-| Intel Mac 提示 | 检测到 Intel 芯片的 Mac：当前安装包只支持 Apple 芯片。 |
-| ARM Windows 提示 | 检测到 ARM 版 Windows：当前安装包为 x64 版本，未在 ARM 设备上验证。 |
-| 手机与平板提示 | 智通数工AI 是电脑端应用，请在 Mac 或 Windows 电脑上下载安装。 + 按钮"复制下载页链接"（复制 `https://ztsgai.com/#install`） |
+| 版本行 | `v{version}` · `{date} 发布`（`date` 为 null 时"发布日期待定"）；`base` 不为 null 时版本行下加一行"安装后，"关于"中显示的程序版本为 {base}。" |
+| 平台卡 | 名称、架构、适用说明、匹配标记"与您的电脑匹配"、文件行、下载按钮"下载 Mac 版 / 下载 Windows 版"（点击后 2.4 s 内为"已开始下载"）、"SHA256 校验值"块与复制、"下载 .sha256 文件"、展开块"首次打开与校验"（步骤与校验命令）、即将发布卡：全部与 01 章 §7.2 逐字相同 |
+| 卡下链接 | 安装遇到问题？看安装说明 → `/docs/install/` |
+| 手机与平板提示 | 与 01 章 §7.2 相同：您正在使用手机或平板。安装包需要在 Mac 或 Windows 电脑上安装，可以把本页链接发到电脑上打开。 + 按钮"复制页面链接"（本区复制 `location.origin + '/#install'`） |
 | 配置包 h3 | 配置包 |
 | 配置包正文 | 配置包是服务方按贵司环境整理的一个压缩文件（内含 `zhitong.config.json`），不随安装包分发，也不在本站提供下载。 |
 | 配置包内容列表 | 公司名称 ／ 对象存储的地址、区域、桶名与目录前缀 ／ 访问密钥（导入后存入本机凭据存储） ／ 可选：SSH 主机别名、地址与私钥 ／ 可选：火山引擎 ve 的 profile 名（ve 自己的密钥由您在终端里单独设置，不放进配置包） |
 | 配置包提醒 | 配置包含明文密钥：导入后请从下载目录删除，不要转发。更换密钥时，服务方发来新配置包，重新导入即可。 |
 | 首次使用 h3 | 首次使用 |
 | 首次使用正文 | 首次启动先在欢迎页填写模型 API Key（向贵司管理员或服务方获取，默认连接 DeepSeek 官方接口），再把配置包拖进对话，系统校验并写入本机配置，随后即可列出公司桶里的项目。本机只缓存用到的文件，目录与桶同构，缓存上限可配置，默认 20 GiB。 |
-| 联系 h3 | 联系服务方 |
-| 联系正文 | 安装包与配置包向服务方获取。 + `site.config.ts` 中已填写的联系项；全部未填写时改为"配置包由向贵司交付本产品的服务方提供。" |
-| 文档链接 | 安装说明 → `/docs/install/` ／ 导入配置包 → `/docs/config-package/` |
-| 提示条 | 已复制 SHA256 ／ 已复制校验命令 ／ 已复制链接 ／ 开始下载 {file}（{size}） ／ 复制失败，请手动选中文字复制 |
-
-首次打开步骤沿用 `downloads.ts` 的 `PLATFORM_COPY.firstLaunch`，Mac 追加第 4 步：
-
-| 平台 | 步骤 |
-|---|---|
-| Mac | 1. 打开 .dmg，把"智通数工AI"拖进"应用程序"。 2. 首次打开：在"应用程序"里按住 Control 点按（或右键）应用 → 打开 → 打开。 3. macOS 15 及以上若被拦截：到"系统设置 → 隐私与安全性"底部点"仍要打开"。 4. 若提示"已损坏"：确认 SHA256 一致后，在"终端"执行 `xattr -dr com.apple.quarantine "/Applications/智通数工AI.app"`，再按第 2 步打开（命令带复制按钮）。 |
-| Windows | 1. 双击安装程序，安装到当前用户，无需管理员权限。 2. 出现"Windows 已保护你的电脑"时，点"更多信息" → "仍要运行"。 |
+| 联系 h3 | 联系服务方（只在 01 章的 `hasContact` 为 true 时渲染） |
+| 联系正文 | 安装包与配置包向服务方获取。 + `<dl>`，按 01 章 §8.3 的顺序与格式列出非空项 |
+| 文档链接 | 读文档：导入配置包 → `/docs/config-package/` |
+| 提示条（01 章 `useToast`） | 已复制 SHA256 校验值 ／ 已复制校验命令 ／ 已复制页面链接 ／ 复制失败，请手动选择文本 |
 
 ### 3.3 布局
 
 - **桌面**：区块上下内边距 128px；深色面板 `.install-panel` 占内容宽，`--navy-900` 底、24px 圆角、内边距 72px 64px、`overflow: hidden`；面板内 12 列，左 5 列为眉标、h2、副标题、安装包、配置包、首次使用、联系服务方、文档链接；右 7 列为版本行与两张平台卡（上下排列，间距 16px）。
 - **平板**：面板内边距 56px 48px，单列：标题 → 安装包 → 版本行 → 平台卡 → 配置包 → 首次使用 → 联系 → 文档链接。
 - **手机**：面板通栏（左右贴边、无圆角），内边距 56px 20px，顺序同平板；平台卡内各行纵向堆叠，下载按钮宽 100%。
-- **平台卡**：底 `rgba(255,255,255,.06)`，1px `rgba(255,255,255,.16)` 边，16px 圆角，内边距 24px（手机 20px）；行序：名称行（24px 图标、名称 20px/600、架构芯片、右侧预留 72×24 的徽标位）→ 提示行（仅检测到不匹配时）→ 文件行 → SHA256 行 → 动作行（下载按钮 + 首次打开切换）→ 展开区（步骤 `<ol>` + 校验小节）。推荐卡边框改 `--brand-cyan`，徽标位显示"您的系统"。
-- 面板内文字白色；次要文字 `rgba(255,255,255,.76)`；等宽值 `rgba(255,255,255,.88)`。下载按钮用 `.button-white`（白底 `--brand-navy` 字）。
+- **平台卡**：复用 01 章 `PlatformCard`（内部行序与校验值块见 01 章 §7.3），本区以 `surface="dark"` 渲染：卡底 `rgba(255,255,255,.06)`、1px `rgba(255,255,255,.16)` 边、16px 圆角、内边距 24px（手机 20px）；名称与文件行白色，适用说明与次要文字 `rgba(255,255,255,.76)`；校验值块底 `rgba(255,255,255,.08)`、字 `rgba(255,255,255,.92)`；匹配标记白字、`rgba(0,179,236,.28)` 底；匹配卡边框 `--brand-cyan`；即将发布卡 1px 虚线 `rgba(255,255,255,.28)` 边，徽标仍为 `--warning-bg` 底、`--warning-text` 字。下载按钮 `.button-white`（状态见 01 章 §9）。桌面两卡上下排列，间距 16px；卡下 16px 为"安装遇到问题？"链接。
+- 面板内文字白色；次要文字 `rgba(255,255,255,.76)`；等宽值 `rgba(255,255,255,.88)`；聚焦环用 01 章 §9 的深色区聚焦环。
 - **装饰插槽**：面板内第一个子元素 `<DecoInstallField>`，`position: absolute; inset: 0; z-index: 0; pointer-events: none; aria-hidden="true"`，尺寸随面板（桌面约 1248×760，平板约 672×1180，手机约 390×1480，以 `ResizeObserver` 取实际值）；内容层 `position: relative; z-index: 1`。07 章实现须满足：文字所在区域的装饰亮度不使白字对比低于 4.5:1；挂在 `useInView` 上；减少动效显示静态终帧；单块 ≤ 12 KB gzip。
 
 ### 3.4 组件与数据
 
-数据仍来自 `public/downloads/releases.json` → `release-manifest.mjs` 校验 → `downloads.ts` 的 `release`，页面不写死版本、大小、哈希。`downloads.ts` 两处修改：
+数据仍来自 `public/downloads/releases.json` → `release-manifest.mjs` 校验 → `downloads.ts` 的 `release`，页面不写死版本、大小、哈希；`downloads.ts` 的改动以 01 章 §7.4 为准（`verify(file)`、`base` 等）。
 
-1. `PLATFORM_COPY['mac-arm64'].firstLaunch` 追加第 4 步（上表）；`verify` 改为函数 `(file: string) => string`，返回含实际文件名的命令（Windows 带 `.Hash.ToLower()`）。
-2. `DownloadRelease` 增加 `base: string | null`（取清单 `base`）。
-
-本仓当前没有 `public/downloads/releases.json`，`downloads.ts` 的 `import` 会让构建失败。实现时先提交初始清单（`release-manifest.mjs stage` 之后会填写各平台；`base` 不写，因为解析器不接受 `null`）：
+本仓当前没有 `public/downloads/releases.json`，`downloads.ts` 的 `import` 会让构建失败。实现时先提交初始清单（之后由 `release-manifest.mjs stage` 填写各平台；不写 `base`，因为解析器不接受 `null`）：
 
 ```json
 {
@@ -651,65 +631,53 @@ export const FOCUS: Record<FocusKey, { nodes: TrustNodeId[]; paths: TrustPathId[
 }
 ```
 
-- `PlatformCard.vue`：props `item: PlatformDownload`、`recommended: boolean`、`hint: string | null`、`variant: 'dark' | 'light'`（01 章获取弹层可用 `light` 复用）。
-- `ConfigPackageNote.vue`：配置包、首次使用两小节，纯展示。
-- 平台检测用本章新增的 `usePlatform`（§6.3）；`InstallSection` 把结果映射为 `recommended` 与 `hint`：
-
-| 检测结果 | Mac 卡 | Windows 卡 | 区块提示 |
-|---|---|---|---|
-| `mac` + `arm` 或 `unknown` | 推荐 | — | — |
-| `mac` + `x86` | 推荐 + Intel 提示 | — | — |
-| `windows` + `x86` 或 `unknown` | — | 推荐 | — |
-| `windows` + `arm` | — | 推荐 + ARM 提示 | — |
-| `mobile` | — | — | 手机与平板提示（版本行上方） |
-| `other` | — | — | — |
-
-两张卡始终都显示，顺序不变。
+- 01 章 `PlatformCard.vue` 增加两个 prop：`surface: 'light' | 'dark'`（默认 `'light'`，弹层不变）；`magnetic: boolean`（默认 `false`，为 true 时下载按钮带 `v-magnetic`）。本区传 `surface="dark"`、`magnetic`。
+- `ConfigPackageNote.vue`：配置包、首次使用两小节，纯展示，无 props。
+- 平台识别：水合后调用一次 01 章 `lib/platform.ts`。结果为 `mac-arm64` / `win-x64` → 对应卡 `matched`；`mobile` → 版本行上方显示手机与平板提示；`null` → 无标记。两张卡始终都显示，任何宽度下顺序都不变（本区不随识别结果重排，避免水合后内容跳动）。
 
 ### 3.5 交互与动效
 
-- 入场：h2 `heading`；左栏段落 `block`；平台卡 `stagger`。推荐状态在水合后 `usePlatform` 返回时设置：卡边框颜色过渡 `DUR.short`，徽标 `opacity 0→1, scale 0.9→1` `DUR.short` `EASE.out`；徽标位尺寸预留，不引起布局位移。
-- 下载按钮 `v-magnetic`（默认参数，偏移上限 10px）；点击：浏览器开始下载（`<a href download>`），同时提示条"开始下载 {file}（{size}）"，并展开该卡的"首次打开"（已展开则不变）。
-- SHA256 与命令复制：`ZtCopyButton`（§6.2）。
-- 首次打开展开/收起：Flip 方式（同 §4.5 手风琴），展开区 `clip-path: inset(0 0 100% 0) → inset(0 0 0% 0)` `DUR.base` `EASE.out`，步骤 `stagger: STAGGER.tight`；收起先 `clip-path` 收回 `DUR.short`，再移除内容并以 Flip 让下方元素上移 0.32 s `EASE.inOut`；切换按钮的箭头旋转 180°，`DUR.short`。完成后调用 `refreshMotionLayout()`（200 ms 防抖）。
-- 即将发布的卡：无下载按钮、无复制、无磁吸；状态文字"即将发布"为 `--warning-bg` 底徽标。
+- 入场：h2 `heading`；左栏段落 `block`；两张平台卡 `stagger`。匹配状态在水合后设置：卡边框颜色过渡 `DUR.short`，匹配标记 `opacity 0→1, scale 0.9→1`，`DUR.short`，`EASE.out`；标记绝对定位在卡右上角，不引起布局位移。
+- 下载按钮 `v-magnetic`（默认参数，偏移上限 10px）；点击后的按钮反馈、自动展开"首次打开与校验"、朗读"已开始下载 {file}"均按 01 章 §7.5（本区的朗读写入 `#page-status`）。
+- 复制：01 章 `useCopy` + `useToast`，提示文字见 §3.2。
+- "首次打开与校验"的展开收起按 01 章 §7.5；结束后调用 `refreshMotionLayout()`（200 ms 防抖），因为本区高度变化会移动其下 `#faq` 与页脚的触发位置。
+- 即将发布卡：无下载按钮、无复制、无磁吸。
 
 ### 3.6 降级
 
-- 无 JS：卡片、文件名、大小、完整 SHA256（`title` 之外，无 JS 时显示全文、自动换行）、下载链接、`<details>` 形式的首次打开都可用；无推荐、无复制按钮（复制按钮在水合后才渲染）。
-- `navigator.clipboard` 不可用（非安全上下文、权限拒绝）：§6.2 的退路。
-- 减少动效：无磁吸、展开收起无动画、徽标直接出现。
+- 无 JS：卡片、文件名、大小、完整 SHA256、下载链接、原生 `<details>` 的"首次打开与校验"都可用；无匹配标记；复制按钮不渲染（水合后插入，位置预留）。
+- 剪贴板不可用：01 章 `useCopy` 的退路（选中文字 + 错误提示）。
+- 减少动效：同 01 章 §7.6；无磁吸、无入场。
 
 ### 3.7 无障碍
 
-- 每张卡 `<article aria-labelledby="pkg-{platform}-title">`；推荐卡的徽标文字"您的系统"在读屏中紧跟卡标题读出。
-- SHA256 截断显示的 `<span>` 带 `aria-hidden="true"`，旁边 `.sr-only` 为全文；`title` 为全文。
-- 首次打开是 `<details>`/`<summary>`，脚本增强时保持原生语义。
-- 下载链接 `aria-label="下载 {名称} 安装包，{file}，{size}"`。
-- 提示条见 §6.1，`role="status"`。
+- 平台区 `<ul aria-label="v{version} 安装包">`，每张卡 `<li>`；区内标题层级 h2（区块）→ h3（安装包、配置包、首次使用、联系服务方）→ h4（卡片名称）。
+- 匹配标记是卡片标题内的文字，读屏读作"Mac，与您的电脑匹配"（同 01 章 §7.7）。
+- "首次打开与校验"是原生 `<details>`/`<summary>`，脚本增强时保持原生语义。
+- 提示条朗读按 01 章 §11（写入 `#page-status`）。
 
 ### 3.8 验收标准
 
 | 编号 | 标准 |
 |---|---|
-| AC-05-41 | 页面上的版本、日期、文件名、大小、SHA256 全部来自 `releases.json`；改清单后重建，页面随之变化（vitest 用夹具清单渲染断言） |
-| AC-05-42 | 平台 `file` 为 null：该卡显示"即将发布"，卡内没有 `<a>`、没有复制按钮、按钮无 `v-magnetic` |
-| AC-05-43 | 下载链接 `href` = `/downloads/{file}` 且带 `download` 属性；点击后提示条显示"开始下载 {file}（{size}）"，该卡首次打开区展开 |
-| AC-05-44 | 点 SHA256"复制"：剪贴板内容为 64 位小写十六进制全文；提示条"已复制 SHA256"显示 2.4 s；按钮图标变对勾 1.6 s |
-| AC-05-45 | 剪贴板 API 被拒绝：SHA256 全文被选中，提示条"复制失败，请手动选中文字复制" |
-| AC-05-46 | UA 为 macOS Safari：Mac 卡有"您的系统"徽标与 `--brand-cyan` 边框，Windows 卡照常显示，两卡顺序不变 |
-| AC-05-47 | Chromium、`userAgentData.platform = "macOS"`、`architecture = "x86"`：Mac 卡显示 Intel 提示 |
-| AC-05-48 | UA 为 Windows：Windows 卡推荐；`architecture = "arm"` 时显示 ARM 提示 |
-| AC-05-49 | UA 为 iPhone 或 Android：显示手机与平板提示与"复制下载页链接"，两张卡都在，无推荐 |
-| AC-05-50 | 预渲染 HTML 中没有任何卡带推荐状态；推荐状态出现时 CLS 增量为 0 |
-| AC-05-51 | 校验命令包含实际文件名；Windows 命令以 `.Hash.ToLower()` 结尾 |
-| AC-05-52 | Mac 首次打开为 4 步、Windows 为 2 步，文字与 §3.2 一致；`xattr` 命令带复制按钮 |
-| AC-05-53 | 配置包小节列出 5 项内容与提醒；`#install` 内没有任何指向配置包的下载链接 |
-| AC-05-54 | 清单有 `base` 时版本行显示"应用内版本 {base}"；无 `base` 时不显示 |
-| AC-05-55 | `site.config.ts` 联系项全为 null 时显示"配置包由向贵司交付本产品的服务方提供。"；有值时逐项显示 |
-| AC-05-56 | `<DecoInstallField>` 位于 `.install-panel` 内、`aria-hidden="true"`、`pointer-events: none`；axe 色彩对比在装饰运行中的截图上 0 违规 |
-| AC-05-57 | 触屏（`pointer: coarse`）下下载按钮无磁吸位移 |
-| AC-05-58 | 键盘顺序：每张卡内为 下载 → SHA256 复制 → .sha256 链接 → 首次打开；Enter/Space 可展开收起 |
+| AC-05-41 | 本区的版本、日期、文件名、大小、SHA256 全部来自 `releases.json`；换夹具清单重建后页面随之变化（vitest 渲染断言） |
+| AC-05-42 | 平台 `file` 为 null：该卡为即将发布卡，卡内没有 `<a>`、没有复制按钮、没有 `v-magnetic` |
+| AC-05-43 | 下载链接 `href` = `/downloads/{file}` 且带 `download`；点击后按钮文字 2.4 s 内为"已开始下载"，"首次打开与校验"展开，`#page-status` 为"已开始下载 {file}" |
+| AC-05-44 | 复制 SHA256：剪贴板为 64 位小写十六进制全文；提示条"已复制 SHA256 校验值" |
+| AC-05-45 | 剪贴板 API 被拒绝：校验值文字被选中，提示条"复制失败，请手动选择文本" |
+| AC-05-46 | UA 为 macOS Safari：Mac 卡有"与您的电脑匹配"与 `--brand-cyan` 边框，Windows 卡照常显示，两卡顺序不变 |
+| AC-05-47 | UA 为 Windows：Windows 卡匹配；在 1440 与 390 宽度下两卡顺序都与无识别时相同 |
+| AC-05-48 | UA 为 iPhone 或 Android：版本行上方出现手机与平板提示；"复制页面链接"复制 `location.origin + '/#install'`，提示条"已复制页面链接"；两张卡都在，均无匹配标记 |
+| AC-05-49 | 预渲染 HTML 中没有匹配标记；匹配状态出现时 CLS 增量为 0 |
+| AC-05-50 | 校验命令包含实际文件名，与 01 章 §7.2 的命令逐字一致 |
+| AC-05-51 | "首次打开与校验"的步骤与 01 章获取弹层逐字一致（同一组件、同一数据） |
+| AC-05-52 | 配置包小节列出 5 项内容与提醒；`#install` 内没有任何指向配置包的下载链接 |
+| AC-05-53 | 清单有 `base` 时显示"安装后，"关于"中显示的程序版本为 {base}。"；无 `base` 时不显示 |
+| AC-05-54 | `hasContact` 为 false 时本区没有"联系服务方"小节，也没有任何占位文字；为 true 时按 01 章 §8.3 列出非空项 |
+| AC-05-55 | `<DecoInstallField>` 位于 `.install-panel` 内、`aria-hidden="true"`、`pointer-events: none`；装饰运行中截图上 axe 色彩对比 0 违规 |
+| AC-05-56 | 触屏（`pointer: coarse`）下下载按钮无磁吸位移；精确指针下偏移 ≤ 10px |
+| AC-05-57 | 键盘顺序：每张卡内为 下载 → 复制校验值 → .sha256 链接 → 首次打开与校验；Enter/Space 可展开收起 |
+| AC-05-58 | 同一 `PlatformCard` 在 01 章获取弹层中仍以 `light` 渲染、无磁吸；本区 `dark` 卡内文字对比 ≥ 4.5:1 |
 
 ## 4. 常见问题 `#faq`
 
@@ -727,7 +695,7 @@ export const FOCUS: Record<FocusKey, { nodes: TrustNodeId[]; paths: TrustPathId[
 | 筛选组 | `role="group" aria-label="按主题筛选"`；按钮"全部 8""安装 2""数据 2""结果 2""协作 2"（数字为等宽计数） |
 | 筛选播报 | 显示 {n} 个问题：{主题}（"全部"时为"显示全部 8 个问题"） |
 | 文档链接 | 在文档中查看更多 → `/docs/troubleshooting/` |
-| 每问的复制链接 | 图标按钮，`aria-label="复制本问题的链接"`；提示条"已复制链接" |
+| 每问的复制链接 | 图标按钮，`aria-label="复制本问题的链接"`；提示条"已复制问题链接" |
 | 每问的相关文档 | 相关文档：{页标题} → |
 
 八问（显示顺序 = 文案稿顺序；"校正"列说明与文案稿的差异）：
@@ -785,7 +753,7 @@ export const FAQS: FaqItem[] = [/* 按 §4.2 表顺序 */];
 - **页内查找**：监听 `details` 的 `toggle` 事件；浏览器因查找而自动展开时，同步 `open` 集合与加号角度（无动画）。
 - **筛选**：点击按钮 → `state = Flip.getState(全部问题项)` → 不属于该主题的项设 `hidden` → `Flip.from(state, { duration: DUR.base, ease: EASE.inOut, absolute: true, stagger: STAGGER.tight, onEnter: el => gsap.fromTo(el, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: DUR.short }), onLeave: el => gsap.to(el, { opacity: 0, duration: DUR.micro }) })`；被隐藏的项保留展开状态。筛选按钮 `v-magnetic`；底板随选中项移动（`useHoverIndicator`）；`#faq-status`（`role="status"`）写入筛选播报。
 - **深链**：页面加载与 `hashchange` 时，若 hash 为 `#faq-{id}` 且 id 存在：筛选设为"全部"（无动画）→ 展开该问（无动画）→ `lenis.scrollTo(该项, { offset: -(顶栏高度 + 24), duration: 1.1 })`（减少动效时立即跳转）→ 焦点到其 `summary`（`preventScroll`）。
-- **复制链接**：`ZtCopyButton`，文本 `https://ztsgai.com/#faq-{id}`；同时 `history.replaceState` 为 `#faq-{id}`。
+- **复制链接**：01 章 `useCopy().copy('https://ztsgai.com/#faq-{id}', { success: '已复制问题链接' })`；按钮图标 `copy → check` 交叉淡入 160 ms、1.6 s 后复原（同 01 章 §7.5）；同时 `history.replaceState` 为 `#faq-{id}`。
 - 入场：h2 `heading`；问题列表 `stagger`。
 
 ### 4.6 降级
@@ -814,7 +782,7 @@ export const FAQS: FaqItem[] = [/* 按 §4.2 表顺序 */];
 | AC-05-65 | 禁用 JS：点击 `summary` 能展开收起 |
 | AC-05-66 | 访问 `/#faq-concurrent`：筛选为"全部"、该问展开、其 `summary` 有焦点且位于顶栏下方 24px 处 |
 | AC-05-67 | 页面已打开时把 hash 改为 `#faq-migrate`：同 AC-05-66 的行为 |
-| AC-05-68 | 复制链接得到 `https://ztsgai.com/#faq-{id}`，提示条"已复制链接" |
+| AC-05-68 | 复制链接得到 `https://ztsgai.com/#faq-{id}`，提示条"已复制问题链接" |
 | AC-05-69 | Chrome 页内查找命中收起问题里的答案文字：该问展开，加号为 45° |
 | AC-05-70 | 每次展开或收起结束后 `ScrollTrigger.refresh` 只调用一次 |
 | AC-05-71 | "在文档中查看更多 →"的 `href` 为 `/docs/troubleshooting/`；各问相关文档链接无死链 |
@@ -836,8 +804,8 @@ export const FAQS: FaqItem[] = [/* 按 §4.2 表顺序 */];
 | 主按钮 | 获取安装包（打开 01 章获取弹层） |
 | 栏目"产品" | 工作示例 `#demo` ／ 适用岗位 `#roles` ／ 它解决什么 `#problem` ／ 产品能力 `#capabilities` ／ 使用流程 `#workflow` ／ 数据与复核 `#trust` ／ 安装与交付 `#install` ／ 常见问题 `#faq`（文档页里写成 `/#<id>`） |
 | 栏目"文档" | 快速开始 `/docs/quick-start/` ／ 安装 `/docs/install/` ／ 导入配置包 `/docs/config-package/` ／ 12 项能力 `/docs/#按任务找` ／ 数据与安全 `/docs/security/` ／ 常见问题与排错 `/docs/troubleshooting/` |
-| 栏目"联系" | 服务方 {provider} ／ 电话 {phone}（`tel:`）／ 邮箱 {email}（`mailto:`）／ 微信 {wechat} ／ 服务时间 {hours}；只列已填写的项，全部未填写时整栏不渲染 |
-| 法律行 | © {构建年份} {company} ／ {icp}（链接 https://beian.miit.gov.cn/）／ {psb.text}（链接 {psb.href}）／ 隐私说明（链接 {privacyHref}）；未填写的项不渲染 |
+| 栏目"联系" | 按 01 章 §8.3 的顺序与格式：服务方 ／ 联系人 ／ 电话（`tel:`）／ 邮箱（`mailto:`）／ 微信（文字 + 复制按钮，提示"已复制微信号"）／ 服务时间；只列非空项；01 章 `hasContact` 为 false 时整栏不渲染 |
+| 法律行 | © {构建年份} {company} ／ {icp}（链接 https://beian.miit.gov.cn/）／ {psbText}（链接 {psbHref}）／ 隐私说明（链接 {privacyHref}）；空串的项不渲染，不出现任何占位文字 |
 | 说明行 | 基于 DeepSeek Harness 构建 · 页面中的项目、金额与文件均为示例数据 |
 | 回到顶部 | 回到顶部（按钮，带向上箭头） |
 
@@ -853,41 +821,29 @@ export const FAQS: FaqItem[] = [/* 按 §4.2 表顺序 */];
 
 ### 5.4 组件与数据
 
-```ts
-// src/site.config.ts —— 运营方填写；仓库默认值全部为 null
-export interface SiteConfig {
-  contact: {
-    provider: string | null;   // 服务方名称
-    phone: string | null;      // 显示文字；tel: 链接去掉空格与连字符
-    email: string | null;
-    wechat: string | null;     // 微信号文字，不放二维码
-    hours: string | null;      // 如"工作日 9:00–18:00"
-  };
-  legal: {
-    company: string | null;                         // 网站运营主体全称
-    icp: string | null;                             // 如"浙ICP备XXXXXXXX号-1"
-    psb: { text: string; href: string } | null;     // 公安联网备案号与官方查询链接，原样填写
-    privacyHref: string | null;                     // 站内路径须带尾斜杠且为预渲染路由
-  };
-}
-export const siteConfig: SiteConfig = { /* 全部 null */ };
+联系方式沿用 01 章 §8.2 的 `ServiceContact`、`contactChannels`、`hasContact`；本章在同一文件里追加法律信息（空串表示未填写，与 01 章约定一致）：
 
-// src/data/site.ts —— 06 章文档页底部的"{联系方式}"取此值
-export type SupportContact = { text: string; href: string | null } | null;
-// 规则：email 优先（mailto:），其次 phone（tel:），其次 wechat（"微信 {wechat}"，无链接）；都无为 null
-export const SUPPORT_CONTACT: SupportContact;
+```ts
+// src/site.config.ts（01 章 §8.2 的文件，本章追加）
+/** 网站运营方的法律信息；空串表示未提供，该项不显示。 */
+export interface LegalInfo {
+  company: string;      // 网站运营主体全称
+  icp: string;          // ICP 备案号，如"浙ICP备XXXXXXXX号-1"
+  psbText: string;      // 公安联网备案号文字；与 psbHref 同时填写或同时留空
+  psbHref: string;      // 该备案号的官方查询链接，原样填写
+  privacyHref: string;  // 隐私说明路径；站内路径须带尾斜杠且在预渲染路由表内
+}
+export interface SiteConfig { contact: ServiceContact; legal: LegalInfo }
+// 默认值：legal 五项均为 ''
+
+/** 法律信息的上线检查；返回问题清单，空数组表示可以上线。 */
+export function legalLaunchIssues(l: LegalInfo, routes: readonly string[]): string[];
+
+// src/data/site.ts —— 06 章文档页底部"内容有误或不清楚？{联系方式}"取此值
+export const SUPPORT_CONTACT: ContactChannel | null; // = contactChannels(siteConfig.contact)[0] ?? null
 ```
 
-**上线阻断检查** `scripts/check-launch.mjs`（`npm run build` 的最后一步）：
-
-| 检查 | `ZT_PORTAL_RELEASE` 未设 | `ZT_PORTAL_RELEASE=1` |
-|---|---|---|
-| `legal.company`、`legal.icp`、`legal.privacyHref` 任一为 null | 打印 `LAUNCH BLOCKER: legal.<字段> 未填写` | 打印同一行并以退出码 1 结束 |
-| `privacyHref` 为站内路径但不在预渲染路由表 | 同上 `LAUNCH BLOCKER` | 退出码 1 |
-| `contact` 全为 null | 打印 `LAUNCH WARNING: 联系方式未填写` | 同左（不阻断） |
-| `releases.json` 两个平台的 `file` 都为 null | 打印 `LAUNCH WARNING: 两个平台都是"即将发布"` | 同左（不阻断） |
-
-`deploy/deploy.sh` 构建门户时设 `ZT_PORTAL_RELEASE=1`（部署件改动，与 06 章的 nginx 改动一并提交）。开发与预览构建中，未填写的法律项以虚线框占位文字"【待填写：公司主体 / ICP 备案号 / 隐私说明】"显示（类 `.launch-placeholder`）；发布构建因阻断检查不会出现占位。
+`legalLaunchIssues` 规则（文字格式同 01 章 §8.4）：`company`、`icp`、`privacyHref` 为空 → "site.config.ts：legal.{字段} 未填写"；任一字段含 01 章的占位正则 → "site.config.ts：legal.{字段} 含占位文字"；`psbText` 与 `psbHref` 只填了一个 → "site.config.ts：legal.psbText 与 legal.psbHref 须同时填写"；`privacyHref` 以 `/` 开头但不在 `routes` 内 → "site.config.ts：legal.privacyHref 不是已预渲染的页面"。`entry-server.ts` 导出的 `launchIssues()` 改为返回 `[...launchIssues(siteConfig.contact), ...legalLaunchIssues(siteConfig.legal, routes)]`，由 01 章 §8.4 的 `ZT_LAUNCH=1` 构建在预渲染时检查并以退出码 1 阻断；本章不另建检查脚本。
 
 - `SiteFooter.vue`：props `context: 'home' | 'docs'`；`home` 时产品链接用 `#<id>` 并经 `scrollToSection`，`docs` 时用 `/#<id>` 普通链接。文档栏的标题与路径从 06 章路由清单按 slug 取（`quick-start`、`install`、`config-package`、`security`、`troubleshooting`），"12 项能力"固定指向 `/docs/#按任务找`。
 
@@ -917,54 +873,26 @@ export const SUPPORT_CONTACT: SupportContact;
 | AC-05-74 | 品牌一句话与说明行逐字一致；说明行中"基于 DeepSeek Harness 构建"不是链接，页脚内没有 DeepSeek 图形资源 |
 | AC-05-75 | 首页页脚 8 个产品链接各自滚动到对应章节；文档页页脚的产品链接 `href` 为 `/#<id>` |
 | AC-05-76 | 文档栏 6 个链接全部解析到预渲染页面或页内锚点（死链检查） |
-| AC-05-77 | `contact` 全为 null：页面上没有"联系"栏，文档栏占 6 列；只填 `email`：联系栏只有邮箱一项，`href` 为 `mailto:` |
-| AC-05-78 | 填写 `icp`：链接到 `https://beian.miit.gov.cn/`，`target="_blank"`，`rel="noopener noreferrer"` |
-| AC-05-79 | `ZT_PORTAL_RELEASE=1 node scripts/check-launch.mjs`：`company`、`icp`、`privacyHref` 任一为 null 时退出码 1，并逐项打印 `LAUNCH BLOCKER`；全部填写时退出码 0 |
-| AC-05-80 | `SUPPORT_CONTACT` 按"邮箱 → 电话 → 微信"取值；全无时为 null |
+| AC-05-77 | `hasContact` 为 false：页面上没有"联系"栏，文档栏占 6 列；只填 `email`：联系栏只有邮箱一项，`href` 为 `mailto:` |
+| AC-05-78 | 填写 `icp`：链接到 `https://beian.miit.gov.cn/`，`target="_blank"`，`rel="noopener noreferrer"`；`legal` 各项为空串时法律行不出现该项，也没有占位文字 |
+| AC-05-79 | `ZT_LAUNCH=1 npm run build`：`legal.company`、`legal.icp`、`legal.privacyHref` 任一为空时退出码 1，并逐项打印 `legalLaunchIssues` 的文字；`privacyHref` 指向不存在的路由时同样失败；全部填写正确时不因 `legal` 失败 |
+| AC-05-80 | `SUPPORT_CONTACT` 等于 `contactChannels(siteConfig.contact)[0]`；没有可联系渠道时为 null |
 | AC-05-81 | 点回到顶部：1.2 s 内滚到顶部，结束后 `document.activeElement` 为 `#main`；减少动效时立即完成 |
 | AC-05-82 | 1440、1024、768、390 四个宽度截图：栏目分别为 4 栏 / 4 栏 / 品牌全宽 + 3 栏 / 单列，无横向滚动 |
 
 ## 6. 本章新增基础件
 
-### 6.1 提示条 `useToast` / `ZtToast`
-
-- 用于：复制成功或失败、开始下载。若 01 章已定义全站提示条，以 01 章为准并删除本节，调用方式不变。
-- `useToast()` 返回 `toast(message: string, opts?: { kind?: 'info' | 'success' | 'error'; duration?: number }): void`；默认 `kind: 'success'`、`duration: 2400`（毫秒）。
-- `ZtToast.vue` 全站只挂一次（首页与文档布局各一处），固定在视口底部居中，距底 24px（手机 `16px + env(safe-area-inset-bottom)`），最大宽 `min(90vw, 420px)`，`--ink` 底白字 14px，12px 圆角；`error` 时左侧 3px `--danger-text` 条。
-- 同时最多一条：新提示到来时旧的 `DUR.micro` 淡出、新的 `y 12→0, opacity 0→1` `DUR.short` `EASE.out` 入场；到时 `DUR.micro` 淡出。指针悬停时计时暂停。
-- 容器 `role="status"`、`aria-live="polite"`、`aria-atomic="true"`；不抢焦点。减少动效时只做透明度切换。
-
-### 6.2 复制按钮 `ZtCopyButton`
-
-- props：`text: string`（要复制的全文）、`label: string`（`aria-label`）、`toastText: string`、`selectTarget?: HTMLElement`（失败时选中的元素）、`size?: 'sm' | 'md'`（28 / 36px，命中区均 ≥ 44px）。06 章代码块的复制按钮可复用。
-- 点击：`navigator.clipboard.writeText(text)` → 成功：图标从"复制"换成对勾（`scale 0.6→1`，`back.out(2)`，`DUR.short`），1.6 s 后换回；`toast(toastText)`。失败或 API 不存在：若给了 `selectTarget` 用 `Selection` 选中其全部文字，`toast('复制失败，请手动选中文字复制', { kind: 'error' })`。
-- 不使用 `document.execCommand('copy')`。
-
-### 6.3 平台检测 `usePlatform`
-
-```ts
-export interface PlatformGuess {
-  os: 'mac' | 'windows' | 'mobile' | 'other';
-  arch: 'arm' | 'x86' | 'unknown';
-}
-export function usePlatform(): Ref<PlatformGuess | null>; // 水合前与 SSR 为 null
-```
-
-判定顺序（`onMounted` 里执行一次）：
-
-1. `navigator.userAgentData` 存在：`mobile === true` → `mobile`；`platform` 为 `macOS` → `mac`，`Windows` → `windows`，其他 → `other`；再 `await getHighEntropyValues(['architecture'])`，`'arm'` → `arm`，`'x86'` → `x86`，取不到 → `unknown`（失败吞掉，保持 `unknown`）。
-2. 否则看 `navigator.userAgent`：含 `iPhone|iPad|Android` → `mobile`；含 `Macintosh` 且 `navigator.maxTouchPoints > 1` → `mobile`（iPadOS 桌面模式）；含 `Macintosh|Mac OS X` → `mac`；含 `Windows NT` → `windows`；其他 → `other`。此路径 `arch` 一律 `unknown`（Safari 在 Apple 芯片上也报 Intel，不据此判断）。
-
-只读取，不存储、不上报。
+无。本章用到的全局件都由其它章定义：复制与提示条用 01 章 §14 的 `useCopy`、`useToast`（`ZtToast`）；平台识别用 01 章 §7.5 的 `lib/platform.ts`；平台卡用 01 章的 `PlatformCard`（本章只加 `surface`、`magnetic` 两个 prop，§3.4）；站点配置用 01 章 §8.2 的 `site.config.ts`（本章追加 `legal`，§5.4）。
 
 ## 7. 上线阻断项与待定事项
 
 | # | 事项 | 状态 |
 |---|---|---|
-| 1 | `legal.company`、`legal.icp`、`legal.privacyHref` 未填写 | 阻断（§5.4 检查） |
+| 1 | `legal.company`、`legal.icp`、`legal.privacyHref` 未填写 | 阻断（§5.4，`ZT_LAUNCH=1` 构建失败） |
 | 2 | 隐私说明页不存在：须新增预渲染路由（建议 `/docs/privacy/`，进 06 章路由表）并由运营方提供正文 | 阻断 |
-| 3 | 仓库缺 `public/downloads/releases.json`，构建失败 | 阻断，按 §3.4 提交初始清单 |
-| 4 | Mac / Windows 安装包未在目标机器打包与验收（`STATUS.md` W9） | 未上架前两卡显示"即将发布" |
-| 5 | 联系方式未填写 | 警告；获取弹层与安装区显示替代文字 |
-| 6 | 案例索引模板比 `README.md` §5 多一列"状态"（`STATUS.md` 待 spec 负责人确认）；本章场景四按模板 8 列展示 | 待定；若删列，场景四与 AC-05-15 同步改为 7 列 |
-| 7 | 公安联网备案号是否需要、何时取得 | 待运营方确认；字段已预留 |
+| 3 | 服务方联系方式未填写 | 阻断（01 章 §8.4） |
+| 4 | 仓库缺 `public/downloads/releases.json`，构建失败 | 阻断，按 §3.4 提交初始清单 |
+| 5 | Mac / Windows 安装包未在目标机器打包与验收（`STATUS.md` W9） | 不阻断；未上架的平台显示"即将发布" |
+| 6 | 安装包未签名，网页下载的 DMG 带隔离属性，可能提示"已损坏"；处理办法（`xattr` 命令）目前只在文档 `/docs/install/` 中，01 章 `PlatformCard` 的首次打开步骤未包含 | 待 01 章决定是否在步骤里补一条 |
+| 7 | 案例索引模板比 `README.md` §5 多一列"状态"（`STATUS.md` 待 spec 负责人确认）；本章场景四按模板 8 列展示 | 待定；若删列，场景四与 AC-05-15 同步改为 7 列 |
+| 8 | 公安联网备案号是否需要、何时取得 | 待运营方确认；字段已预留 |
