@@ -11,7 +11,7 @@ import type { WelcomeSaveResult, WelcomeNotice } from '../src/welcome-api.ts'
 const html = readFileSync(join(import.meta.dirname, '../renderer/welcome.html'), 'utf8')
 afterEach(cleanup)
 
-function mount(language = 'zh-CN', takeNotice = vi.fn<() => Promise<WelcomeNotice | undefined>>().mockResolvedValue(undefined)) {
+function mount(language = 'zh-CN', takeNotice = vi.fn<() => Promise<WelcomeNotice | undefined>>().mockResolvedValue(undefined), accountSignIn = true) {
   cleanup()
   const stopAccount = vi.fn()
   const api = {
@@ -26,7 +26,7 @@ function mount(language = 'zh-CN', takeNotice = vi.fn<() => Promise<WelcomeNotic
     saveApiKey: vi.fn<(value: string) => Promise<WelcomeSaveResult>>().mockResolvedValue({ ok: true }),
     skip: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
   }
-  const mounted = render(<Welcome api={api} />)
+  const mounted = render(<Welcome api={api} accountSignIn={accountSignIn} />)
   const input = document.querySelector('input')!
   const button = (id: string) => document.querySelector<HTMLButtonElement>(id)!
   const enterKey = (value: string) => {
@@ -57,6 +57,21 @@ describe('desktop welcome presentation', () => {
     expect(view.document.activeElement).toBe(view.input)
     expect(view.input.type).toBe('password')
     await expect(view.copy()).toMatchFileSnapshot(`./expected/welcome/${language}-api-key.expected.txt`)
+  })
+
+  // zhitong increment: 智通数工AI opens on the API-key step and offers no account sign-in.
+  it.each(['zh-CN', 'en'])('opens %s on the API-key step without account sign-in choices', async (language) => {
+    const view = mount(language, undefined, false)
+    expect(view.document.querySelector('main')!.getAttribute('aria-labelledby')).toBe('key-title')
+    expect(view.document.activeElement).toBe(view.input)
+    expect(view.button('#sign-in').closest('[hidden]')).not.toBeNull()
+    expect(view.button('#back-to-login').hidden).toBe(true)
+    await expect(view.copy()).toMatchFileSnapshot(`./expected/welcome/${language}-key-only.expected.txt`)
+    view.enterKey(' sk-only-key ')
+    view.submit()
+    expect(view.api.saveApiKey).toHaveBeenCalledExactlyOnceWith('sk-only-key')
+    expect(view.api.startSignIn).not.toHaveBeenCalled()
+    await act(async () => { await Promise.resolve() })
   })
 
   it('sends one trimmed key, prevents competing actions, and clears it after saving', async () => {

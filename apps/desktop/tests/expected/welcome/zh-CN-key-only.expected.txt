@@ -1,0 +1,7 @@
+智通数工AI
+智通数工AI
+填写模型 API Key 开始使用
+默认连接 DeepSeek 官方接口（https://api.deepseek.com），使用 DeepSeek V4.1 Flash（官方推荐）。要改用其他 OpenAI 兼容地址，可稍后在“设置 → 模型”中添加。
+输入 API 密钥 [password]
+保存并继续 [disabled]
+稍后配置

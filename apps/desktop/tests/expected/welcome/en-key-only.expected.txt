@@ -1,0 +1,7 @@
+智通数工AI
+智通数工AI
+Add your model API key to get started
+Uses the official DeepSeek API (https://api.deepseek.com) with DeepSeek V4.1 Flash (recommended). To use another OpenAI-compatible endpoint, add it later in Settings → Models.
+Enter API key [password]
+Save and continue [disabled]
+Set up later

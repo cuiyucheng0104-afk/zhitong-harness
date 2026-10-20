@@ -21,5 +21,6 @@ window.addEventListener('pagehide', () => { palette.removeEventListener('change'
 const container = document.getElementById('root')
 if (container === null) throw new Error('desktop welcome: missing React root')
 const root = createRoot(container)
-flushSync(() => { root.render(<Welcome api={window.dshWelcome} />) })
+// zhitong increment: 智通数工AI offers no DeepSeek account sign-in; the welcome opens on the model API-key step.
+flushSync(() => { root.render(<Welcome api={window.dshWelcome} accountSignIn={false} />) })
 window.addEventListener('pagehide', () => { root.unmount() }, { once: true })

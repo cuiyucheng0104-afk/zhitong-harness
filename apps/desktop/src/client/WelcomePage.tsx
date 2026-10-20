@@ -11,15 +11,19 @@ type Page = 'entry' | 'key' | 'account'
 /**
  * Render the standalone welcome flow using shell-owned operations and localized copy.
  * Clearing the account attempt returns the sign-in status page to the initial choices.
+ * Without account sign-in the flow opens on the API-key step and offers no route to the sign-in choices.
  * @param props.api - isolated preload API; no account credentials reach the renderer.
+ * @param props.accountSignIn - whether the DeepSeek account sign-in choices exist; defaults to true.
  * @returns welcome pages with fixed bottom actions.
  */
-export function Welcome({ api }: { api: WelcomeApi }) {
+export function Welcome({ api, accountSignIn = true }: { api: WelcomeApi; accountSignIn?: boolean }) {
+  // zhitong increment: `accountSignIn` lets 智通数工AI open on the API-key step without the account entry.
   const { messages: m } = api
+  const initialPage: Page = accountSignIn ? 'entry' : 'key'
   const [expiryNotice, setExpiryNotice] = useState(false)
-  const [page, setPage] = useState<Page>('entry')
-  const pageRef = useRef<Page>('entry')
-  const visiblePage = useRef<Page>('entry')
+  const [page, setPage] = useState<Page>(initialPage)
+  const pageRef = useRef<Page>(initialPage)
+  const visiblePage = useRef<Page>(initialPage)
   const [attempt, setAttempt] = useState<AccountView['attempt']>(null)
   const attemptRef = useRef<AccountView['attempt']>(null)
   const [starting, setStarting] = useState(false)
@@ -215,7 +219,7 @@ export function Welcome({ api }: { api: WelcomeApi }) {
       <div id="key-actions" className="actions" hidden={page !== 'key'}>
         <button id="save-key" className="primary" type="submit" form="key-form" disabled={busy || draft.trim() === ''}>{m.welcomeKeySave}</button>
         <button id="skip-key" className="secondary" type="button" disabled={busy} onClick={() => { void skip() }}>{m.welcomeKeyLater}</button>
-        <button id="back-to-login" className="back" type="button" disabled={busy} onClick={() => {
+        <button id="back-to-login" className="back" type="button" hidden={!accountSignIn} disabled={busy} onClick={() => {
           if (busyRef.current) return
           setDraft(''); setError(''); focusEntry.current = true; navigate('entry')
         }}>{m.welcomeKeyBack}</button>
