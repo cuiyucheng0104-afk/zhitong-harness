@@ -53,7 +53,7 @@ button{font:inherit}
 @keyframes ms-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
 @keyframes ms-fade{from{opacity:0}}
 @keyframes ms-pop{from{opacity:0;transform:scale(.2)}}
-@keyframes ms-stamp{from{opacity:0;transform:scale(1.6) rotate(-14deg)}to{opacity:1;transform:scale(1) rotate(-8deg)}}
+@keyframes ms-stamp{from{opacity:0;transform:scale(1.6) rotate(-6deg)}to{opacity:1;transform:none}}
 /* Crosshair searches the missing area: move, hold, move… (keyframe easing applies per segment). */
 @keyframes ms-roam{
   0%,10%{transform:translate(318px,92px)} 18%,30%{transform:translate(372px,118px)} 38%,50%{transform:translate(334px,176px)}
@@ -139,7 +139,7 @@ AY.forEach((y, j) => {
 // 3. Dimension chain over axes 1-4 (45° ticks, values in mm)
 draw(`M${AX[0]} 42H${AX[3]}`, 1.0, 0.5, `stroke="${CFG.ink}" stroke-opacity=".5" stroke-width=".3"`);
 AX.slice(0, 4).forEach((x, i) => draw(`M${x - 1.6} 43.6L${x + 1.6} 40.4`, 1.3 + i * 0.03, 0.2, `stroke="${CFG.ink}" stroke-width=".6"`));
-add(`<g class="f" ${st(1.35)} fill="${CFG.ink}" fill-opacity=".7" font-size="3.8" class="mono">${AX.slice(0, 3).map((x, i) => `<text class="mono" x="${(x + AX[i + 1]) / 2}" y="40" text-anchor="middle">6 200</text>`).join('')}</g>`);
+add(`<g class="f" ${st(1.35)} fill="${CFG.ink}" fill-opacity=".7" font-size="3.8">${AX.slice(0, 3).map((x, i) => `<text class="mono" x="${(x + AX[i + 1]) / 2}" y="40" text-anchor="middle">6 200</text>`).join('')}</g>`);
 
 // 4. Walls: centre-line polylines drawn twice (wide ink, then narrow navy) = double-line walls.
 //    Openings are gaps between segments. Everything stops at the match line.
@@ -197,7 +197,7 @@ add(`<g class="f mono" ${st(4.0)} fill="${CFG.warm}" font-size="3.4" text-anchor
 add(`<text class="f" ${st(4.05)} x="${ix + 8}" y="245.4" font-size="4.2" fill="${CFG.warm}">缺页：本页不在图纸目录中</text>`);
 
 // 7. Review stamp (审核章) lands in the empty area
-add(`<g class="stamp" ${st(3.75)} transform="rotate(-8)"><g transform="translate(345 134)">
+add(`<g class="stamp" ${st(3.75)}><g transform="translate(345 134) rotate(-8)">
   <rect x="-25" y="-11" width="50" height="22" rx="2.5" fill="none" stroke="${CFG.warm}" stroke-width=".9"/>
   <rect x="-22.5" y="-8.5" width="45" height="17" rx="1.5" fill="none" stroke="${CFG.warm}" stroke-width=".35"/>
   <text x="0" y="2.6" text-anchor="middle" font-size="9" font-weight="700" letter-spacing="3" fill="${CFG.warm}">缺 页</text>
