@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.ssr/
+coverage/
+.DS_Store
+*.local
+*.log
+# The repository root ignores every lib/ directory (build output); this one is source.
+!src/lib/
+# Installers belong in zhitong/portal/downloads (deploy/release-manifest.mjs); only the manifest is tracked here.
+public/downloads/*
+!public/downloads/releases.json

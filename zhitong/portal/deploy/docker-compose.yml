@@ -1,0 +1,30 @@
+# 门户 nginx（容器模式）。deploy.sh 上传到服务器 /opt/ztsgai/docker-compose.yml；首次启动与回滚见 runbook.md。
+#
+# 容器名沿用旧部署的 zt-nginx：acme.sh 续期后的重载命令与运维习惯都认这个名字（runbook「检查证书」）。
+# 因此启动前旧 compose 项目（zhitong）里的 zt-nginx 必须已经停掉并删除，否则名字冲突、起不来。
+#
+# 宿主路径原样挂到容器里的同一路径，nginx/ztsgai.conf 在容器与宿主两种模式下一字不改。
+# /opt/ztsgai 整个父目录只读挂载：deploy.sh 用改名替换 /opt/ztsgai/site，
+# 若只挂 site 目录本身，容器会继续指向改名前的旧目录。
+name: ztsgai
+
+services:
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: zt-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /opt/ztsgai/nginx/conf.d:/etc/nginx/conf.d:ro
+      - /opt/ztsgai:/opt/ztsgai:ro
+      - /opt/zhitong/nginx/ssl:/opt/zhitong/nginx/ssl:ro
+      - /opt/zhitong/nginx/html:/opt/zhitong/nginx/html:ro
+      - /opt/ztsgai/logs/nginx:/var/log/nginx
+    deploy:
+      resources:
+        limits: {memory: 256m}
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}

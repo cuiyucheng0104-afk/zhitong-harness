@@ -1,0 +1,22 @@
+@charset "UTF-8";
+:root {
+  --brand-navy: #0b347d;
+  --brand-blue: #0666f5;
+  --brand-cyan: #00b3ec;
+  --brand-green: #12c68b;
+  --ink: #162943;
+  --canvas: #f5f8fd;
+  --surface: #fff;
+  --text-muted: #5c6d82;
+  --line: #d9e4f0;
+  --blue-tint: #eaf2ff;
+  --green-tint: #e6f8f0;
+  --success-text: #137a53;
+  --warning-bg: #fff3d6;
+  --warning-text: #825600;
+  --font-display:
+    'Source Han Sans SC', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-body: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+  --shadow-workbench: 0 24px 64px rgba(11, 52, 125, 0.1), 0 4px 16px rgba(11, 52, 125, 0.05);
+}

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0B347D" />
+    <meta
+      name="description"
+      content="智通数工AI，造价咨询公司的对话式工作台。用对话读资料、做核对、算指标、写报告，让资料、计算和成果有据可查。"
+    />
+    <title>智通数工AI · 造价咨询公司的对话式工作台</title>
+    <link rel="icon" href="./favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <noscript>
+      <style>
+        .feature-group[hidden],
+        .role-panel[hidden] {
+          display: block !important;
+        }
+        .feature-group {
+          padding: 16px;
+          min-height: 0;
+          margin-top: 16px;
+        }
+        .feature-group::before {
+          display: none;
+        }
+        .feature-item > summary {
+          width: 100%;
+          margin: 0;
+        }
+        .feature-item::details-content {
+          content-visibility: visible;
+          display: block;
+        }
+        .feature-detail {
+          position: static;
+          min-height: 0;
+          padding: 24px;
+        }
+        .capability-tabs,
+        .role-tabs,
+        .scenario-tabs,
+        .replay-button,
+        .header-cta,
+        .hero-actions button,
+        .acquire-action,
+        .footer-main button,
+        .source-link,
+        .menu-toggle,
+        .task-links button {
+          display: none !important;
+        }
+        .amount-button {
+          pointer-events: none;
+          border-bottom: 0;
+        }
+        .role-panel + .role-panel {
+          margin-top: 30px;
+        }
+      </style>
+    </noscript>
+  </head>
+  <body>
+    <div id="app"><!--app-html--></div>
+    <noscript
+      ><p style="padding: 16px; text-align: center">
+        当前正在浏览静态页面。启用 JavaScript 后可切换工作示例、岗位与能力，并查看交付说明。
+      </p></noscript
+    >
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
