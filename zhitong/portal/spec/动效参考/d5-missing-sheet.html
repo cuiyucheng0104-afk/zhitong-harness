@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D5 404 图纸缺页</title>
+<style>
+:root{
+  --ink:#162943;--navy:#0b347d;--navy-900:#082457;--blue:#0666f5;--green:#12c68b;--muted:#5c6d82;
+  --grid-line:#dce8f4;--grid-line-strong:#c5d6ea;--line:#d9e4f0;
+  --ease-out:cubic-bezier(.22,1,.36,1);--ease-in-out:cubic-bezier(.65,0,.35,1);
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:"PingFang SC","Microsoft YaHei","Noto Sans SC","WenQuanYi Zen Hei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:16px/1.8 var(--sans);color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+button{font:inherit}
+/* ---------- reference chrome ---------- */
+.refbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;height:40px;padding:0 16px;background:rgba(255,255,255,.95);border-bottom:1px solid var(--grid-line);font:12px/1 var(--mono);color:var(--muted)}
+.refbar a{color:var(--navy);text-decoration:none}.refbar b{color:var(--ink);font-weight:600}.refbar .sp{flex:1}
+.refbar button{height:26px;padding:0 10px;border:1px solid var(--grid-line-strong);border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font:12px var(--mono)}
+.refbar button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.refbar output{min-width:150px;text-align:right}
+@media (max-width:767px){.refbar .desc,.refbar output{display:none}}
+/* ---------- page mock: 404 per 06 §7.16 (navy area, no content below) ---------- */
+.site-header{height:64px;display:flex;align-items:center;padding:0 max(20px,calc((100% - 1248px)/2));border-bottom:1px solid var(--line);font-weight:700}
+.container{width:min(1248px,calc(100% - 192px));margin-inline:auto}
+.nf{color:#fff;min-height:calc(100vh - 104px);display:flex;align-items:center;padding:80px 0;
+  /* D6 static navy grid (deco-navy-grid) */
+  background-color:var(--navy-900);
+  background-image:linear-gradient(to right,rgba(255,255,255,.075) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.075) 1px,transparent 1px),linear-gradient(to right,rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:120px 120px,120px 120px,24px 24px,24px 24px;background-position:-1px -1px}
+.nf-grid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr);gap:48px;align-items:center}
+.nf h1{margin:0;font-size:44px;line-height:1.25}
+.nf p{margin:18px 0 0;color:rgba(255,255,255,.8);font-size:17px}
+.nf .actions{display:flex;gap:16px;margin-top:32px}
+.nf .actions a{display:inline-flex;align-items:center;height:46px;padding:0 20px;border-radius:10px;text-decoration:none;font-size:15px}
+.nf .primary{background:#fff;color:var(--navy);font-weight:600}.nf .ghost{color:#fff;border:1px solid rgba(255,255,255,.4)}
+@media (max-width:1023px){.container{width:calc(100% - 96px)}.nf-grid{grid-template-columns:1fr}}
+@media (max-width:767px){.container{width:calc(100% - 40px)}.nf{padding:48px 0;align-items:flex-start}.nf h1{font-size:30px}.nf p{font-size:16px}}
+
+/* ---------- D5 MissingSheet (component styles) ---------- */
+.ms{display:block;width:100%;height:auto;overflow:visible}
+.ms text{font-family:var(--sans)}
+.ms .mono{font-family:var(--mono)}
+/* End state is the base style; animations only describe how elements arrive (no JS needed, print-safe). */
+.ms .d{stroke-dasharray:1 1;animation:ms-draw calc(var(--d,.6)*1s) var(--ease-out) calc(var(--t,0)*1s) both}
+.ms .f{animation:ms-fade .4s var(--ease-out) calc(var(--t,0)*1s) both}
+.ms .p{transform-box:fill-box;transform-origin:center;animation:ms-pop .38s var(--ease-out) calc(var(--t,0)*1s) both}
+.ms .stamp{transform-box:fill-box;transform-origin:center;animation:ms-stamp .5s cubic-bezier(.3,1.6,.5,1) calc(var(--t,0)*1s) both}
+.ms .roam{animation:ms-roam 15s var(--ease-in-out) 4.4s infinite both}
+@keyframes ms-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes ms-fade{from{opacity:0}}
+@keyframes ms-pop{from{opacity:0;transform:scale(.2)}}
+@keyframes ms-stamp{from{opacity:0;transform:scale(1.6) rotate(-14deg)}to{opacity:1;transform:scale(1) rotate(-8deg)}}
+/* Crosshair searches the missing area: move, hold, move… (keyframe easing applies per segment). */
+@keyframes ms-roam{
+  0%,10%{transform:translate(318px,92px)} 18%,30%{transform:translate(372px,118px)} 38%,50%{transform:translate(334px,176px)}
+  58%,70%{transform:translate(380px,186px)} 78%,90%{transform:translate(308px,140px)} 100%{transform:translate(318px,92px)}}
+.ms.paused *{animation-play-state:paused !important}
+@media (prefers-reduced-motion:reduce){.ms *{animation:none !important}}
+.ms.still *{animation:none !important}
+@media print{.ms *{animation:none !important}}
+</style>
+</head>
+<body>
+<header class="refbar">
+  <a href="index.html">← 动效参考</a><b>D5 · MissingSheet</b><span class="desc">404 页 · 图纸缺页（纯 SVG + CSS 动画）</span>
+  <span class="sp"></span><output id="stat">CSS 动画 · 无 rAF</output>
+  <button id="replay" type="button">重播</button><button id="still" type="button" aria-pressed="false">静态终帧</button>
+</header>
+<div class="site-header">智通数工AI</div>
+<main class="nf">
+  <div class="container nf-grid">
+    <div>
+      <h1>页面不存在</h1>
+      <p>您访问的地址没有对应的页面。可能是链接已更改，或地址有误。</p>
+      <div class="actions"><a class="primary" href="#">回到首页</a><a class="ghost" href="#">查看文档</a></div>
+    </div>
+    <!-- D5: generated at build time in production (static SVG in the prerendered 404.html) -->
+    <div id="sheet-host" aria-hidden="true"></div>
+  </div>
+</main>
+
+<script>
+(() => {
+'use strict';
+/**
+ * Builds the sheet SVG. Units are millimetres on an A3 landscape sheet (420 × 297, GB/T 50001:
+ * binding margin a = 25, other margins c = 5). In production this function runs at build time
+ * and the markup is inlined into 404.html; the page itself then needs no JavaScript.
+ * @typedef {Object} MissingSheetConfig
+ * @property {number[]} axesX   x of axes 1..6
+ * @property {number[]} axesY   y of axes A..D (A at the bottom)
+ * @property {number} matchX    x of the match line (接合线); the plan stops here
+ * @property {{x0:number,y0:number,x1:number,y1:number}} missing  revision-cloud rectangle
+ * @property {number} cloudArc  mean chord of one cloud arc, mm
+ * @property {string} ink       line colour on navy
+ * @property {string} warm      revision-cloud / stamp colour
+ */
+/** @type {MissingSheetConfig} */
+const CFG = { axesX: [70, 132, 194, 256, 318, 380], axesY: [214, 160, 106, 52], matchX: 287,
+  missing: { x0: 296, y0: 62, x1: 394, y1: 206 }, cloudArc: 11, ink: '#cfe0ff', warm: '#ffb48a' };
+const NAVY = '#082457';
+
+/** Deterministic pseudo-random (same sheet every build). */
+let seed = 7;
+const rand = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+const parts = [];
+const add = (s) => parts.push(s);
+const st = (t, d) => `style="--t:${t.toFixed(2)}${d ? `;--d:${d}` : ''}"`;
+/** A drawable path: normalised length so CSS can draw it with stroke-dashoffset. */
+const draw = (d, t, dur, attrs = '') => add(`<path class="d" pathLength="1" d="${d}" ${st(t, dur)} ${attrs}/>`);
+
+// 1. Sheet edge and drawing frame (图框), title block (标题栏)
+draw('M0 0H420V297H0Z', 0, 0.6, `stroke="${CFG.ink}" stroke-opacity=".35" stroke-width=".35"`);
+draw('M25 5H415V292H25Z', 0.15, 0.7, `stroke="${CFG.ink}" stroke-opacity=".85" stroke-width="1"`);
+const tb = { x0: 285, y0: 262, x1: 415, y1: 292 };
+draw(`M${tb.x0} ${tb.y1}V${tb.y0}H${tb.x1}`, 0.5, 0.45, `stroke="${CFG.ink}" stroke-opacity=".8" stroke-width=".7"`);
+[[`M${tb.x0} 272H415`, 0.6], [`M${tb.x0} 282H415`, 0.64], ['M310 262V292', 0.68], ['M360 272V292', 0.72], ['M380 272V292', 0.76]]
+  .forEach(([d, t]) => draw(d, t, 0.35, `stroke="${CFG.ink}" stroke-opacity=".5" stroke-width=".35"`));
+const tbText = [[289, 269, '工程名称'], [314, 269, '智通数工AI 门户'], [289, 279, '图名'], [314, 279, '页面不存在'], [364, 279, '图号'], [384, 279, 'A-404', 1],
+  [289, 289, '比例'], [314, 289, '1:100', 1], [364, 289, '页次'], [384, 289, '404 / —', 1]];
+add(`<g class="f" ${st(0.95)} fill="${CFG.ink}" fill-opacity=".8" font-size="4.2">${tbText.map(([x, y, s, m]) => `<text x="${x}" y="${y}"${m ? ' class="mono"' : ''}>${s}</text>`).join('')}</g>`);
+
+// 2. Axes: thin dash-dot lines with bubbles (I, O, Z unused). Axes past the match line stay faint.
+const AX = CFG.axesX, AY = CFG.axesY, L = 'ABCD';
+AX.forEach((x, i) => {
+  const lost = x > CFG.matchX;
+  add(`<line class="f" ${st(0.7 + i * 0.05)} x1="${x}" y1="38" x2="${x}" y2="228" stroke="${CFG.ink}" stroke-opacity="${lost ? 0.16 : 0.32}" stroke-width=".3" stroke-dasharray="7 2 1 2"/>`);
+  add(`<g class="p" ${st(0.75 + i * 0.05)}><circle cx="${x}" cy="31" r="4.5" fill="${NAVY}" stroke="${CFG.ink}" stroke-opacity="${lost ? 0.3 : 0.6}" stroke-width=".35"/><text class="mono" x="${x}" y="32.6" text-anchor="middle" font-size="4.4" fill="${CFG.ink}" fill-opacity="${lost ? 0.35 : 0.75}">${i + 1}</text></g>`);
+});
+AY.forEach((y, j) => {
+  add(`<line class="f" ${st(0.8 + j * 0.05)} x1="52" y1="${y}" x2="${CFG.matchX + 112}" y2="${y}" stroke="${CFG.ink}" stroke-opacity=".28" stroke-width=".3" stroke-dasharray="7 2 1 2"/>`);
+  add(`<g class="p" ${st(0.85 + j * 0.05)}><circle cx="46" cy="${y}" r="4.5" fill="${NAVY}" stroke="${CFG.ink}" stroke-opacity=".6" stroke-width=".35"/><text class="mono" x="46" y="${y + 1.6}" text-anchor="middle" font-size="4.4" fill="${CFG.ink}" fill-opacity=".75">${L[j]}</text></g>`);
+});
+
+// 3. Dimension chain over axes 1-4 (45° ticks, values in mm)
+draw(`M${AX[0]} 42H${AX[3]}`, 1.0, 0.5, `stroke="${CFG.ink}" stroke-opacity=".5" stroke-width=".3"`);
+AX.slice(0, 4).forEach((x, i) => draw(`M${x - 1.6} 43.6L${x + 1.6} 40.4`, 1.3 + i * 0.03, 0.2, `stroke="${CFG.ink}" stroke-width=".6"`));
+add(`<g class="f" ${st(1.35)} fill="${CFG.ink}" fill-opacity=".7" font-size="3.8" class="mono">${AX.slice(0, 3).map((x, i) => `<text class="mono" x="${(x + AX[i + 1]) / 2}" y="40" text-anchor="middle">6 200</text>`).join('')}</g>`);
+
+// 4. Walls: centre-line polylines drawn twice (wide ink, then narrow navy) = double-line walls.
+//    Openings are gaps between segments. Everything stops at the match line.
+const M = CFG.matchX;
+const walls = [
+  'M70 214V200', 'M70 170V100', 'M70 70V52H84', 'M118 52H146', 'M180 52H208', `M242 52H${M}`,          // left + top (window gaps)
+  'M70 214H146', `M180 214H208`, `M242 214H${M}`,                                                     // bottom
+  'M70 124H100', 'M112 124H160', 'M172 124H220', `M232 124H${M}`,                                      // corridor north wall (door gaps)
+  'M70 142H160', 'M172 142H220', `M232 142H${M}`,                                                     // corridor south wall
+  'M132 52V124', 'M194 52V124', 'M132 142V214', 'M194 142V214', 'M256 142V214', 'M256 52V124',          // partitions
+];
+walls.forEach((d, i) => draw(d, 1.15 + i * 0.045, 0.45, `stroke="${CFG.ink}" stroke-width="2.6" stroke-linecap="square"`));
+walls.forEach((d, i) => draw(d, 1.15 + i * 0.045, 0.45, `stroke="${NAVY}" stroke-width="1.5" stroke-linecap="square"`));
+// windows: three thin lines in each exterior opening
+[['M84 52H118', 'h'], ['M146 52H180', 'h'], ['M208 52H242', 'h'], ['M146 214H180', 'h'], ['M208 214H242', 'h'], ['M70 100V170', 'v'], ['M70 200V214', 'v']]
+  .forEach(([d, o], i) => { [-0.9, 0, 0.9].forEach((k) => draw(d, 2.15 + i * 0.04, 0.3, `stroke="${CFG.ink}" stroke-opacity=".6" stroke-width=".25" transform="translate(${o === 'v' ? k : 0} ${o === 'h' ? k : 0})"`)); });
+// columns at axis intersections inside the drawn half
+AX.filter((x) => x < M).forEach((x, i) => AY.forEach((y, j) => add(`<rect class="p" ${st(1.95 + (i + j) * 0.03)} x="${x - 2.5}" y="${y - 2.5}" width="5" height="5" fill="${CFG.ink}" fill-opacity=".9"/>`)));
+// doors: leaf + quarter-circle swing into the rooms
+[[100, 124, -1], [160, 124, -1], [220, 124, -1], [160, 142, 1], [220, 142, 1]].forEach(([x, y, s], i) => {
+  draw(`M${x} ${y}V${y + s * 12}`, 2.2 + i * 0.05, 0.25, `stroke="${CFG.ink}" stroke-opacity=".8" stroke-width=".35"`);
+  draw(`M${x} ${y + s * 12}A12 12 0 0 ${s > 0 ? 0 : 1} ${x + 12} ${y}`, 2.3 + i * 0.05, 0.35, `stroke="${CFG.ink}" stroke-opacity=".5" stroke-width=".25"`);
+});
+// stair in bay 1-2 / A-B
+const tread = []; for (let y = 152; y <= 204; y += 4) tread.push(`M80 ${y}H122`);
+draw(tread.join(''), 2.35, 0.5, `stroke="${CFG.ink}" stroke-opacity=".45" stroke-width=".25"`);
+draw('M101 206V152M98 157L101 152L104 157', 2.6, 0.4, `stroke="${CFG.ink}" stroke-opacity=".7" stroke-width=".3"`);
+add(`<g class="f" ${st(2.5)} fill="${CFG.ink}" fill-opacity=".55" font-size="4.6">
+  <text x="101" y="92" text-anchor="middle">办公室</text><text x="163" y="92" text-anchor="middle">办公室</text><text x="225" y="92" text-anchor="middle">会议室</text>
+  <text x="178" y="135" text-anchor="middle">走廊</text><text x="163" y="182" text-anchor="middle">办公室</text><text x="225" y="182" text-anchor="middle">办公室</text>
+  <text x="270" y="182" text-anchor="middle">资料室</text><text x="101" y="217.5" text-anchor="middle" font-size="3.6">楼梯间</text></g>`);
+
+// 5. Match line (接合线): heavy dash-dot; the plan continues on sheet A-404, which is missing.
+add(`<line class="f" ${st(2.7)} x1="${M}" y1="40" x2="${M}" y2="230" stroke="#ffffff" stroke-opacity=".85" stroke-width=".8" stroke-dasharray="9 2 1.5 2"/>`);
+add(`<text class="f mono" ${st(2.8)} x="${M + 3}" y="236" font-size="4" fill="#ffffff" fill-opacity=".85">接 A-404</text>`);
+
+// 6. Revision cloud (修订云线) around the missing area: outward arcs with jittered chords.
+function cloud({ x0, y0, x1, y1 }, arc) {
+  const pts = [], edge = (ax, ay, bx, by) => {
+    const len = Math.hypot(bx - ax, by - ay), n = Math.max(2, Math.round(len / arc));
+    let acc = 0; const cuts = Array.from({ length: n }, () => (acc += 0.75 + rand() * 0.5));
+    cuts.forEach((c) => { const k = c / acc; pts.push([ax + (bx - ax) * k, ay + (by - ay) * k]); });
+  };
+  edge(x0, y0, x1, y0); edge(x1, y0, x1, y1); edge(x1, y1, x0, y1); edge(x0, y1, x0, y0);   // clockwise
+  let d = `M${x0} ${y0}`;
+  for (const [x, y] of pts) d += `A${(arc * 0.62).toFixed(1)} ${(arc * 0.62).toFixed(1)} 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}`; // sweep 1 = outward
+  return d;
+}
+draw(cloud(CFG.missing, CFG.cloudArc), 2.95, 0.9, `stroke="${CFG.warm}" stroke-width=".7" stroke-linejoin="round"`);
+// index symbol (索引符号, Ø10) with leader and note
+draw(`M${(CFG.missing.x0 + CFG.missing.x1) / 2} ${CFG.missing.y1 + 4}V239`, 3.7, 0.25, `stroke="${CFG.warm}" stroke-width=".35"`);
+const ix = (CFG.missing.x0 + CFG.missing.x1) / 2;
+draw(`M${ix - 5} 244A5 5 0 1 1 ${ix + 5} 244A5 5 0 1 1 ${ix - 5} 244H${ix + 5}`, 3.85, 0.35, `stroke="${CFG.warm}" stroke-width=".4"`);
+add(`<g class="f mono" ${st(4.0)} fill="${CFG.warm}" font-size="3.4" text-anchor="middle"><text class="mono" x="${ix}" y="242.6">1</text><text class="mono" x="${ix}" y="248.2">404</text></g>`);
+add(`<text class="f" ${st(4.05)} x="${ix + 8}" y="245.4" font-size="4.2" fill="${CFG.warm}">缺页：本页不在图纸目录中</text>`);
+
+// 7. Review stamp (审核章) lands in the empty area
+add(`<g class="stamp" ${st(3.75)} transform="rotate(-8)"><g transform="translate(345 134)">
+  <rect x="-25" y="-11" width="50" height="22" rx="2.5" fill="none" stroke="${CFG.warm}" stroke-width=".9"/>
+  <rect x="-22.5" y="-8.5" width="45" height="17" rx="1.5" fill="none" stroke="${CFG.warm}" stroke-width=".35"/>
+  <text x="0" y="2.6" text-anchor="middle" font-size="9" font-weight="700" letter-spacing="3" fill="${CFG.warm}">缺 页</text>
+  <text class="mono" x="0" y="7.3" text-anchor="middle" font-size="2.8" letter-spacing=".6" fill="${CFG.warm}">A-404 · NOT FOUND</text></g></g>`);
+
+// 8. Searching crosshair (same vocabulary as D1): hairlines fade with userSpaceOnUse gradients.
+add(`<defs><linearGradient id="msh" gradientUnits="userSpaceOnUse" x1="-34" y1="0" x2="34" y2="0"><stop offset="0" stop-color="#8fc0ff" stop-opacity="0"/><stop offset=".5" stop-color="#8fc0ff" stop-opacity=".9"/><stop offset="1" stop-color="#8fc0ff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="msv" gradientUnits="userSpaceOnUse" x1="0" y1="-30" x2="0" y2="30"><stop offset="0" stop-color="#8fc0ff" stop-opacity="0"/><stop offset=".5" stop-color="#8fc0ff" stop-opacity=".9"/><stop offset="1" stop-color="#8fc0ff" stop-opacity="0"/></linearGradient></defs>
+  <g class="f" ${st(4.3)}><g class="roam" transform="translate(318 92)">
+  <line x1="-34" x2="34" y1="0" y2="0" stroke="url(#msh)" stroke-width=".35"/><line x1="0" x2="0" y1="-30" y2="30" stroke="url(#msv)" stroke-width=".35"/>
+  <rect x="-2" y="-2" width="4" height="4" fill="${NAVY}" stroke="#8fc0ff" stroke-width=".45"/>
+  <text class="mono" x="4" y="-4" font-size="3.4" fill="#8fc0ff">X ?  Y ?</text></g></g>`);
+
+const host = document.getElementById('sheet-host');
+host.innerHTML = `<svg class="ms" viewBox="-2 -2 424 301" fill="none" aria-hidden="true" focusable="false">${parts.join('')}</svg>`;
+const svg = host.firstElementChild;
+
+/* Pause the idle crosshair when the tab is hidden or the sheet is off screen (00 §6.8). */
+const setPaused = () => svg.classList.toggle('paused', document.hidden || !visible);
+let visible = true;
+new IntersectionObserver((es) => { visible = es[es.length - 1].isIntersecting; setPaused(); }).observe(svg);
+document.addEventListener('visibilitychange', setPaused);
+
+/* ---------------- reference chrome ---------------- */
+window.__deco = { replay };
+function replay() { host.innerHTML = host.innerHTML; } // re-inserting restarts CSS animations
+document.getElementById('replay').onclick = () => { replay(); location.reload(); };
+const stillBtn = document.getElementById('still');
+stillBtn.onclick = () => { const on = stillBtn.getAttribute('aria-pressed') !== 'true'; stillBtn.setAttribute('aria-pressed', String(on)); host.firstElementChild.classList.toggle('still', on); };
+})();
+</script>
+</body>
+</html>
