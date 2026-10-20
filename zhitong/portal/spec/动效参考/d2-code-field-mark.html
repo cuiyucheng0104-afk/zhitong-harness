@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D2 清单编码字符场</title>
+<style>
+:root{
+  --ink:#162943;--navy:#0b347d;--navy-900:#082457;--blue:#0666f5;--green:#12c68b;--muted:#5c6d82;
+  --grid-line:#dce8f4;--grid-line-strong:#c5d6ea;--canvas:#f5f8fd;--line:#d9e4f0;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:"PingFang SC","Microsoft YaHei","Noto Sans SC","WenQuanYi Zen Hei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:16px/1.8 var(--sans);color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+button{font:inherit}
+/* ---------- reference chrome ---------- */
+.refbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;height:40px;padding:0 16px;background:rgba(255,255,255,.95);border-bottom:1px solid var(--grid-line);font:12px/1 var(--mono);color:var(--muted)}
+.refbar a{color:var(--navy);text-decoration:none}.refbar b{color:var(--ink);font-weight:600}.refbar .sp{flex:1}
+.refbar button{height:26px;padding:0 10px;border:1px solid var(--grid-line-strong);border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font:12px var(--mono)}
+.refbar button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.refbar output{min-width:190px;text-align:right}
+@media (max-width:767px){.refbar .desc,.refbar output{display:none}}
+/* ---------- page mock ---------- */
+.container{width:min(1248px,calc(100% - 192px));margin-inline:auto}
+.section{padding:96px 0}
+.ctx{font-size:14px;color:var(--muted);margin:0 0 24px;font-family:var(--mono)}
+.panel{position:relative;isolation:isolate;overflow:hidden;border-radius:16px;color:#fff;padding:56px 64px;
+  display:grid;grid-template-columns:5fr 4fr 3fr;gap:24px;align-items:center;min-height:360px;
+  /* D6 static base: hairline blueprint grid on navy (no JS, no animation) */
+  background-color:var(--navy-900);
+  background-image:linear-gradient(to right,rgba(255,255,255,.075) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.075) 1px,transparent 1px),linear-gradient(to right,rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:120px 120px,120px 120px,24px 24px,24px 24px;background-position:-1px -1px}
+.copy{position:relative;z-index:1}
+.copy .eyebrow{margin:0 0 14px;color:#b5d8ff;font-size:14px}
+.copy h2{margin:0;font-size:40px;line-height:1.3;letter-spacing:-.02em}
+.copy p{margin:18px 0 0;font-size:14px;line-height:1.95;color:#d8e7ff}
+.copy ul{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:13px}
+.copy li span{font:12px var(--mono);color:#b5d8ff;margin-left:6px}
+.action{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px}
+.btn-white{height:48px;padding:0 24px;border-radius:10px;border:0;background:#fff;color:var(--navy);font-size:16px;font-weight:600}
+.action small{font-size:12px;color:#c1d9fa}
+/* ---------- D2 CodeFieldMark (component styles) ---------- */
+.cf-slot{position:relative;align-self:stretch;margin:-56px 0;min-height:240px;pointer-events:auto}
+.cf-slot canvas{position:absolute;inset:0;width:100%;height:100%}
+@media (max-width:1023px){.container{width:calc(100% - 96px)}.panel{grid-template-columns:1fr 1fr;padding:48px}.cf-slot{display:none}}
+@media (max-width:767px){.container{width:calc(100% - 40px)}.section{padding:56px 0}
+  .panel{grid-template-columns:1fr;padding:0 24px 32px;gap:20px}
+  .cf-slot{display:block;order:-1;margin:0 -24px;height:200px;min-height:0}
+  .copy h2{font-size:30px}.action{align-items:flex-start}}
+</style>
+</head>
+<body>
+<header class="refbar">
+  <a href="index.html">← 动效参考</a><b>D2 · CodeFieldMark</b><span class="desc">清单编码字符场汇成品牌图形（安装区）</span>
+  <span class="sp"></span><output id="stat">—</output>
+  <button id="replay" type="button">重播</button><button id="still" type="button" aria-pressed="false">静态终帧</button>
+</header>
+<main class="section">
+  <div class="container">
+    <p class="ctx">#install · 安装与交付（05 章布局，深色面板中间为 07 章装饰位）</p>
+    <div class="panel">
+      <div class="copy">
+        <p class="eyebrow">安装与交付</p>
+        <h2>装好，导入，开始用。</h2>
+        <p>支持 Mac 与 Windows，内置运行环境与 DWG 转换组件。<br>公司专属配置包，由服务方单独交付。</p>
+        <ul><li>macOS（Apple 芯片）<span>412 MB</span></li><li>Windows（x64）<span>388 MB</span></li></ul>
+      </div>
+      <div class="cf-slot" data-deco-host aria-hidden="true"><canvas></canvas></div>
+      <div class="action">
+        <button class="btn-white" type="button">获取安装包 →</button>
+        <small>v1.1.0 · 无需另行安装 Python</small>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+(() => {
+'use strict';
+
+/** Verbatim copy of zhitong/brand/brand-mark.svg (production: `import raw from '…/brand-mark.svg?raw'`). */
+const MARK_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="brand" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#00B3EC"/><stop offset="1" stop-color="#0666F5"/></linearGradient></defs><rect width="64" height="64" rx="17" fill="url(#brand)"/><g transform="rotate(-43 32 32)" stroke-linecap="round"><path d="M15 32h10m14 0h10M32 15v10m0 14v10" stroke="#FFF" stroke-width="7.5"/><path d="M17 19h5m20 0h5M17 45h5m20 0h5" stroke="#12D99F" stroke-width="5"/></g></svg>';
+
+/**
+ * 12-digit GB 50854-2013 bill codes from the chapters in spec 00 §8.2
+ * (0101 earthwork, 0104 masonry, 0105 concrete, 0108 doors/windows, 0109 roofing, 0117 measures).
+ */
+const CODES = ['010101001001','010101002001','010101004001','010103001001','010401001001','010402001001',
+  '010501001001','010502001001','010503002001','010504001001','010505001001','010506001001','010515001001',
+  '010516003001','010801001001','010802001001','010807001001','010902001001','010902003001','010904002001',
+  '011701001001','011702001001','011702002001','011703001001'];
+
+/**
+ * @typedef {Object} CodeFieldConfig
+ * @property {number} fontPx        glyph size, CSS px
+ * @property {number} cellW         cell pitch, CSS px
+ * @property {number} cellH
+ * @property {number} markScale     mark edge as a fraction of min(slot width, slot height)
+ * @property {[number,number]} fieldAlpha  alpha range for codes outside the mark (before vignette)
+ * @property {[number,number]} vignette    elliptical fade: full inside r0, zero at r1 (1 = slot edge)
+ * @property {number} lockStart     s before the first cell locks
+ * @property {number} lockSpanIn    s for the lock wave to cross the mark (centre → edge)
+ * @property {number} lockSpanOut   s for the wave to cross the surrounding field
+ * @property {number} lockJitter    random extra delay per cell, s
+ * @property {number} flashDur      s a newly locked cell takes to fade from white to its colour
+ * @property {number} twinkleRate   fraction of cells per second that briefly re-scramble when idle
+ * @property {number} glintPeriod   s between diagonal glints over the mark
+ * @property {number} glintDur      s one glint takes to cross
+ * @property {number} pointerR      decode radius under a fine pointer, CSS px
+ * @property {number} dprCap
+ * @property {number} budgetMs      per-frame script budget; sustained overrun drops DPR to 1
+ */
+/** @type {CodeFieldConfig} */
+const CFG = { fontPx: 11, cellW: 8, cellH: 12, markScale: 0.72, fieldAlpha: [0.12, 0.3], vignette: [0.42, 1],
+  lockStart: 0.45, lockSpanIn: 0.95, lockSpanOut: 0.8, lockJitter: 0.25, flashDur: 0.55,
+  twinkleRate: 0.012, glintPeriod: 8, glintDur: 1.6, pointerR: 34, dprCap: 2, budgetMs: 3 };
+const FIELD_COLOR = '#6f9be8';
+const GLYPHS = '0123456789·';
+const DOT = 10, BLANK = 15;
+const CLS_OUT = 0, CLS_BODY = 1, CLS_LIGHT = 2, CLS_ACC = 3;
+const STEPS = 12;
+const ROW_LIGHT = STEPS, ROW_ACC = STEPS + 1, ROW_FIELD = STEPS + 2, ROW_FLASH = STEPS + 3, ROW_FLASH_BOLD = STEPS + 4;
+const MONO = getComputedStyle(document.documentElement).getPropertyValue('--mono');
+
+const slot = document.querySelector('.cf-slot');
+const cv = slot.querySelector('canvas');
+const ctx = cv.getContext('2d');
+const mqReduce = matchMedia('(prefers-reduced-motion: reduce)');
+const mqFine = matchMedia('(hover: hover) and (pointer: fine)');
+
+const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+const smooth = (a, b, v) => { const t = clamp01((v - a) / (b - a)); return t * t * (3 - 2 * t); };
+const hexRgb = (h) => { h = h.replace('#', ''); if (h.length === 3) h = [...h].map((c) => c + c).join(''); const n = parseInt(h, 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+const isWhite = (c) => { const [r, g, b] = hexRgb(c); return r > 235 && g > 235 && b > 235; };
+
+/* ---------------- brand mark: parsed from the SVG source, drawn with Path2D (no image, no canvas taint) ---------------- */
+/** @returns {{box:number[], rect:{x:number,y:number,w:number,h:number,rx:number}, grad:{x1:number,y1:number,x2:number,y2:number,stops:{o:number,c:string}[]}, rot:{deg:number,cx:number,cy:number}|null, strokes:{d:string,color:string,width:number,cap:CanvasLineCap}[]}} */
+function parseMark(text) {
+  const svg = new DOMParser().parseFromString(text, 'image/svg+xml').documentElement;
+  const num = (el, a, d = 0) => (el && el.hasAttribute(a) ? parseFloat(el.getAttribute(a)) : d);
+  const rect = svg.querySelector('rect'), lg = svg.querySelector('linearGradient'), g = svg.querySelector('g');
+  const m = /rotate\(\s*([-\d.]+)[\s,]+([-\d.]+)[\s,]+([-\d.]+)/.exec(g?.getAttribute('transform') || '');
+  return {
+    box: svg.getAttribute('viewBox').split(/[\s,]+/).map(Number),
+    rect: { x: num(rect, 'x'), y: num(rect, 'y'), w: num(rect, 'width'), h: num(rect, 'height'), rx: num(rect, 'rx') },
+    grad: { x1: num(lg, 'x1', 0), y1: num(lg, 'y1', 0), x2: num(lg, 'x2', 1), y2: num(lg, 'y2', 0),
+      stops: [...svg.querySelectorAll('stop')].map((s) => ({ o: num(s, 'offset'), c: s.getAttribute('stop-color') })) },
+    rot: m ? { deg: +m[1], cx: +m[2], cy: +m[3] } : null,
+    strokes: [...svg.querySelectorAll('g path')].map((p) => ({ d: p.getAttribute('d'), color: p.getAttribute('stroke'),
+      width: num(p, 'stroke-width', 1), cap: /** @type {CanvasLineCap} */ (p.getAttribute('stroke-linecap') || g.getAttribute('stroke-linecap') || 'butt') })),
+  };
+}
+const MARK = parseMark(MARK_SVG);
+const ACC_COLOR = MARK.strokes.find((s) => !isWhite(s.color))?.color || '#12D99F';
+function gradColor(t) {
+  const st = MARK.grad.stops; let i = 0;
+  while (i < st.length - 2 && t > st[i + 1].o) i++;
+  const a = st[i], b = st[Math.min(i + 1, st.length - 1)], k = b.o > a.o ? clamp01((t - a.o) / (b.o - a.o)) : 0;
+  const ca = hexRgb(a.c), cb = hexRgb(b.c);
+  return `rgb(${ca.map((v, j) => Math.round(v + (cb[j] - v) * k)).join(',')})`;
+}
+
+/* ---------------- state ---------------- */
+let W = 0, H = 0, dpr = 1, dprCap = CFG.dprCap, cols = 0, rows = 0, N = 0, offX = 0, offY = 0, introEnd = 0, markInfo = { cx: 0, cy: 0, S: 0 };
+/** @type {HTMLCanvasElement} */ let atlas = document.createElement('canvas');
+let glyph = new Uint8Array(0), cls = new Uint8Array(0), step = new Uint8Array(0), baseA = new Float32Array(0),
+  lockAt = new Float32Array(0), rnd = new Float32Array(0), scrUntil = new Float32Array(0), glintP = new Float32Array(0), last = new Int32Array(0);
+
+function buildAtlas() {
+  const rowsSpec = [];
+  for (let s = 0; s < STEPS; s++) rowsSpec.push([gradColor(s / (STEPS - 1)), 400]);
+  rowsSpec.push(['#ffffff', 700], [ACC_COLOR, 700], [FIELD_COLOR, 400], ['#ffffff', 400], ['#ffffff', 700]);
+  const cw = Math.round(CFG.cellW * dpr), ch = Math.round(CFG.cellH * dpr);
+  atlas.width = cw * GLYPHS.length; atlas.height = ch * rowsSpec.length;
+  const a = atlas.getContext('2d'); a.clearRect(0, 0, atlas.width, atlas.height);
+  a.textAlign = 'center'; a.textBaseline = 'middle';
+  rowsSpec.forEach(([color, weight], r) => {
+    a.font = `${weight} ${Math.round(CFG.fontPx * dpr)}px ${MONO}`; a.fillStyle = color;
+    for (let g = 0; g < GLYPHS.length; g++) a.fillText(GLYPHS[g], g * cw + cw / 2, r * ch + ch / 2 + 0.5 * dpr);
+  });
+}
+
+/** Rasterise the mark into class channels (R body, G white strokes, B accent strokes) and average per cell. */
+function sampleMark() {
+  const S = Math.round(Math.min(W, H) * CFG.markScale), mx = Math.round((W - S) / 2), my = Math.round((H - S) / 2);
+  markInfo = { cx: mx + S / 2, cy: my + S / 2, S };
+  const off = document.createElement('canvas'); off.width = W; off.height = H;
+  const c = off.getContext('2d', { willReadFrequently: true });
+  const [bx, by, bw] = MARK.box, k = S / bw, R = MARK.rect;
+  c.setTransform(k, 0, 0, k, mx - bx * k, my - by * k);
+  c.fillStyle = '#ff0000'; c.beginPath();
+  if (c.roundRect) c.roundRect(R.x, R.y, R.w, R.h, R.rx); else c.rect(R.x, R.y, R.w, R.h);
+  c.fill();
+  if (MARK.rot) { c.translate(MARK.rot.cx, MARK.rot.cy); c.rotate(MARK.rot.deg * Math.PI / 180); c.translate(-MARK.rot.cx, -MARK.rot.cy); }
+  for (const s of MARK.strokes) { c.strokeStyle = isWhite(s.color) ? '#00ff00' : '#0000ff'; c.lineWidth = s.width; c.lineCap = s.cap; c.stroke(new Path2D(s.d)); }
+  const px = c.getImageData(0, 0, W, H).data;
+  const G = MARK.grad, gdx = G.x2 - G.x1, gdy = G.y2 - G.y1, gl = gdx * gdx + gdy * gdy || 1;
+  for (let i = 0; i < N; i++) {
+    const x0 = offX + (i % cols) * CFG.cellW, y0 = offY + ((i / cols) | 0) * CFG.cellH;
+    let r = 0, gg = 0, b = 0, n = 0;
+    for (let y = y0; y < y0 + CFG.cellH && y < H; y++) for (let x = x0; x < x0 + CFG.cellW && x < W; x++) {
+      const p = (y * W + x) * 4, a = px[p + 3] / 255; r += px[p] * a; gg += px[p + 1] * a; b += px[p + 2] * a; n++;
+    }
+    n = n * 255 || 1; r /= n; gg /= n; b /= n;
+    const cx = x0 + CFG.cellW / 2, cy = y0 + CFG.cellH / 2;
+    if (gg > 0.3) { cls[i] = CLS_LIGHT; baseA[i] = Math.min(1, gg / 0.55); }
+    else if (b > 0.3) { cls[i] = CLS_ACC; baseA[i] = Math.min(1, b / 0.55); }
+    else if (r + gg + b > 0.12) { cls[i] = CLS_BODY; baseA[i] = 0.92 * Math.pow(Math.min(1, r + gg + b), 0.7); }
+    else cls[i] = CLS_OUT;
+    if (cls[i] !== CLS_OUT) {
+      const u = (cx - mx) / S, v = (cy - my) / S;
+      step[i] = Math.round(clamp01(((u - G.x1) * gdx + (v - G.y1) * gdy) / gl) * (STEPS - 1));
+    }
+  }
+}
+
+function layout() {
+  const r = slot.getBoundingClientRect();
+  W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
+  dpr = Math.min(dprCap, window.devicePixelRatio || 1);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.imageSmoothingEnabled = false;
+  cols = Math.floor(W / CFG.cellW); rows = Math.floor(H / CFG.cellH); N = cols * rows;
+  offX = Math.floor((W - cols * CFG.cellW) / 2); offY = Math.floor((H - rows * CFG.cellH) / 2);
+  glyph = new Uint8Array(N); cls = new Uint8Array(N); step = new Uint8Array(N); baseA = new Float32Array(N);
+  lockAt = new Float32Array(N); rnd = new Float32Array(N); scrUntil = new Float32Array(N); glintP = new Float32Array(N); last = new Int32Array(N).fill(-1);
+  buildAtlas(); sampleMark();
+  const ang = Math.PI / 4; let maxLock = 0;
+  for (let i = 0; i < N; i++) {
+    const c = i % cols, row = (i / cols) | 0;
+    // Code stream: rows of 12-digit codes separated by one blank, each row shifted.
+    const line = row * 7, pos = c + (row * 5) % 13, code = CODES[(line + Math.floor(pos / 13)) % CODES.length], k = pos % 13;
+    const inside = cls[i] !== CLS_OUT;
+    glyph[i] = k === 12 ? (inside ? DOT : BLANK) : code.charCodeAt(k) - 48;
+    rnd[i] = Math.random();
+    const x = offX + c * CFG.cellW + CFG.cellW / 2, y = offY + row * CFG.cellH + CFG.cellH / 2;
+    const d = Math.hypot((x - W / 2) / (W / 2), (y - H / 2) / (H / 2));
+    if (!inside) baseA[i] = (CFG.fieldAlpha[0] + (CFG.fieldAlpha[1] - CFG.fieldAlpha[0]) * rnd[i]) * (1 - smooth(CFG.vignette[0], CFG.vignette[1], d));
+    const sIn = Math.hypot(x - markInfo.cx, y - markInfo.cy) / (markInfo.S * 0.72);
+    lockAt[i] = CFG.lockStart + (inside ? CFG.lockSpanIn * clamp01(sIn) : CFG.lockSpanIn * 0.55 + CFG.lockSpanOut * clamp01(d)) + CFG.lockJitter * rnd[i];
+    maxLock = Math.max(maxLock, lockAt[i]);
+    // Glint coordinate: projection on the 45° diagonal, normalised over the mark.
+    glintP[i] = ((x - markInfo.cx) * Math.cos(ang) + (y - markInfo.cy) * Math.sin(ang)) / (markInfo.S * 0.75) * 0.5 + 0.5;
+  }
+  introEnd = maxLock + CFG.flashDur;
+  ctx.clearRect(0, 0, W, H);
+}
+
+/* ---------------- per-cell render with diffing: only cells whose look changed are redrawn ---------------- */
+const scramble = (i, t) => (Math.imul(i + 1, 2654435761) ^ Math.imul(Math.floor(t * 15 + rnd[i] * 15) + 7, 40503)) >>> 0;
+let mode = 'live';
+
+function render(t, still) {
+  const cwD = Math.round(CFG.cellW * dpr), chD = Math.round(CFG.cellH * dpr);
+  const fade = still ? 1 : clamp01(t / 0.35);
+  const glintOn = !still && mode === 'live' && t > introEnd;
+  const gpos = glintOn ? ((t - introEnd) % CFG.glintPeriod) / CFG.glintDur * 1.4 - 0.2 : -9;
+  let drawn = 0;
+  for (let i = 0; i < N; i++) {
+    let g, row, a, o = 0, orow = ROW_FLASH;
+    const c = cls[i];
+    if (!still && t < lockAt[i]) {                         // still scrambling: dim random digits
+      g = scramble(i, t) % 10; row = ROW_FIELD; a = fade * (0.1 + 0.12 * rnd[i]) * (c === CLS_OUT ? Math.min(1, baseA[i] * 6) : 1);
+    } else {
+      g = glyph[i]; a = baseA[i];
+      row = c === CLS_BODY ? step[i] : c === CLS_LIGHT ? ROW_LIGHT : c === CLS_ACC ? ROW_ACC : ROW_FIELD;
+      if (c === CLS_LIGHT || c === CLS_ACC) orow = ROW_FLASH_BOLD;
+      if (!still) {
+        const f = 1 - (t - lockAt[i]) / CFG.flashDur;          // lock flash
+        if (f > 0) o = f * f * (c === CLS_OUT ? 0.45 : 0.9);
+        if (scrUntil[i] > t) { g = scramble(i, t) % 10; o = Math.max(o, c === CLS_OUT ? 0.25 : 0.45); if (c === CLS_OUT) a = Math.max(a, 0.18); }
+        if (c !== CLS_OUT && glintOn) { const d = Math.abs(glintP[i] - gpos); if (d < 0.12) o = Math.max(o, 0.42 * (1 - (d / 0.12) ** 2)); }
+      }
+    }
+    if (g === BLANK) a = 0;
+    const aq = Math.round(clamp01(a) * 63), oq = aq ? Math.round(clamp01(o) * 31) : 0;
+    const key = g | row << 4 | aq << 9 | oq << 15 | (orow === ROW_FLASH_BOLD ? 1 << 20 : 0);
+    if (key === last[i]) continue;
+    last[i] = key; drawn++;
+    const x = offX + (i % cols) * CFG.cellW, y = offY + ((i / cols) | 0) * CFG.cellH;
+    ctx.clearRect(x, y, CFG.cellW, CFG.cellH);
+    if (!aq) continue;
+    ctx.globalAlpha = aq / 63; ctx.drawImage(atlas, g * cwD, row * chD, cwD, chD, x, y, CFG.cellW, CFG.cellH);
+    if (oq) { ctx.globalAlpha = oq / 31; ctx.drawImage(atlas, g * cwD, orow * chD, cwD, chD, x, y, CFG.cellW, CFG.cellH); }
+  }
+  ctx.globalAlpha = 1;
+  return drawn;
+}
+
+/* ---------------- loop ---------------- */
+const stats = { frames: 0, total: 0, max: 0, winFrames: 0, winTotal: 0,
+  record(ms) { this.frames++; this.total += ms; this.max = Math.max(this.max, ms); this.winFrames++; this.winTotal += ms; },
+  reset() { this.frames = this.total = this.max = this.winFrames = this.winTotal = 0; } };
+window.__deco = { stats };
+let raf = 0, prev = 0, clock = 0, inView = false, started = false, forcedStill = false, slowFrames = 0;
+const pointer = { x: 0, y: 0, active: false, dirty: false };
+
+function tick(t, dt) {
+  if (mode === 'live' && t > introEnd) {
+    // Idle twinkle: a few cells per second briefly re-scramble.
+    let n = N * CFG.twinkleRate * dt;
+    for (; n > 0; n--) if (n >= 1 || Math.random() < n) { const i = (Math.random() * N) | 0; scrUntil[i] = t + 0.25 + 0.35 * Math.random(); }
+  }
+  if (pointer.dirty && pointer.active) {
+    // Decode under the pointer: cells within pointerR re-scramble, then lock back.
+    pointer.dirty = false;
+    const R = CFG.pointerR, c0 = Math.max(0, Math.floor((pointer.x - offX - R) / CFG.cellW)), c1 = Math.min(cols - 1, Math.floor((pointer.x - offX + R) / CFG.cellW));
+    const r0 = Math.max(0, Math.floor((pointer.y - offY - R) / CFG.cellH)), r1 = Math.min(rows - 1, Math.floor((pointer.y - offY + R) / CFG.cellH));
+    for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
+      const dx = offX + c * CFG.cellW + CFG.cellW / 2 - pointer.x, dy = offY + r * CFG.cellH + CFG.cellH / 2 - pointer.y;
+      if (dx * dx + dy * dy < R * R) { const i = r * cols + c; scrUntil[i] = Math.max(scrUntil[i], t + 0.3 + 0.25 * rnd[i]); }
+    }
+  }
+  render(t, false);
+  // Touch / narrow screens: play the resolve once, then sleep for good.
+  return mode === 'live' || t < introEnd + 0.1;
+}
+function frame(now) {
+  raf = 0;
+  const dt = prev ? Math.min(0.05, (now - prev) / 1000) : 1 / 60;
+  prev = now; clock += dt;
+  const t0 = performance.now();
+  const more = tick(clock, dt);
+  const ms = performance.now() - t0;
+  stats.record(ms);
+  slowFrames = ms > CFG.budgetMs ? slowFrames + 1 : 0;
+  if (slowFrames > 90 && dprCap > 1) { dprCap = 1; layout(); }
+  if (more) wake(); else prev = 0;
+}
+const allowed = () => (mode === 'live' || mode === 'once') && started && inView && !document.hidden;
+function wake() { if (!raf && allowed()) raf = requestAnimationFrame(frame); }
+function sleep() { if (raf) cancelAnimationFrame(raf); raf = 0; prev = 0; }
+
+function decideMode() {
+  if (forcedStill || mqReduce.matches) return 'still';
+  return mqFine.matches && innerWidth >= 768 ? 'live' : 'once';
+}
+function init() {
+  sleep(); layout(); mode = decideMode(); clock = 0;
+  if (mode === 'still') { render(Infinity, true); return; }
+  wake();
+}
+
+slot.addEventListener('pointermove', (e) => {
+  if (mode !== 'live' || e.pointerType === 'touch') return;
+  const r = slot.getBoundingClientRect(); pointer.x = e.clientX - r.left; pointer.y = e.clientY - r.top; pointer.active = true; pointer.dirty = true;
+}, { passive: true });
+slot.addEventListener('pointerleave', () => { pointer.active = false; }, { passive: true });
+// Start the resolve only when a third of the panel is visible; pause whenever it leaves.
+new IntersectionObserver((es) => { inView = es[es.length - 1].intersectionRatio >= 0.35; inView ? wake() : sleep(); }, { threshold: [0, 0.35] }).observe(slot.parentElement);
+document.addEventListener('visibilitychange', () => (document.hidden ? sleep() : wake()));
+let rw = 0, rh = 0;
+new ResizeObserver(() => {
+  const r = slot.getBoundingClientRect();
+  if (Math.round(r.width) === rw && Math.round(r.height) === rh) return;
+  rw = Math.round(r.width); rh = Math.round(r.height);
+  if (!started) return;
+  // Re-layout keeps the clock: after the intro the field re-samples and shows its end state at once.
+  const t = clock; sleep(); layout(); mode = decideMode(); clock = t;
+  if (mode === 'still' || clock > introEnd) render(Infinity, true);
+  wake();
+}).observe(slot);
+mqReduce.addEventListener('change', init);
+const boot = () => { started = true; document.fonts.ready.then(init); };
+'requestIdleCallback' in window ? requestIdleCallback(boot, { timeout: 1500 }) : setTimeout(boot, 1500);
+
+/* ---------------- reference chrome ---------------- */
+const out = document.getElementById('stat');
+setInterval(() => {
+  const f = stats.winFrames, avg = f ? stats.winTotal / f : 0;
+  out.textContent = mode === 'still' ? `静态终帧 · ${N} 格` : f ? `脚本 ${avg.toFixed(2)} ms/帧 · ${f * 2} fps · ${N} 格` : `循环休眠 · ${N} 格`;
+  stats.winFrames = 0; stats.winTotal = 0;
+}, 500);
+document.getElementById('replay').onclick = () => { stats.reset(); init(); };
+const stillBtn = document.getElementById('still');
+stillBtn.onclick = () => { forcedStill = !forcedStill; stillBtn.setAttribute('aria-pressed', String(forcedStill)); init(); };
+window.__deco.replay = init;
+})();
+</script>
+</body>
+</html>

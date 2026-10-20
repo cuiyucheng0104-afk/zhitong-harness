@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D1 首屏底稿网格</title>
+<style>
+:root{
+  --ink:#162943;--navy:#0b347d;--blue:#0666f5;--green:#12c68b;--muted:#5c6d82;
+  --grid-line:#dce8f4;--grid-line-strong:#c5d6ea;--canvas:#f5f8fd;--line:#d9e4f0;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:"PingFang SC","Microsoft YaHei","Noto Sans SC","WenQuanYi Zen Hei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:16px/1.8 var(--sans);color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+button{font:inherit}
+/* ---------- reference chrome (not part of the component) ---------- */
+.refbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;height:40px;padding:0 16px;background:rgba(255,255,255,.95);border-bottom:1px solid var(--grid-line);font:12px/1 var(--mono);color:var(--muted)}
+.refbar a{color:var(--navy);text-decoration:none}.refbar b{color:var(--ink);font-weight:600}.refbar .sp{flex:1}
+.refbar button{height:26px;padding:0 10px;border:1px solid var(--grid-line-strong);border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font:12px var(--mono)}
+.refbar button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.refbar output{min-width:190px;text-align:right}
+@media (max-width:767px){.refbar .desc,.refbar output{display:none}}
+/* ---------- page mock (context only) ---------- */
+.site-header{position:relative;z-index:3;height:64px;display:flex;align-items:center;gap:32px;padding:0 max(20px,calc((100% - 1248px)/2));background:rgba(255,255,255,.96);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink)}
+.brand svg{width:30px;height:30px;border-radius:8px}
+.site-header nav{display:flex;gap:28px;font-size:14px;color:var(--muted)}
+.site-header .cta{margin-left:auto;height:38px;padding:0 16px;border-radius:8px;border:0;background:var(--blue);color:#fff;font-size:14px}
+.container{width:min(1248px,calc(100% - 192px));margin-inline:auto}
+.hero{position:relative;isolation:isolate;overflow:hidden;min-height:calc(100vh - 104px);padding:72px 0 96px}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:5fr 7fr;gap:24px;align-items:center}
+.eyebrow{display:flex;align-items:center;gap:8px;margin:0 0 22px;color:var(--navy);font-size:14px;font-weight:500}
+.eyebrow i{width:12px;height:12px;position:relative}.eyebrow i:before,.eyebrow i:after{content:"";position:absolute;background:var(--blue)}
+.eyebrow i:before{left:5px;top:0;width:2px;height:12px}.eyebrow i:after{top:5px;left:0;width:12px;height:2px}
+h1{margin:0;font-size:60px;line-height:1.18;letter-spacing:-.03em;white-space:nowrap}h1 span{color:var(--navy)}
+.lead{margin:26px 0 0;font-size:18px;color:var(--muted)}
+.actions{display:flex;align-items:center;gap:24px;margin-top:32px}
+.btn{height:48px;padding:0 22px;border-radius:10px;border:0;background:var(--blue);color:#fff;font-size:16px;font-weight:500}
+.link{color:var(--navy);font-size:14px}
+.demo-slot{position:relative;min-height:470px;border:1px solid #cadcf3;border-radius:16px;background:#fff;box-shadow:0 24px 64px rgba(11,52,125,.1),0 4px 16px rgba(11,52,125,.05);overflow:hidden}
+.demo-slot header{height:48px;display:flex;align-items:center;padding:0 18px;border-bottom:1px solid #e9eff7;font-size:12px;font-weight:600}
+.demo-slot .sk{margin:18px;display:grid;gap:12px}.demo-slot .sk i{display:block;height:12px;border-radius:6px;background:#eef3fa}
+.demo-slot .sk i:nth-child(2){width:72%}.demo-slot .sk i:nth-child(3){width:86%}.demo-slot .sk i:nth-child(5){width:54%}
+.demo-slot p{position:absolute;left:0;right:0;bottom:16px;margin:0;text-align:center;font:12px var(--mono);color:#8aa0bd}
+@media (max-width:1023px){.container{width:calc(100% - 96px)}h1{font-size:48px}}
+@media (max-width:767px){.container{width:calc(100% - 40px)}.site-header nav{display:none}.hero{padding:48px 0 64px}
+  .hero-grid{grid-template-columns:1fr}h1{font-size:40px}.demo-slot{min-height:300px}}
+
+/* ---------- D1 BlueprintGrid (component styles) ---------- */
+.bp-grid{position:absolute;inset:0;z-index:0;pointer-events:none}
+/* Paper = static minor grid (CSS, present in prerendered HTML) + static canvas; fades out toward the bottom. */
+.bp-paper{position:absolute;inset:0;
+  background-image:linear-gradient(to right,rgba(220,232,244,.72) 1px,transparent 1px),linear-gradient(to bottom,rgba(220,232,244,.72) 1px,transparent 1px);
+  background-size:24px 24px;background-position:var(--gx,0) var(--gy,0);
+  -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 62%,transparent 100%);mask-image:linear-gradient(to bottom,#000 0,#000 62%,transparent 100%)}
+/* No canvas (no JS yet, or it failed): major lines come from CSS so the prerendered frame matches the end frame. */
+.bp-grid:not(.has-canvas) .bp-paper{background-image:linear-gradient(to right,#d3e0ef 1px,transparent 1px),linear-gradient(to bottom,#d3e0ef 1px,transparent 1px),linear-gradient(to right,rgba(220,232,244,.72) 1px,transparent 1px),linear-gradient(to bottom,rgba(220,232,244,.72) 1px,transparent 1px);
+  background-size:120px 120px,120px 120px,24px 24px,24px 24px}
+.bp-grid canvas{position:absolute;left:0;top:0}
+@media (max-width:767px){.bp-paper{opacity:.75}}
+</style>
+</head>
+<body>
+<header class="refbar">
+  <a href="index.html">← 动效参考</a><b>D1 · BlueprintGrid</b><span class="desc">首屏底稿网格 · 轴号 · 吸附定位十字</span>
+  <span class="sp"></span><output id="stat">—</output>
+  <button id="replay" type="button">重播</button><button id="still" type="button" aria-pressed="false">静态终帧</button>
+</header>
+
+<div class="site-header">
+  <span class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bm" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#00B3EC"/><stop offset="1" stop-color="#0666F5"/></linearGradient></defs><rect width="64" height="64" rx="17" fill="url(#bm)"/><g transform="rotate(-43 32 32)" stroke-linecap="round"><path d="M15 32h10m14 0h10M32 15v10m0 14v10" stroke="#FFF" stroke-width="7.5"/><path d="M17 19h5m20 0h5M17 45h5m20 0h5" stroke="#12D99F" stroke-width="5"/></g></svg>智通数工AI</span>
+  <nav><span>产品能力</span><span>使用流程</span><span>数据与复核</span><span>常见问题</span><span>文档</span></nav>
+  <button class="cta" type="button">获取安装包</button>
+</div>
+
+<main>
+  <section class="hero" id="hero" aria-labelledby="hero-title">
+    <!-- D1: decorative layer, behind content -->
+    <div class="bp-grid" aria-hidden="true"><div class="bp-paper"><canvas class="bp-static"></canvas></div><canvas class="bp-live"></canvas></div>
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow"><i aria-hidden="true"></i>为造价咨询团队而做</p>
+        <h1 id="hero-title">造价咨询公司的<br><span>对话式工作台</span></h1>
+        <p class="lead">用对话读资料、做核对、算指标、写报告。<br>过程与成果统一保存，数字有据可查。</p>
+        <div class="actions"><button class="btn" type="button">获取安装包 →</button><a class="link" href="#hero">查看工作示例 ↓</a></div>
+      </div>
+      <div class="demo-slot" data-deco-avoid>
+        <header>2026-007-滨江综合办公楼 · 示例</header>
+        <div class="sk"><i></i><i></i><i></i><i></i><i></i></div>
+        <p>工作示例窗口占位（02 章，不属于 D1）</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+'use strict';
+
+/**
+ * @typedef {Object} BlueprintGridConfig
+ * @property {number} cell          minor grid pitch, CSS px (= 12-col gutter)
+ * @property {number} majorEvery    minor cells per major line
+ * @property {number} originTop     y of the first horizontal major line (aligned with hero padding-top)
+ * @property {number} bottomClear   no major row closer than this to the hero bottom
+ * @property {number} mmPerCell     readout scale: one cell = 300 mm (3M modulus)
+ * @property {number} bubbleR       axis bubble radius, px
+ * @property {number} lensR         radius of the pointer lens that darkens nearby grid lines
+ * @property {number} hairReachX    crosshair half-length as a fraction of width (fades to 0)
+ * @property {number} hairReachY    same, fraction of height
+ * @property {number} followOmega   spring stiffness (rad/s) when tracking the pointer
+ * @property {number} homeOmega     spring stiffness when gliding back to the parking point
+ * @property {number} trailLife     seconds a dropped registration mark stays visible
+ * @property {number} trailMax      max registration marks kept
+ * @property {number} introDur      seconds for one major line to draw
+ * @property {number} introStagger  delay between consecutive major lines
+ * @property {number} dprCap        device pixel ratio cap
+ * @property {number} budgetMs      script budget per frame; above it for 90 frames -> DPR 1
+ */
+/** @type {BlueprintGridConfig} */
+const CFG = {
+  cell: 24, majorEvery: 5, originTop: 72, bottomClear: 112, mmPerCell: 300, bubbleR: 10, lensR: 168,
+  hairReachX: 0.42, hairReachY: 0.62, followOmega: 28, homeOmega: 6, trailLife: 0.9, trailMax: 14,
+  introDur: 0.9, introStagger: 0.045, dprCap: 2, budgetMs: 3,
+};
+const COLOR = { major: '#d3e0ef', bubble: '#bfd0e6', bubbleText: '#7189a8', accent: '#0666f5', ink: '#0b347d' };
+const ACCENT_RGB = '6,102,245';
+/** GB/T 50001: I, O, Z are never used as axis letters. */
+const AXIS_LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXY';
+const MONO = getComputedStyle(document.documentElement).getPropertyValue('--mono');
+
+const hero = document.getElementById('hero');
+const layer = hero.querySelector('.bp-grid');
+const paper = layer.querySelector('.bp-paper');
+const cvS = layer.querySelector('.bp-static');
+const cvL = layer.querySelector('.bp-live');
+const ctxS = cvS.getContext('2d');
+const ctxL = cvL.getContext('2d');
+const mqReduce = matchMedia('(prefers-reduced-motion: reduce)');
+const mqFine = matchMedia('(hover: hover) and (pointer: fine)');
+
+/* ---------------- math helpers ---------------- */
+const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+const easeOutExpo = (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
+const easeOutBack = (t) => { const c = 1.7; t -= 1; return 1 + (c + 1) * t * t * t + c * t * t; };
+/** Snap a coordinate to the centre of a device pixel row so 1px lines stay crisp. */
+const crisp = (v) => Math.round(v) + 0.5;
+/** Exact critically damped spring step (stable for any dt). Mutates s[k], s[kv]. */
+function spring(s, k, kv, target, omega, dt) {
+  const e = s[k] - target, v = s[kv], decay = Math.exp(-omega * dt), tmp = (v + omega * e) * dt;
+  s[k] = target + (e + tmp) * decay;
+  s[kv] = (v - omega * tmp) * decay;
+}
+/** Frame-rate independent exponential approach. */
+const approach = (cur, target, rate, dt) => cur + (target - cur) * (1 - Math.exp(-rate * dt));
+function mixHex(a, b, t) {
+  const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+  const ch = (s) => Math.round(((pa >> s) & 255) * (1 - t) + ((pb >> s) & 255) * t);
+  return `rgb(${ch(16)},${ch(8)},${ch(0)})`;
+}
+
+/* ---------------- stats (reference only) ---------------- */
+const stats = { frames: 0, total: 0, max: 0, winFrames: 0, winTotal: 0,
+  record(ms) { this.frames++; this.total += ms; this.max = Math.max(this.max, ms); this.winFrames++; this.winTotal += ms; },
+  reset() { this.frames = this.total = this.max = this.winFrames = this.winTotal = 0; } };
+window.__deco = { stats };
+
+/* ---------------- layout ---------------- */
+let W = 0, H = 0, dpr = 1, dprCap = CFG.dprCap;
+let x0 = 0, M = CFG.cell * CFG.majorEvery;
+/** @type {number[]} */ let vx = [];
+/** @type {number[]} */ let hy = [];
+/** @type {{l:number,t:number,r:number,b:number}[]} */ let avoidRects = [];
+let bubbleY = 0, leftBubbleX = -1, home = { x: 0, y: 0 }, introEnd = 0, crossAppear = 0;
+let hiV = new Float32Array(0), hiH = new Float32Array(0);
+
+function layout() {
+  const r = hero.getBoundingClientRect();
+  W = Math.round(r.width); H = Math.round(r.height);
+  dpr = Math.min(dprCap, window.devicePixelRatio || 1);
+  for (const cv of [cvS, cvL]) {
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  }
+  ctxS.setTransform(dpr, 0, 0, dpr, 0, 0); ctxL.setTransform(dpr, 0, 0, dpr, 0, 0);
+  // Axis 1 sits on the content column's left edge so the copy aligns to the grid.
+  x0 = Math.round(hero.querySelector('.container').getBoundingClientRect().left - r.left);
+  vx = []; for (let x = x0; x <= W - CFG.bubbleR - 6; x += M) vx.push(x); // keep whole bubbles on screen
+  // Major rows stop one major above the bottom; the lowest is axis A, the drawing origin.
+  hy = []; for (let y = CFG.originTop; y <= H - CFG.bottomClear; y += M) hy.push(y);
+  bubbleY = CFG.bubbleR + 10;
+  leftBubbleX = x0 - 48 - CFG.bubbleR >= 6 ? x0 - 48 : -1;
+  paper.style.setProperty('--gx', (x0 % CFG.cell) + 'px');
+  paper.style.setProperty('--gy', (CFG.originTop % CFG.cell) + 'px');
+  // Readout labels must not slide under functional elements (the demo window).
+  avoidRects = [...hero.querySelectorAll('[data-deco-avoid]')].map((el) => {
+    const a = el.getBoundingClientRect(); return { l: a.left - r.left, t: a.top - r.top, r: a.right - r.left, b: a.bottom - r.top };
+  });
+  hiV = new Float32Array(vx.length); hiH = new Float32Array(hy.length);
+  // Parking point: the origin, axis 1 / A (readout X 0  Y 0); both bubbles light up there.
+  home = { x: x0, y: hy[hy.length - 1] ?? CFG.originTop };
+  introEnd = CFG.introDur + CFG.introStagger * Math.max(vx.length, hy.length);
+  crossAppear = introEnd * 0.55;
+}
+const snapX = (px) => Math.min(W - CFG.cell, Math.max(CFG.cell, x0 + Math.round((px - x0) / CFG.cell) * CFG.cell));
+const snapY = (py) => Math.min(H - CFG.cell, Math.max(CFG.cell, CFG.originTop + Math.round((py - CFG.originTop) / CFG.cell) * CFG.cell));
+
+/* ---------------- static layer: major lines + axis bubbles ---------------- */
+function drawBubble(c, x, y, label, scale, hi) {
+  if (scale <= 0.01) return;
+  c.beginPath(); c.arc(x + 0.5, y, CFG.bubbleR * scale, 0, Math.PI * 2);
+  c.fillStyle = hi > 0 ? mixHex('#ffffff', COLOR.accent, hi) : '#ffffff'; c.fill();
+  c.lineWidth = 1; c.strokeStyle = hi > 0 ? mixHex(COLOR.bubble, COLOR.accent, hi) : COLOR.bubble; c.stroke();
+  if (scale > 0.55) {
+    c.globalAlpha = clamp01((scale - 0.55) / 0.45);
+    c.fillStyle = hi > 0 ? mixHex(COLOR.bubbleText, '#ffffff', hi) : COLOR.bubbleText;
+    c.font = `500 10px ${MONO}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(label, x + 0.5, y + 0.5); c.globalAlpha = 1;
+  }
+}
+const vLabel = (i) => String(i + 1);
+const hLabel = (j) => AXIS_LETTERS[(hy.length - 1 - j) % AXIS_LETTERS.length]; // A at the bottom
+
+/** @param {number} t seconds since intro start; Infinity draws the end frame. */
+function drawStatic(t, withLeftBubbles = true) {
+  const c = ctxS; c.clearRect(0, 0, W, H); c.lineWidth = 1; c.strokeStyle = COLOR.major;
+  const top = bubbleY + CFG.bubbleR;
+  c.beginPath();
+  vx.forEach((x, i) => {
+    const p = easeOutExpo(clamp01((t - i * CFG.introStagger) / CFG.introDur));
+    if (p > 0) { c.moveTo(crisp(x), top); c.lineTo(crisp(x), top + (H - top) * p); }
+  });
+  const left = withLeftBubbles && leftBubbleX > 0 ? leftBubbleX + CFG.bubbleR : x0 - CFG.cell * 2;
+  hy.forEach((y, j) => {
+    const p = easeOutExpo(clamp01((t - j * CFG.introStagger) / CFG.introDur));
+    if (p > 0) { c.moveTo(left, crisp(y)); c.lineTo(left + (W - left) * p, crisp(y)); }
+  });
+  c.stroke();
+  vx.forEach((x, i) => drawBubble(c, x, bubbleY, vLabel(i), easeOutBack(clamp01((t - i * CFG.introStagger) / 0.45)), 0));
+  if (withLeftBubbles && leftBubbleX > 0)
+    hy.forEach((y, j) => drawBubble(c, leftBubbleX, y, hLabel(j), easeOutBack(clamp01((t - j * CFG.introStagger) / 0.45)), 0));
+}
+
+/* ---------------- live layer: lens, crosshair, readout, trail ---------------- */
+const cross = { x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0, alpha: 0, pulse: 0 };
+const lens = { x: 0, y: 0, a: 0 };
+const pointer = { x: 0, y: 0, active: false };
+/** @type {{x:number,y:number,born:number}[]} */ let trail = [];
+
+function drawLive(t) {
+  const c = ctxL; c.clearRect(0, 0, W, H);
+  // 1. Lens: grid lines near the pointer darken (stroke with a radial gradient).
+  if (lens.a > 0.01) {
+    const R = CFG.lensR, g = c.createRadialGradient(lens.x, lens.y, 0, lens.x, lens.y, R);
+    g.addColorStop(0, `rgba(${ACCENT_RGB},${0.3 * lens.a})`); g.addColorStop(1, `rgba(${ACCENT_RGB},0)`);
+    c.strokeStyle = g; c.lineWidth = 1; c.beginPath();
+    const gx0 = x0 % CFG.cell, gy0 = CFG.originTop % CFG.cell;
+    for (let x = gx0 + Math.ceil((lens.x - R - gx0) / CFG.cell) * CFG.cell; x <= lens.x + R; x += CFG.cell) { c.moveTo(crisp(x), lens.y - R); c.lineTo(crisp(x), lens.y + R); }
+    for (let y = gy0 + Math.ceil((lens.y - R - gy0) / CFG.cell) * CFG.cell; y <= lens.y + R; y += CFG.cell) { c.moveTo(lens.x - R, crisp(y)); c.lineTo(lens.x + R, crisp(y)); }
+    c.stroke();
+  }
+  // 2. Registration marks dropped at intersections the crosshair left.
+  for (const m of trail) {
+    const a = 1 - (t - m.born) / CFG.trailLife;
+    if (a <= 0) continue;
+    c.strokeStyle = `rgba(${ACCENT_RGB},${0.5 * a * a})`; c.beginPath();
+    c.moveTo(m.x - 4, crisp(m.y)); c.lineTo(m.x + 5, crisp(m.y)); c.moveTo(crisp(m.x), m.y - 4); c.lineTo(crisp(m.x), m.y + 5); c.stroke();
+  }
+  if (cross.alpha < 0.01) return;
+  const A = cross.alpha, cx = cross.x, cy = cross.y;
+  // 3. Axis highlight: the major line the crosshair sits on lights up with its bubble.
+  const top = bubbleY + CFG.bubbleR;
+  vx.forEach((x, i) => { if (hiV[i] > 0.01) {
+    c.strokeStyle = `rgba(${ACCENT_RGB},${0.35 * hiV[i] * A})`; c.beginPath(); c.moveTo(crisp(x), top); c.lineTo(crisp(x), H); c.stroke();
+    drawBubble(c, x, bubbleY, vLabel(i), 1, hiV[i] * A); } });
+  hy.forEach((y, j) => { if (hiH[j] > 0.01) {
+    c.strokeStyle = `rgba(${ACCENT_RGB},${0.35 * hiH[j] * A})`; c.beginPath(); c.moveTo(leftBubbleX > 0 ? leftBubbleX + CFG.bubbleR : 0, crisp(y)); c.lineTo(W, crisp(y)); c.stroke();
+    if (leftBubbleX > 0) drawBubble(c, leftBubbleX, y, hLabel(j), 1, hiH[j] * A); } });
+  // 4. Hairlines (CAD crosshair), fading out along their length.
+  const rx = W * CFG.hairReachX, ry = H * CFG.hairReachY;
+  let g = c.createLinearGradient(cx - rx, 0, cx + rx, 0);
+  g.addColorStop(0, `rgba(${ACCENT_RGB},0)`); g.addColorStop(0.5, `rgba(${ACCENT_RGB},${0.5 * A})`); g.addColorStop(1, `rgba(${ACCENT_RGB},0)`);
+  c.strokeStyle = g; c.beginPath(); c.moveTo(Math.max(0, cx - rx), crisp(cy)); c.lineTo(Math.min(W, cx + rx), crisp(cy)); c.stroke();
+  g = c.createLinearGradient(0, cy - ry, 0, cy + ry);
+  g.addColorStop(0, `rgba(${ACCENT_RGB},0)`); g.addColorStop(0.5, `rgba(${ACCENT_RGB},${0.5 * A})`); g.addColorStop(1, `rgba(${ACCENT_RGB},0)`);
+  c.strokeStyle = g; c.beginPath(); c.moveTo(crisp(cx), Math.max(0, cy - ry)); c.lineTo(crisp(cx), Math.min(H, cy + ry)); c.stroke();
+  // 5. Pickbox, with a short pulse when it lands on a new intersection.
+  const h = 4.5 + 3 * cross.pulse, bx = Math.round(cx), by = Math.round(cy);
+  c.fillStyle = `rgba(255,255,255,${0.92 * A})`; c.fillRect(bx - h, by - h, h * 2 + 1, h * 2 + 1);
+  c.strokeStyle = `rgba(${ACCENT_RGB},${A})`; c.lineWidth = 1.25; c.strokeRect(bx - h + 0.5, by - h + 0.5, h * 2, h * 2); c.lineWidth = 1;
+  // 6. Coordinate readout of the snapped target, origin at axis 1 / A, in millimetres.
+  const yA = hy[hy.length - 1] ?? CFG.originTop;
+  const mx = Math.round((cross.tx - x0) / CFG.cell) * CFG.mmPerCell, my = Math.round((yA - cross.ty) / CFG.cell) * CFG.mmPerCell;
+  const text = `X ${mx}  Y ${my}`;
+  c.font = `500 10.5px ${MONO}`; c.textAlign = 'left'; c.textBaseline = 'middle';
+  const tw = Math.ceil(c.measureText(text).width) + 12, ly = by - 30;
+  const hits = (x) => x + tw > W - 8 || avoidRects.some((a) => x < a.r && x + tw > a.l && ly < a.b && ly + 19 > a.t);
+  const lx = hits(bx + 14) && !hits(bx - 14 - tw) ? bx - 14 - tw : bx + 14;
+  c.globalAlpha = A; c.fillStyle = 'rgba(255,255,255,.94)'; c.fillRect(lx, ly, tw, 19);
+  c.strokeStyle = '#dce8f4'; c.strokeRect(lx + 0.5, ly + 0.5, tw - 1, 18);
+  c.fillStyle = COLOR.ink; c.fillText(text, lx + 6, ly + 10); c.globalAlpha = 1;
+}
+
+/* ---------------- loop ---------------- */
+let raf = 0, prev = 0, clock = 0, inView = false, started = false, mode = 'live', forcedStill = false, slowFrames = 0;
+
+function tick(t, dt) {
+  let busy = false;
+  if (t <= introEnd + 0.05) { drawStatic(t); busy = true; }
+  const target = pointer.active ? { x: snapX(pointer.x), y: snapY(pointer.y) } : home;
+  if (target.x !== cross.tx || target.y !== cross.ty) {
+    if (pointer.active && cross.alpha > 0.3) { trail.push({ x: cross.tx, y: cross.ty, born: t }); if (trail.length > CFG.trailMax) trail.shift(); cross.pulse = 1; }
+    cross.tx = target.x; cross.ty = target.y;
+  }
+  const omega = pointer.active ? CFG.followOmega : CFG.homeOmega;
+  spring(cross, 'x', 'vx', cross.tx, omega, dt); spring(cross, 'y', 'vy', cross.ty, omega, dt);
+  const alphaTarget = t < crossAppear ? 0 : pointer.active ? 1 : 0.6;
+  cross.alpha = approach(cross.alpha, alphaTarget, 8, dt);
+  cross.pulse *= Math.exp(-dt * 12);
+  lens.x = approach(lens.x, pointer.x, 30, dt); lens.y = approach(lens.y, pointer.y, 30, dt);
+  lens.a = approach(lens.a, pointer.active ? 1 : 0, 6, dt);
+  let hiBusy = false;
+  vx.forEach((x, i) => { const tg = Math.abs(cross.tx - x) < 1 ? 1 : 0; hiV[i] = approach(hiV[i], tg, 14, dt); hiBusy ||= Math.abs(hiV[i] - tg) > 0.01; });
+  hy.forEach((y, j) => { const tg = Math.abs(cross.ty - y) < 1 ? 1 : 0; hiH[j] = approach(hiH[j], tg, 14, dt); hiBusy ||= Math.abs(hiH[j] - tg) > 0.01; });
+  trail = trail.filter((m) => t - m.born < CFG.trailLife);
+  drawLive(t);
+  const moving = Math.abs(cross.x - cross.tx) + Math.abs(cross.y - cross.ty) > 0.05 || Math.abs(cross.vx) + Math.abs(cross.vy) > 0.5;
+  const lensBusy = Math.abs(lens.a - (pointer.active ? 1 : 0)) > 0.005 || Math.abs(lens.x - pointer.x) + Math.abs(lens.y - pointer.y) > 0.2;
+  // Returning false lets the loop sleep until the next pointer event (no idle CPU).
+  return busy || moving || hiBusy || lensBusy || trail.length > 0 || cross.pulse > 0.01 || Math.abs(cross.alpha - alphaTarget) > 0.005;
+}
+
+function frame(now) {
+  raf = 0;
+  const dt = prev ? Math.min(0.05, (now - prev) / 1000) : 1 / 60;
+  prev = now; clock += dt;
+  const t0 = performance.now();
+  const more = tick(clock, dt);
+  const ms = performance.now() - t0;
+  stats.record(ms);
+  // Frame budget guard: sustained overrun drops the canvas to DPR 1 once.
+  slowFrames = ms > CFG.budgetMs ? slowFrames + 1 : 0;
+  if (slowFrames > 90 && dprCap > 1) { dprCap = 1; layout(); if (clock > introEnd) drawStatic(Infinity); }
+  if (more) wake(); else prev = 0;
+}
+const allowed = () => mode === 'live' && started && inView && !document.hidden;
+function wake() { if (!raf && allowed()) raf = requestAnimationFrame(frame); }
+function sleep() { if (raf) cancelAnimationFrame(raf); raf = 0; prev = 0; }
+
+/** Paint the end frame once: used for reduced motion, touch and narrow screens. */
+function paintStill(withCross) {
+  drawStatic(Infinity, mode !== 'touch');
+  Object.assign(cross, { x: home.x, y: home.y, tx: home.x, ty: home.y, vx: 0, vy: 0, alpha: withCross ? 0.6 : 0, pulse: 0 });
+  lens.a = 0; trail = []; hiV.fill(0); hiH.fill(0);
+  if (withCross && vx.length && hy.length) { hiV[0] = 1; hiH[hy.length - 1] = 1; } // parked on axis 1 / A
+  drawLive(Infinity);
+}
+
+function decideMode() {
+  if (forcedStill || mqReduce.matches) return 'still';
+  if (!mqFine.matches || innerWidth < 768) return 'touch';
+  return 'live';
+}
+function init(replay = false) {
+  sleep(); layout(); mode = decideMode(); layer.classList.add('has-canvas');
+  if (mode !== 'live') { paintStill(mode === 'still'); return; }
+  if (replay || clock === 0) {
+    clock = 0; ctxS.clearRect(0, 0, W, H);
+    const start = { x: vx[0] ?? 0, y: hy[0] ?? 0 };
+    Object.assign(cross, { x: start.x, y: start.y, tx: home.x, ty: home.y, vx: 0, vy: 0, alpha: 0, pulse: 0 });
+  } else drawStatic(Infinity);
+  wake();
+}
+
+/* ---------------- events ---------------- */
+hero.addEventListener('pointermove', (e) => {
+  if (mode !== 'live' || e.pointerType === 'touch') return;
+  const r = hero.getBoundingClientRect();
+  // Over the demo window the crosshair parks, so it never competes with the functional demo.
+  const avoid = e.target instanceof Element && e.target.closest('[data-deco-avoid]');
+  pointer.x = e.clientX - r.left; pointer.y = e.clientY - r.top;
+  if (!pointer.active && !avoid) { lens.x = pointer.x; lens.y = pointer.y; }
+  pointer.active = !avoid; wake();
+}, { passive: true });
+hero.addEventListener('pointerleave', () => { pointer.active = false; wake(); }, { passive: true });
+new IntersectionObserver((es) => { inView = es[es.length - 1].isIntersecting; inView ? wake() : sleep(); }, { threshold: [0, 0.15] }).observe(hero);
+document.addEventListener('visibilitychange', () => (document.hidden ? sleep() : wake()));
+new ResizeObserver(() => { const w = W, h = H; layout(); if (w !== W || h !== H) init(false); }).observe(hero);
+mqReduce.addEventListener('change', () => init(true));
+mqFine.addEventListener('change', () => init(true));
+
+// Decorations start only after the first screen is interactive (00 §5.4.6).
+const boot = () => { started = true; init(true); };
+'requestIdleCallback' in window ? requestIdleCallback(boot, { timeout: 1500 }) : setTimeout(boot, 1500);
+
+/* ---------------- reference chrome ---------------- */
+const out = document.getElementById('stat');
+setInterval(() => {
+  const f = stats.winFrames, avg = f ? stats.winTotal / f : 0;
+  out.textContent = mode !== 'live' ? `静态终帧 · DPR ${dpr}` : f ? `脚本 ${avg.toFixed(2)} ms/帧 · ${f * 2} fps · DPR ${dpr}` : `循环休眠 · DPR ${dpr}`;
+  stats.winFrames = 0; stats.winTotal = 0;
+}, 500);
+document.getElementById('replay').onclick = () => { stats.reset(); init(true); };
+const stillBtn = document.getElementById('still');
+stillBtn.onclick = () => { forcedStill = !forcedStill; stillBtn.setAttribute('aria-pressed', String(forcedStill)); init(true); };
+window.__deco.replay = () => init(true);
+window.__deco.isRunning = () => raf !== 0;
+})();
+</script>
+</body>
+</html>
