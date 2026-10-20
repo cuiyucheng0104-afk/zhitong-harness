@@ -1,2 +1,2 @@
-# Installers staged by deploy/release-manifest.mjs; they are uploaded, never committed.
-downloads/
+# Installers staged by deploy/release-manifest.mjs; they are uploaded, never committed. Anchored: site/public/downloads/ keeps releases.json.
+/downloads/

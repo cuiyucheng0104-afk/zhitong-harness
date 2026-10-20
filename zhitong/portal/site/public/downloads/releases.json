@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "product": "智通数工AI",
+  "version": "1.0.0",
+  "date": null,
+  "base": "0.2.1-rc.2",
+  "notes": [
+    "首个正式版本：造价咨询对话式工作台，内置 Python 运行环境与 DWG 转换组件。",
+    "安装包未做开发者签名，首次打开请按页面提示操作。"
+  ],
+  "platforms": {
+    "mac-arm64": {
+      "file": null,
+      "sha256": null,
+      "size": null,
+      "notes": "适用于 Apple 芯片（M 系列）的 Mac。"
+    },
+    "win-x64": {
+      "file": null,
+      "sha256": null,
+      "size": null,
+      "notes": "适用于 64 位 Windows 10 / 11。"
+    }
+  }
+}
