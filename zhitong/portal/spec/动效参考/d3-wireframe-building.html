@@ -27,49 +27,51 @@ button{font:inherit}
 .prev{padding:72px 0 64px;color:var(--muted);font-size:14px}
 .prev h2{margin:0 0 8px;color:var(--ink);font-size:28px}
 .prev p{margin:0;font-family:var(--mono);font-size:12px}
-.site-footer{border-top:1px solid var(--line)}
-.footer-grid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,4fr) minmax(0,4fr);gap:24px;align-items:end;padding-top:48px}
-.footer-brand{align-self:start}
+.site-footer{position:relative;overflow:hidden;border-top:1px solid var(--line);padding:80px 0 32px;background:#fff}
+.footer-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px}
+.fb{grid-column:span 4}.fp{grid-column:span 2}.fd,.fc{grid-column:span 3}
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
-.brand svg{width:32px;height:32px;border-radius:9px}
-.footer-brand p{margin:14px 0 0;font-size:13px;line-height:1.9;color:var(--muted)}
-.footer-links{align-self:start;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;font-size:13px}
-.footer-links b{display:block;margin-bottom:8px;font-size:12px;color:var(--ink)}
-.footer-links span{display:block;color:var(--muted);line-height:2.2}
-.footer-meta{display:flex;justify-content:space-between;gap:16px;padding:16px 0;border-top:1px solid #e8eef7;font-size:12px;color:#647995}
-/* ---------- D3 WireframeBuilding (component styles) ---------- */
-.wb{position:relative;height:300px;margin-bottom:-1px}
-.wb canvas{position:absolute;left:0;top:0;width:100%;height:calc(100% - 22px)}
-.wb-caption{position:absolute;left:0;right:0;bottom:0;margin:0;height:22px;font:11px/22px var(--mono);color:#7d92ae;text-align:right;letter-spacing:.02em}
-@media (max-width:1023px){.container{width:calc(100% - 96px)}.footer-grid{grid-template-columns:1fr 1fr}.wb{grid-column:1 / -1;height:260px}}
-@media (max-width:767px){.container{width:calc(100% - 40px)}.footer-grid{grid-template-columns:1fr}.footer-links{grid-template-columns:repeat(2,1fr)}
-  .wb{height:240px}.footer-meta{flex-direction:column;gap:4px}}
+.brand svg{width:36px;height:36px;border-radius:10px}
+.fb p{margin:14px 0 0;font-size:15px;line-height:1.8;color:var(--muted)}
+.fb .cta{margin-top:18px;height:44px;padding:0 18px;border:0;border-radius:10px;background:var(--blue);color:#fff;font-size:15px}
+.footer-grid b{display:block;margin-bottom:8px;font-size:13px;color:var(--muted)}
+.footer-grid span{display:block;font-size:15px;line-height:36px;color:var(--ink)}
+.legal{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+.legal small{display:block;font-size:13px}
+.legal .top{border:0;background:none;color:var(--navy);font-size:14px}
+/* ---------- D3 DecoFooterMark (component styles) ---------- */
+/* 05 §5.3: background slot at the footer's bottom-right, 240×120, aria-hidden, pointer-events none. */
+.deco-footer{position:absolute;right:0;bottom:0;z-index:0;width:var(--deco-w,240px);height:var(--deco-h,120px);pointer-events:none}
+.deco-footer canvas{position:absolute;inset:0;width:100%;height:100%}
+.site-footer.big{--deco-w:480px;--deco-h:240px}
+@media (max-width:1023px){.container{width:calc(100% - 96px)}.fb{grid-column:1 / -1;margin-bottom:24px}.fp,.fd,.fc{grid-column:span 4}}
+@media (max-width:767px){.container{width:calc(100% - 40px)}.fp,.fd,.fc{grid-column:1 / -1}.legal{flex-direction:column;align-items:flex-start}
+  .deco-footer{display:none}}
 </style>
 </head>
 <body>
 <header class="refbar">
-  <a href="index.html">← 动效参考</a><b>D3 · WireframeBuilding</b><span class="desc">页脚 · 滨江综合办公楼线框逐层搭起</span>
+  <a href="index.html">← 动效参考</a><b>D3 · DecoFooterMark</b><span class="desc">页脚右下装饰位 · 滨江综合办公楼线框逐层搭起</span>
   <span class="sp"></span><output id="stat">—</output>
-  <button id="replay" type="button">重播</button><button id="still" type="button" aria-pressed="false">静态终帧</button>
+  <button id="big" type="button" aria-pressed="false">放大装饰位</button><button id="replay" type="button">重播</button><button id="still" type="button" aria-pressed="false">静态终帧</button>
 </header>
 <main>
   <section class="prev container"><h2>常见问题</h2><p>（上一节占位：05 章 #faq）</p></section>
 </main>
 <footer class="site-footer">
+  <!-- D3: 05 §5.3 optional slot <DecoFooterMark> -->
+  <div class="deco-footer" data-deco-host aria-hidden="true"><canvas></canvas></div>
   <div class="container footer-grid">
-    <div class="footer-brand">
+    <div class="fb">
       <span class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bm" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#00B3EC"/><stop offset="1" stop-color="#0666F5"/></linearGradient></defs><rect width="64" height="64" rx="17" fill="url(#bm)"/><g transform="rotate(-43 32 32)" stroke-linecap="round"><path d="M15 32h10m14 0h10M32 15v10m0 14v10" stroke="#FFF" stroke-width="7.5"/><path d="M17 19h5m20 0h5M17 45h5m20 0h5" stroke="#12D99F" stroke-width="5"/></g></svg>智通数工AI</span>
-      <p>用对话处理造价咨询，<br>让资料、计算和成果有据可查。</p>
+      <p>把造价咨询里重复的读资料、算数、核对和归档，收进一次对话。</p>
+      <button class="cta" type="button">获取安装包</button>
     </div>
-    <nav class="footer-links" aria-label="页脚">
-      <div><b>产品</b><span>产品能力</span><span>使用流程</span><span>数据与复核</span></div>
-      <div><b>文档</b><span>快速开始</span><span>安装</span><span>配置包</span></div>
-      <div><b>支持</b><span>常见问题</span><span>获取安装包</span></div>
-    </nav>
-    <!-- D3: decorative, aria-hidden -->
-    <div class="wb" data-deco-host aria-hidden="true"><canvas></canvas><p class="wb-caption">滨江综合办公楼 · 示例 · 轴测示意</p></div>
+    <div class="fp"><b>产品</b><span>工作示例</span><span>产品能力</span><span>使用流程</span><span>常见问题</span></div>
+    <div class="fd"><b>文档</b><span>快速开始</span><span>安装</span><span>导入配置包</span><span>数据与安全</span></div>
+    <div class="fc"><b>联系</b><span>服务方（占位）</span><span>电话（占位）</span></div>
   </div>
-  <div class="container footer-meta"><span>© 2026 智通数工AI · 主体信息与备案号（占位）</span><span>工作示例 · 示例数据</span></div>
+  <div class="container legal"><div>© 2026 运营主体（占位）<small>基于 DeepSeek Harness 构建 · 页面中的项目、金额与文件均为示例数据</small></div><button class="top" type="button">回到顶部 ↑</button></div>
 </footer>
 
 <script>
@@ -115,17 +117,19 @@ const MARKERS = [{ L: 65.1, vol: 'tower' }, { L: 14.4, vol: 'podium' }, { L: 0, 
  * @property {number} idleFps      redraw rate after the build (sway is slow)
  * @property {number} pad          px padding inside the canvas
  * @property {number} markerW      px reserved on the right for elevation marks
+ * @property {number} compactBelow  slot width under which bubbles and elevation marks are omitted
+ * @property {number} compactInk    line alpha multiplier in compact mode (the slot sits behind the legal row)
  * @property {number} dprCap
  */
 /** @type {WireframeConfig} */
 const CFG = { yaw0: 36, pitch: 24, distance: 230, targetY: 24, swayAmp: 11, swayPeriod: 26, pointerYaw: 9,
-  gridDur: 0.7, buildStart: 0.95, floorStagger: 0.12, floorDur: 0.34, idleFps: 30, pad: 14, markerW: 66, dprCap: 2 };
+  gridDur: 0.7, buildStart: 0.95, floorStagger: 0.12, floorDur: 0.34, idleFps: 30, pad: 14, markerW: 66, compactBelow: 320, compactInk: 0.7, dprCap: 2 };
 const C = { ink: '11,52,125', accent: '6,102,245', axis: '#b9cbe3', bubbleText: '#7189a8', base: '#8ea5c3', mark: '#5c6d82',
   side: ['#e8eff8', '#ffffff'], top: '#f6f9fd' };
 const MONO = getComputedStyle(document.documentElement).getPropertyValue('--mono');
 const LIGHT = norm([-0.45, 0.8, 0.55]);
 
-const host = document.querySelector('.wb');
+const host = document.querySelector('.deco-footer');
 const cv = host.querySelector('canvas');
 const ctx = cv.getContext('2d');
 const mqReduce = matchMedia('(prefers-reduced-motion: reduce)');
@@ -160,7 +164,7 @@ function project(x, y, z) {
 }
 
 /* ---------------- layout & fit ---------------- */
-let W = 0, H = 0, dpr = 1, markerX = 0;
+let W = 0, H = 0, dpr = 1, markerX = 0, compact = false;
 function fit() {
   // Fit the whole model over every yaw the sway and pointer can reach, so the scale never changes.
   cam.f = 1; cam.ox = 0; cam.oy = 0;
@@ -174,10 +178,10 @@ function fit() {
     setYaw(rad(CFG.yaw0 - span + (2 * span * k) / 6));
     for (const p of pts) { const [sx, sy] = project(...p); x0 = Math.min(x0, sx); x1 = Math.max(x1, sx); y0 = Math.min(y0, sy); y1 = Math.max(y1, sy); }
   }
-  const aw = W - 2 * CFG.pad - CFG.markerW, ah = H - 2 * CFG.pad;
+  const pad = compact ? 6 : CFG.pad, aw = W - 2 * pad - (compact ? 0 : CFG.markerW), ah = H - 2 * pad;
   cam.f = Math.min(aw / (x1 - x0), ah / (y1 - y0));
-  cam.ox = CFG.pad + (aw - cam.f * (x1 - x0)) / 2 - cam.f * x0;
-  cam.oy = CFG.pad + (ah - cam.f * (y1 - y0)) / 2 - cam.f * y0;
+  cam.ox = pad + (aw - cam.f * (x1 - x0)) / 2 - cam.f * x0;
+  cam.oy = pad + (ah - cam.f * (y1 - y0)) / 2 - cam.f * y0;
   markerX = Math.round(cam.ox + cam.f * x1) + 10;
   setYaw(rad(CFG.yaw0));
 }
@@ -187,6 +191,8 @@ function layout() {
   dpr = Math.min(CFG.dprCap, window.devicePixelRatio || 1);
   cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  compact = W < CFG.compactBelow;
+  cv.style.opacity = compact ? String(CFG.compactInk) : '1'; // background slot behind the legal row: lighter ink
   fit();
 }
 
@@ -211,6 +217,7 @@ function drawAxes(t) {
 }
 /** Axis bubbles are annotations: drawn over the model, omitted where the building hides their axis end. */
 function drawBubbles(bubbles, occluder) {
+  if (compact) return;
   ctx.font = `500 9px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineWidth = 1;
   for (const b of bubbles) {
     if (b.s <= 0.02) continue;
@@ -271,7 +278,7 @@ function drawVolume(v, hb, active, occluder) {
 
 /** Elevation mark (标高): inverted triangle on a leader, value above the extension line. */
 function drawMark(L, vol, alpha, label) {
-  if (alpha <= 0.01) return;
+  if (alpha <= 0.01 || compact) return;
   const v = vol === 'base' ? { x0: BASEMENT.x0, x1: BASEMENT.x1, z0: BASEMENT.z0, z1: BASEMENT.z1 } : VOL[vol];
   let best = null;
   for (const x of [v.x0, v.x1]) for (const z of [v.z0, v.z1]) { const p = project(x, L, z); if (!best || p[0] > best[0]) best = p; }
@@ -294,6 +301,7 @@ function buildHeight(t) {
 }
 function render(t) {
   ctx.clearRect(0, 0, W, H);
+  ctx.globalAlpha = 1;
   const bubbles = drawAxes(t), occluder = new Path2D();
   drawBasement(t);
   const h = buildHeight(t), done = t >= buildEnd;
@@ -392,6 +400,8 @@ document.getElementById('replay').onclick = () => { stats.reset(); init(); };
 const stillBtn = document.getElementById('still');
 stillBtn.onclick = () => { forcedStill = !forcedStill; stillBtn.setAttribute('aria-pressed', String(forcedStill)); init(); };
 window.__deco.replay = init;
+const bigBtn = document.getElementById('big');
+bigBtn.onclick = () => { const on = bigBtn.getAttribute('aria-pressed') !== 'true'; bigBtn.setAttribute('aria-pressed', String(on)); footer.classList.toggle('big', on); };
 })();
 </script>
 </body>

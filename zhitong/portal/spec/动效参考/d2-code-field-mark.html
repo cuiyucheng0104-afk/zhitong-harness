@@ -6,7 +6,7 @@
 <title>D2 清单编码字符场</title>
 <style>
 :root{
-  --ink:#162943;--navy:#0b347d;--navy-900:#082457;--blue:#0666f5;--green:#12c68b;--muted:#5c6d82;
+  --ink:#162943;--navy:#0b347d;--navy-900:#082457;--blue:#0666f5;--cyan:#00b3ec;--green:#12c68b;--muted:#5c6d82;
   --grid-line:#dce8f4;--grid-line-strong:#c5d6ea;--canvas:#f5f8fd;--line:#d9e4f0;
   --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
   --sans:"PingFang SC","Microsoft YaHei","Noto Sans SC","WenQuanYi Zen Hei",sans-serif;
@@ -22,55 +22,69 @@ button{font:inherit}
 .refbar button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
 .refbar output{min-width:190px;text-align:right}
 @media (max-width:767px){.refbar .desc,.refbar output{display:none}}
-/* ---------- page mock ---------- */
+/* ---------- page mock: #install per 05 §3.3 (copy is placeholder) ---------- */
 .container{width:min(1248px,calc(100% - 192px));margin-inline:auto}
-.section{padding:96px 0}
-.ctx{font-size:14px;color:var(--muted);margin:0 0 24px;font-family:var(--mono)}
-.panel{position:relative;isolation:isolate;overflow:hidden;border-radius:16px;color:#fff;padding:56px 64px;
-  display:grid;grid-template-columns:minmax(0,5fr) minmax(0,4fr) minmax(220px,2.4fr);gap:24px;align-items:center;min-height:380px;
-  /* D6 static base: hairline blueprint grid on navy (no JS, no animation) */
+.install-section{padding:64px 0 96px}
+.install-panel{position:relative;overflow:hidden;border-radius:24px;color:#fff;padding:72px 64px;
   background-color:var(--navy-900);
   background-image:linear-gradient(to right,rgba(255,255,255,.075) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.075) 1px,transparent 1px),linear-gradient(to right,rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.035) 1px,transparent 1px);
-  background-size:120px 120px,120px 120px,24px 24px,24px 24px;background-position:-1px -1px}
-.copy{position:relative;z-index:1}
-.copy .eyebrow{margin:0 0 14px;color:#b5d8ff;font-size:14px}
-.copy h2{margin:0;font-size:40px;line-height:1.3;letter-spacing:-.02em}
-.copy p{margin:18px 0 0;font-size:14px;line-height:1.95;color:#d8e7ff}
-.copy ul{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:13px}
-.copy li span{font:12px var(--mono);color:#b5d8ff;margin-left:6px}
-.action{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px}
-.btn-white{height:48px;padding:0 24px;border-radius:10px;border:0;background:#fff;color:var(--navy);font-size:16px;font-weight:600}
-.action small{font-size:12px;color:#c1d9fa}
-/* ---------- D2 CodeFieldMark (component styles) ---------- */
-.cf-slot{position:relative;align-self:stretch;margin:-56px -24px;min-height:240px;pointer-events:auto}
-.cf-slot canvas{position:absolute;inset:0;width:100%;height:100%}
-@media (max-width:1023px){.container{width:calc(100% - 96px)}.panel{grid-template-columns:1fr 1fr;padding:48px}.cf-slot{display:none}}
-@media (max-width:767px){.container{width:calc(100% - 40px)}.section{padding:56px 0}
-  .panel{grid-template-columns:1fr;padding:0 24px 32px;gap:20px}
-  .cf-slot{display:block;order:-1;margin:0 -24px;height:200px;min-height:0}
-  .copy h2{font-size:30px}.action{align-items:flex-start}}
+  background-size:120px 120px,120px 120px,24px 24px,24px 24px;background-position:63px 0,0 -1px,63px 0,0 -1px}
+.install-content{position:relative;z-index:1;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px}
+.col-l{grid-column:span 5}.col-r{grid-column:span 7;display:flex;flex-direction:column;gap:16px}
+.eyebrow{margin:0 0 12px;color:#b5d8ff;font-size:14px}
+.install-panel h2{margin:0;font-size:44px;line-height:1.25;letter-spacing:-.02em}
+.install-panel h3{margin:28px 0 6px;font-size:18px}
+.install-panel p{margin:12px 0 0;font-size:15px;line-height:1.85;color:rgba(255,255,255,.76)}
+.install-panel ul{margin:8px 0 0;padding-left:18px;font-size:14px;line-height:1.9;color:rgba(255,255,255,.76)}
+.install-panel a{color:#fff;font-size:14px}
+.version{margin:0 !important;font:13px var(--mono) !important;color:rgba(255,255,255,.88) !important}
+.card{padding:24px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16)}
+.card.matched{border-color:var(--cyan)}
+.card b{font-size:18px}.card small{display:block;color:rgba(255,255,255,.76);font-size:13px}
+.card .row{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:14px;font:13px var(--mono);color:rgba(255,255,255,.88)}
+.card .dl{height:42px;padding:0 18px;border:0;border-radius:10px;background:#fff;color:var(--navy);font:600 14px var(--sans)}
+.card .sha{margin-top:12px;padding:10px 12px;border-radius:8px;background:rgba(255,255,255,.08);font:12px var(--mono);color:rgba(255,255,255,.92);overflow-wrap:anywhere}
+@media (max-width:1023px){.container{width:calc(100% - 96px)}.install-panel{padding:56px 48px}.col-l,.col-r{grid-column:1 / -1}.col-r{margin-top:28px}}
+@media (max-width:767px){.container{width:100%}.install-panel{border-radius:0;padding:56px 20px}.install-panel h2{font-size:30px}.card .row{flex-direction:column;align-items:stretch}}
+
+/* ---------- D2 DecoInstallField (component styles) ---------- */
+.deco-install{position:absolute;inset:0;z-index:0;pointer-events:none}
+.deco-install canvas{position:absolute}
 </style>
 </head>
 <body>
 <header class="refbar">
-  <a href="index.html">← 动效参考</a><b>D2 · CodeFieldMark</b><span class="desc">清单编码字符场汇成品牌图形（安装区）</span>
+  <a href="index.html">← 动效参考</a><b>D2 · DecoInstallField</b><span class="desc">安装区深色面板 · 清单编码字符场汇成品牌图形</span>
   <span class="sp"></span><output id="stat">—</output>
   <button id="replay" type="button">重播</button><button id="still" type="button" aria-pressed="false">静态终帧</button>
 </header>
-<main class="section">
+<main class="install-section" id="install">
   <div class="container">
-    <p class="ctx">#install · 安装与交付（05 章布局，深色面板中间为 07 章装饰位）</p>
-    <div class="panel">
-      <div class="copy">
-        <p class="eyebrow">安装与交付</p>
-        <h2>装好，导入，开始用。</h2>
-        <p>支持 Mac 与 Windows，内置运行环境与 DWG 转换组件。<br>公司专属配置包，由服务方单独交付。</p>
-        <ul><li>macOS（Apple 芯片）<span>412 MB</span></li><li>Windows（x64）<span>388 MB</span></li></ul>
-      </div>
-      <div class="cf-slot" data-deco-host aria-hidden="true"><canvas></canvas></div>
-      <div class="action">
-        <button class="btn-white" type="button">获取安装包 →</button>
-        <small>v1.1.0 · 无需另行安装 Python</small>
+    <div class="install-panel">
+      <!-- D2: 05 §3.3 slot — first child, absolute inset 0, behind the content layer -->
+      <div class="deco-install" data-deco-host aria-hidden="true"><canvas></canvas></div>
+      <div class="install-content">
+        <div class="col-l">
+          <p class="eyebrow">安装与交付</p>
+          <h2>装好，导入，<br>开始用。</h2>
+          <p>支持 Mac 与 Windows，内置运行环境与 DWG 转换组件。公司专属配置包由服务方单独交付。</p>
+          <h3>配置包</h3>
+          <p>配置包是服务方按贵司环境整理的一个压缩文件（内含 zhitong.config.json），不随安装包分发。</p>
+          <ul><li>公司名称</li><li>对象存储的地址、区域、桶名与目录前缀</li><li>访问密钥（导入后存入本机凭据存储）</li></ul>
+          <h3>首次使用</h3>
+          <p>首次启动先填写模型 API Key，再把配置包拖进对话，系统校验并写入本机配置。</p>
+          <p><a href="#install">读文档：导入配置包 →</a></p>
+        </div>
+        <div class="col-r">
+          <p class="version">v1.0.0 · 发布日期待定（占位）</p>
+          <div class="card matched"><b>macOS</b><small>Apple 芯片（M1 及更新）</small>
+            <div class="row"><span>智通数工AI-1.0.0-arm64.dmg · — MB</span><button class="dl" type="button">下载 Mac 版</button></div>
+            <div class="sha">SHA256 校验值 · 发布后显示</div></div>
+          <div class="card"><b>Windows</b><small>Windows 10 / 11，x64</small>
+            <div class="row"><span>智通数工AI-1.0.0-x64.exe · — MB</span><button class="dl" type="button">下载 Windows 版</button></div>
+            <div class="sha">SHA256 校验值 · 发布后显示</div></div>
+          <p><a href="#install">安装遇到问题？看安装说明 →</a></p>
+        </div>
       </div>
     </div>
   </div>
@@ -93,32 +107,39 @@ const CODES = ['010101001001','010101002001','010101004001','010103001001','0104
   '011701001001','011702001001','011702002001','011703001001'];
 
 /**
+ * @typedef {Object} Placement  mark size and centre, relative to the panel
+ * @property {number} size   mark edge: fraction of panel height (wide) or width (narrow)
+ * @property {number} maxW   cap as a fraction of panel width
+ * @property {number} dx     centre = right edge − dx × size (dx < 0.5 lets the mark bleed off the panel)
+ * @property {number} dy     centre = bottom edge − dy × size
+ *
  * @typedef {Object} CodeFieldConfig
- * @property {number} fontPx        glyph size, CSS px
- * @property {number} cellW         cell pitch, CSS px
- * @property {number} cellH
- * @property {{below:number,fontPx:number,cellW:number,cellH:number}} compact  finer cells when min(slot w, h) < below
- * @property {number} markScale     mark edge as a fraction of min(slot width, slot height)
- * @property {[number,number]} fieldAlpha  alpha range for codes outside the mark (before vignette)
- * @property {number} halo          px over which the code field fades out with distance from the mark outline
- * @property {number} edgeFade      px fade at the slot edges (no hard canvas border)
- * @property {[number,number,number]} tileAlpha  tile alpha under body / white-stroke / accent cells (makes the outline read)
- * @property {number} lockStart     s before the first cell locks
- * @property {number} lockSpanIn    s for the lock wave to cross the mark (centre → edge)
- * @property {number} lockSpanOut   s for the wave to cross the surrounding field
- * @property {number} lockJitter    random extra delay per cell, s
- * @property {number} flashDur      s a newly locked cell takes to fade from white to its colour
+ * @property {{wide:Placement, narrow:Placement}} place  wide = ≥ 1024px panel layout, narrow = single column
+ * @property {number} cellsAcross   cells across the mark; cell pitch = size / cellsAcross (6–14px)
+ * @property {number} cellAspect    cell height / width
+ * @property {number} halo          field reach beyond the mark outline, fraction of size
+ * @property {[number,number]} fieldAlpha  alpha range for codes around the mark
+ * @property {[number,number,number]} tileAlpha  tile alpha under body / white-stroke / accent cells
+ * @property {string} safeSelector  content elements whose boxes cap the decoration (white text stays ≥ 4.5:1)
+ * @property {number} safePad       px added around each content box
+ * @property {{field:number, body:number, light:number, acc:number, overlay:number}} safeCap  max alpha under content
+ * @property {number} lockStart, lockSpanIn, lockSpanOut, lockJitter, flashDur   resolve timeline, s
  * @property {number} twinkleRate   fraction of cells per second that briefly re-scramble when idle
- * @property {number} glintPeriod   s between diagonal glints over the mark
- * @property {number} glintDur      s one glint takes to cross
- * @property {number} pointerR      decode radius under a fine pointer, CSS px
+ * @property {number} glintPeriod   s between diagonal glints;  glintDur: s per glint
+ * @property {number} glintDur
+ * @property {number} pointerR      decode radius under a fine pointer, px (never under content)
  * @property {number} dprCap
  * @property {number} budgetMs      per-frame script budget; sustained overrun drops DPR to 1
  */
 /** @type {CodeFieldConfig} */
-const CFG = { fontPx: 10, cellW: 7, cellH: 11, compact: { below: 260, fontPx: 7.5, cellW: 5, cellH: 8 }, markScale: 0.8, fieldAlpha: [0.07, 0.2], halo: 84, edgeFade: 28, tileAlpha: [0.12, 0.3, 0.3],
+const CFG = {
+  place: { wide: { size: 0.82, maxW: 0.5, dx: 0.22, dy: 0.26 }, narrow: { size: 0.92, maxW: 0.92, dx: 0.2, dy: 0.3 } },
+  cellsAcross: 54, cellAspect: 1.55, halo: 0.2, fieldAlpha: [0.07, 0.2], tileAlpha: [0.12, 0.3, 0.3],
+  safeSelector: 'h2, h3, p, li, a, button, .card', safePad: 8,
+  safeCap: { field: 0.08, body: 0.22, light: 0.18, acc: 0.2, overlay: 0.05 },
   lockStart: 0.45, lockSpanIn: 0.95, lockSpanOut: 0.8, lockJitter: 0.25, flashDur: 0.55,
-  twinkleRate: 0.012, glintPeriod: 8, glintDur: 1.6, pointerR: 34, dprCap: 2, budgetMs: 3 };
+  twinkleRate: 0.012, glintPeriod: 8, glintDur: 1.6, pointerR: 40, dprCap: 2, budgetMs: 3,
+};
 const FIELD_COLOR = '#5f8bd8';
 const GLYPHS = '0123456789·■'; // the last entry is the tile, drawn as a rect
 const DOT = 10, TILE = 11, BLANK = 15;
@@ -127,8 +148,9 @@ const STEPS = 12;
 const ROW_LIGHT = STEPS, ROW_ACC = STEPS + 1, ROW_FIELD = STEPS + 2, ROW_FLASH = STEPS + 3, ROW_FLASH_BOLD = STEPS + 4;
 const MONO = getComputedStyle(document.documentElement).getPropertyValue('--mono');
 
-const slot = document.querySelector('.cf-slot');
-const cv = slot.querySelector('canvas');
+const host = document.querySelector('.deco-install');
+const panel = host.parentElement;
+const cv = host.querySelector('canvas');
 const ctx = cv.getContext('2d');
 const mqReduce = matchMedia('(prefers-reduced-motion: reduce)');
 const mqFine = matchMedia('(hover: hover) and (pointer: fine)');
@@ -166,41 +188,41 @@ function gradColor(t) {
 }
 
 /* ---------------- state ---------------- */
-/** Active cell metrics (regular or compact). */
-let CW = CFG.cellW, CH = CFG.cellH, FPX = CFG.fontPx;
-let W = 0, H = 0, dpr = 1, dprCap = CFG.dprCap, cols = 0, rows = 0, N = 0, offX = 0, offY = 0, introEnd = 0, markInfo = { cx: 0, cy: 0, S: 0, rx: 0 };
-/** Signed distance from (x, y) to the mark's rounded square (negative inside). */
-function markSdf(x, y) {
-  const h = markInfo.S / 2 - markInfo.rx, qx = Math.abs(x - markInfo.cx) - h, qy = Math.abs(y - markInfo.cy) - h;
-  return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - markInfo.rx;
-}
-/** @type {HTMLCanvasElement} */ let atlas = document.createElement('canvas');
-let glyph = new Uint8Array(0), cls = new Uint8Array(0), step = new Uint8Array(0), baseA = new Float32Array(0),
+/** Panel size, field region (canvas box inside the panel), cell metrics, mark geometry. */
+let PW = 0, PH = 0, RX = 0, RY = 0, W = 0, H = 0, CW = 7, CH = 11, FPX = 10, dpr = 1, dprCap = CFG.dprCap;
+let cols = 0, rows = 0, N = 0, introEnd = 0;
+let mk = { cx: 0, cy: 0, S: 0, rx: 0, x: 0, y: 0 };
+/** @type {HTMLCanvasElement} */ const atlas = document.createElement('canvas');
+let glyph = new Uint8Array(0), cls = new Uint8Array(0), step = new Uint8Array(0), safe = new Uint8Array(0), baseA = new Float32Array(0),
   lockAt = new Float32Array(0), rnd = new Float32Array(0), scrUntil = new Float32Array(0), glintP = new Float32Array(0), last = new Int32Array(0);
 
+/** Signed distance from panel point (x, y) to the mark's rounded square (negative inside). */
+function markSdf(x, y) {
+  const h = mk.S / 2 - mk.rx, qx = Math.abs(x - mk.cx) - h, qy = Math.abs(y - mk.cy) - h;
+  return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - mk.rx;
+}
+
 function buildAtlas() {
-  const rowsSpec = [];
-  for (let s = 0; s < STEPS; s++) rowsSpec.push([gradColor(s / (STEPS - 1)), 400]);
-  rowsSpec.push(['#ffffff', 700], [ACC_COLOR, 700], [FIELD_COLOR, 400], ['#ffffff', 400], ['#ffffff', 700]);
-  const cw = Math.round(CW * dpr), ch = Math.round(CH * dpr);
-  atlas.width = cw * GLYPHS.length; atlas.height = ch * rowsSpec.length;
+  const spec = [];
+  for (let s = 0; s < STEPS; s++) spec.push([gradColor(s / (STEPS - 1)), 400]);
+  spec.push(['#ffffff', 700], [ACC_COLOR, 700], [FIELD_COLOR, 400], ['#ffffff', 400], ['#ffffff', 700]);
+  const cw = Math.round(CW * dpr), ch = Math.round(CH * dpr), p = Math.max(1, Math.round(dpr));
+  atlas.width = cw * GLYPHS.length; atlas.height = ch * spec.length;
   const a = atlas.getContext('2d'); a.clearRect(0, 0, atlas.width, atlas.height);
   a.textAlign = 'center'; a.textBaseline = 'middle';
-  rowsSpec.forEach(([color, weight], r) => {
+  spec.forEach(([color, weight], r) => {
     a.font = `${weight} ${Math.round(FPX * dpr)}px ${MONO}`; a.fillStyle = color;
     for (let g = 0; g < TILE; g++) a.fillText(GLYPHS[g], g * cw + cw / 2, r * ch + ch / 2 + 0.5 * dpr);
-    a.fillRect(TILE * cw + Math.round(dpr), r * ch + Math.round(dpr), cw - 2 * Math.round(dpr), ch - 2 * Math.round(dpr));
+    a.fillRect(TILE * cw + p, r * ch + p, cw - 2 * p, ch - 2 * p);
   });
 }
 
-/** Rasterise the mark into class channels (R body, G white strokes, B accent strokes) and average per cell. */
+/** Rasterise the mark into class channels (R body, G white strokes, B accent strokes); average per cell. */
 function sampleMark() {
-  const S = Math.round(Math.min(W, H) * CFG.markScale), mx = Math.round((W - S) / 2), my = Math.round((H - S) / 2);
-  markInfo = { cx: mx + S / 2, cy: my + S / 2, S, rx: MARK.rect.rx / MARK.box[2] * S };
   const off = document.createElement('canvas'); off.width = W; off.height = H;
   const c = off.getContext('2d', { willReadFrequently: true });
-  const [bx, by, bw] = MARK.box, k = S / bw, R = MARK.rect;
-  c.setTransform(k, 0, 0, k, mx - bx * k, my - by * k);
+  const [bx, by, bw] = MARK.box, k = mk.S / bw, R = MARK.rect;
+  c.setTransform(k, 0, 0, k, mk.x - RX - bx * k, mk.y - RY - by * k);
   c.fillStyle = '#ff0000'; c.beginPath();
   if (c.roundRect) c.roundRect(R.x, R.y, R.w, R.h, R.rx); else c.rect(R.x, R.y, R.w, R.h);
   c.fill();
@@ -209,55 +231,72 @@ function sampleMark() {
   const px = c.getImageData(0, 0, W, H).data;
   const G = MARK.grad, gdx = G.x2 - G.x1, gdy = G.y2 - G.y1, gl = gdx * gdx + gdy * gdy || 1;
   for (let i = 0; i < N; i++) {
-    const x0 = offX + (i % cols) * CW, y0 = offY + ((i / cols) | 0) * CH;
+    const x0 = (i % cols) * CW, y0 = ((i / cols) | 0) * CH;
     let r = 0, gg = 0, b = 0, n = 0;
-    for (let y = y0; y < y0 + CH && y < H; y++) for (let x = x0; x < x0 + CW && x < W; x++) {
+    for (let y = y0; y < y0 + CH; y++) for (let x = x0; x < x0 + CW; x++) {
       const p = (y * W + x) * 4, a = px[p + 3] / 255; r += px[p] * a; gg += px[p + 1] * a; b += px[p + 2] * a; n++;
     }
     n = n * 255 || 1; r /= n; gg /= n; b /= n;
-    const cx = x0 + CW / 2, cy = y0 + CH / 2;
     if (gg > 0.3) { cls[i] = CLS_LIGHT; baseA[i] = Math.min(1, gg / 0.55); }
     else if (b > 0.3) { cls[i] = CLS_ACC; baseA[i] = Math.min(1, b / 0.55); }
     else if (r + gg + b > 0.12) { cls[i] = CLS_BODY; baseA[i] = 0.92 * Math.pow(Math.min(1, r + gg + b), 0.7); }
     else cls[i] = CLS_OUT;
     if (cls[i] !== CLS_OUT) {
-      const u = (cx - mx) / S, v = (cy - my) / S;
+      const u = (RX + x0 + CW / 2 - mk.x) / mk.S, v = (RY + y0 + CH / 2 - mk.y) / mk.S;
       step[i] = Math.round(clamp01(((u - G.x1) * gdx + (v - G.y1) * gdy) / gl) * (STEPS - 1));
     }
   }
 }
 
+/** Flag cells under content boxes; their alpha is capped so white text keeps ≥ 4.5:1 contrast. */
+function measureSafe() {
+  const pr = panel.getBoundingClientRect(), pad = CFG.safePad;
+  const boxes = [...panel.querySelectorAll(CFG.safeSelector)].filter((el) => !host.contains(el)).map((el) => {
+    const r = el.getBoundingClientRect();
+    return [r.left - pr.left - pad, r.top - pr.top - pad, r.right - pr.left + pad, r.bottom - pr.top + pad];
+  });
+  for (let i = 0; i < N; i++) {
+    const x0 = RX + (i % cols) * CW, y0 = RY + ((i / cols) | 0) * CH, x1 = x0 + CW, y1 = y0 + CH;
+    safe[i] = boxes.some((b) => x0 < b[2] && x1 > b[0] && y0 < b[3] && y1 > b[1]) ? 1 : 0;
+  }
+  last.fill(-1);
+}
+
 function layout() {
-  const r = slot.getBoundingClientRect();
-  W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
+  const pr = panel.getBoundingClientRect();
+  PW = Math.round(pr.width); PH = Math.round(pr.height);
+  const wide = PW >= 900, P = wide ? CFG.place.wide : CFG.place.narrow;
+  const S = Math.round(Math.min((wide ? PH : PW) * P.size, PW * P.maxW));
+  mk = { S, cx: PW - P.dx * S, cy: PH - P.dy * S, rx: (MARK.rect.rx / MARK.box[2]) * S, x: 0, y: 0 };
+  mk.x = mk.cx - S / 2; mk.y = mk.cy - S / 2;
+  CW = Math.max(6, Math.min(14, Math.round(S / CFG.cellsAcross))); CH = Math.round(CW * CFG.cellAspect); FPX = Math.round(CW * 1.35 * 2) / 2;
+  // Field region = mark ± halo, clipped to the panel; the canvas covers only this box.
+  const hal = CFG.halo * S;
+  RX = Math.max(0, Math.floor(mk.x - hal)); RY = Math.max(0, Math.floor(mk.y - hal));
+  cols = Math.floor((Math.min(PW, Math.ceil(mk.x + S + hal)) - RX) / CW); rows = Math.floor((Math.min(PH, Math.ceil(mk.y + S + hal)) - RY) / CH);
+  W = cols * CW; H = rows * CH; N = cols * rows;
   dpr = Math.min(dprCap, window.devicePixelRatio || 1);
-  const cm = Math.min(W, H) < CFG.compact.below ? CFG.compact : CFG;
-  CW = cm.cellW; CH = cm.cellH; FPX = cm.fontPx;
+  Object.assign(cv.style, { left: RX + 'px', top: RY + 'px', width: W + 'px', height: H + 'px' });
   cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.imageSmoothingEnabled = false;
-  cols = Math.floor(W / CW); rows = Math.floor(H / CH); N = cols * rows;
-  offX = Math.floor((W - cols * CW) / 2); offY = Math.floor((H - rows * CH) / 2);
-  glyph = new Uint8Array(N); cls = new Uint8Array(N); step = new Uint8Array(N); baseA = new Float32Array(N);
+  glyph = new Uint8Array(N); cls = new Uint8Array(N); step = new Uint8Array(N); safe = new Uint8Array(N); baseA = new Float32Array(N);
   lockAt = new Float32Array(N); rnd = new Float32Array(N); scrUntil = new Float32Array(N); glintP = new Float32Array(N); last = new Int32Array(N).fill(-1);
-  buildAtlas(); sampleMark();
+  buildAtlas(); sampleMark(); measureSafe();
   const ang = Math.PI / 4; let maxLock = 0;
   for (let i = 0; i < N; i++) {
     const c = i % cols, row = (i / cols) | 0;
     // Code stream: rows of 12-digit codes separated by one blank, each row shifted.
-    const line = row * 7, pos = c + (row * 5) % 13, code = CODES[(line + Math.floor(pos / 13)) % CODES.length], k = pos % 13;
+    const pos = c + (row * 5) % 13, code = CODES[(row * 7 + Math.floor(pos / 13)) % CODES.length], k = pos % 13;
     const inside = cls[i] !== CLS_OUT;
     glyph[i] = k === 12 ? (inside ? DOT : BLANK) : code.charCodeAt(k) - 48;
     rnd[i] = Math.random();
-    const x = offX + c * CW + CW / 2, y = offY + row * CH + CH / 2;
-    // Field alpha falls off with distance from the mark outline and near the slot edges.
-    const sd = Math.max(0, markSdf(x, y)), edge = Math.min(x, y, W - x, H - y);
-    const d = clamp01(sd / CFG.halo);
-    if (!inside) baseA[i] = (CFG.fieldAlpha[0] + (CFG.fieldAlpha[1] - CFG.fieldAlpha[0]) * rnd[i]) * (1 - smooth(0, 1, d)) * smooth(0, CFG.edgeFade, edge);
-    const sIn = Math.hypot(x - markInfo.cx, y - markInfo.cy) / (markInfo.S * 0.72);
-    lockAt[i] = CFG.lockStart + (inside ? CFG.lockSpanIn * clamp01(sIn) : CFG.lockSpanIn * 0.55 + CFG.lockSpanOut * clamp01(d)) + CFG.lockJitter * rnd[i];
+    const x = RX + c * CW + CW / 2, y = RY + row * CH + CH / 2;
+    const d = clamp01(Math.max(0, markSdf(x, y)) / hal);
+    if (!inside) baseA[i] = (CFG.fieldAlpha[0] + (CFG.fieldAlpha[1] - CFG.fieldAlpha[0]) * rnd[i]) * (1 - smooth(0, 1, d));
+    const sIn = Math.hypot(x - mk.cx, y - mk.cy) / (S * 0.72);
+    lockAt[i] = CFG.lockStart + (inside ? CFG.lockSpanIn * clamp01(sIn) : CFG.lockSpanIn * 0.55 + CFG.lockSpanOut * d) + CFG.lockJitter * rnd[i];
     maxLock = Math.max(maxLock, lockAt[i]);
-    // Glint coordinate: projection on the 45° diagonal, normalised over the mark.
-    glintP[i] = ((x - markInfo.cx) * Math.cos(ang) + (y - markInfo.cy) * Math.sin(ang)) / (markInfo.S * 0.75) * 0.5 + 0.5;
+    glintP[i] = ((x - mk.cx) * Math.cos(ang) + (y - mk.cy) * Math.sin(ang)) / (S * 0.75) * 0.5 + 0.5;
   }
   introEnd = maxLock + CFG.flashDur;
   ctx.clearRect(0, 0, W, H);
@@ -265,6 +304,7 @@ function layout() {
 
 /* ---------------- per-cell render with diffing: only cells whose look changed are redrawn ---------------- */
 const scramble = (i, t) => (Math.imul(i + 1, 2654435761) ^ Math.imul(Math.floor(t * 15 + rnd[i] * 15) + 7, 40503)) >>> 0;
+const CAP = [CFG.safeCap.field, CFG.safeCap.body, CFG.safeCap.light, CFG.safeCap.acc];
 let mode = 'live';
 
 function render(t, still) {
@@ -272,7 +312,6 @@ function render(t, still) {
   const fade = still ? 1 : clamp01(t / 0.35);
   const glintOn = !still && mode === 'live' && t > introEnd;
   const gpos = glintOn ? ((t - introEnd) % CFG.glintPeriod) / CFG.glintDur * 1.4 - 0.2 : -9;
-  let drawn = 0;
   for (let i = 0; i < N; i++) {
     let g, row, a, o = 0, orow = ROW_FLASH;
     const c = cls[i];
@@ -289,12 +328,13 @@ function render(t, still) {
         if (c !== CLS_OUT && glintOn) { const d = Math.abs(glintP[i] - gpos); if (d < 0.12) o = Math.max(o, 0.42 * (1 - (d / 0.12) ** 2)); }
       }
     }
+    if (safe[i]) { a = Math.min(a, CAP[c]); o = Math.min(o, CFG.safeCap.overlay); } // contrast guard under content
     if (g === BLANK) a = 0;
     const aq = Math.round(clamp01(a) * 63), oq = aq ? Math.round(clamp01(o) * 31) : 0;
     const key = g | row << 4 | aq << 9 | oq << 15 | (orow === ROW_FLASH_BOLD ? 1 << 20 : 0);
     if (key === last[i]) continue;
-    last[i] = key; drawn++;
-    const x = offX + (i % cols) * CW, y = offY + ((i / cols) | 0) * CH;
+    last[i] = key;
+    const x = (i % cols) * CW, y = ((i / cols) | 0) * CH;
     ctx.clearRect(x, y, CW, CH);
     if (!aq) continue;
     if (c !== CLS_OUT && row !== ROW_FIELD) { ctx.globalAlpha = aq / 63 * CFG.tileAlpha[c - 1]; ctx.drawImage(atlas, TILE * cwD, row * chD, cwD, chD, x, y, CW, CH); }
@@ -302,7 +342,6 @@ function render(t, still) {
     if (oq) { ctx.globalAlpha = oq / 31; ctx.drawImage(atlas, g * cwD, orow * chD, cwD, chD, x, y, CW, CH); }
   }
   ctx.globalAlpha = 1;
-  return drawn;
 }
 
 /* ---------------- loop ---------------- */
@@ -310,28 +349,29 @@ const stats = { frames: 0, total: 0, max: 0, winFrames: 0, winTotal: 0,
   record(ms) { this.frames++; this.total += ms; this.max = Math.max(this.max, ms); this.winFrames++; this.winTotal += ms; },
   reset() { this.frames = this.total = this.max = this.winFrames = this.winTotal = 0; } };
 window.__deco = { stats };
-let raf = 0, prev = 0, clock = 0, inView = false, started = false, forcedStill = false, slowFrames = 0;
+let raf = 0, prev = 0, clock = 0, inView = false, started = false, forcedStill = false, slowFrames = 0, remeasured = false;
 const pointer = { x: 0, y: 0, active: false, dirty: false };
 
 function tick(t, dt) {
+  // Content reveals (useReveal, ≤ 24px) have settled by now: re-measure the content boxes once.
+  if (!remeasured && t > 1.2) { remeasured = true; measureSafe(); }
   if (mode === 'live' && t > introEnd) {
-    // Idle twinkle: a few cells per second briefly re-scramble.
-    let n = N * CFG.twinkleRate * dt;
+    let n = N * CFG.twinkleRate * dt;                  // idle twinkle
     for (; n > 0; n--) if (n >= 1 || Math.random() < n) { const i = (Math.random() * N) | 0; scrUntil[i] = t + 0.25 + 0.35 * Math.random(); }
   }
   if (pointer.dirty && pointer.active) {
-    // Decode under the pointer: cells within pointerR re-scramble, then lock back.
+    // Decode under the pointer (outside content boxes only): cells re-scramble, then lock back.
     pointer.dirty = false;
-    const R = CFG.pointerR, c0 = Math.max(0, Math.floor((pointer.x - offX - R) / CW)), c1 = Math.min(cols - 1, Math.floor((pointer.x - offX + R) / CW));
-    const r0 = Math.max(0, Math.floor((pointer.y - offY - R) / CH)), r1 = Math.min(rows - 1, Math.floor((pointer.y - offY + R) / CH));
+    const R = CFG.pointerR, px = pointer.x - RX, py = pointer.y - RY;
+    const c0 = Math.max(0, Math.floor((px - R) / CW)), c1 = Math.min(cols - 1, Math.floor((px + R) / CW));
+    const r0 = Math.max(0, Math.floor((py - R) / CH)), r1 = Math.min(rows - 1, Math.floor((py + R) / CH));
     for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
-      const dx = offX + c * CW + CW / 2 - pointer.x, dy = offY + r * CH + CH / 2 - pointer.y;
-      if (dx * dx + dy * dy < R * R) { const i = r * cols + c; scrUntil[i] = Math.max(scrUntil[i], t + 0.3 + 0.25 * rnd[i]); }
+      const i = r * cols + c, dx = c * CW + CW / 2 - px, dy = r * CH + CH / 2 - py;
+      if (!safe[i] && dx * dx + dy * dy < R * R) scrUntil[i] = Math.max(scrUntil[i], t + 0.3 + 0.25 * rnd[i]);
     }
   }
   render(t, false);
-  // Touch / narrow screens: play the resolve once, then sleep for good.
-  return mode === 'live' || t < introEnd + 0.1;
+  return mode === 'live' || t < introEnd + 0.1;       // touch / narrow: resolve once, then sleep
 }
 function frame(now) {
   raf = 0;
@@ -342,42 +382,41 @@ function frame(now) {
   const ms = performance.now() - t0;
   stats.record(ms);
   slowFrames = ms > CFG.budgetMs ? slowFrames + 1 : 0;
-  if (slowFrames > 90 && dprCap > 1) { dprCap = 1; layout(); }
+  if (slowFrames > 90 && dprCap > 1) { dprCap = 1; const t = clock; layout(); clock = t; }
   if (more) wake(); else prev = 0;
 }
-const allowed = () => (mode === 'live' || mode === 'once') && started && inView && !document.hidden;
+const allowed = () => mode !== 'still' && started && inView && !document.hidden;
 function wake() { if (!raf && allowed()) raf = requestAnimationFrame(frame); }
 function sleep() { if (raf) cancelAnimationFrame(raf); raf = 0; prev = 0; }
-
 function decideMode() {
   if (forcedStill || mqReduce.matches) return 'still';
   return mqFine.matches && innerWidth >= 768 ? 'live' : 'once';
 }
 function init() {
-  sleep(); layout(); mode = decideMode(); clock = 0;
+  sleep(); layout(); mode = decideMode(); clock = 0; remeasured = false;
   if (mode === 'still') { render(Infinity, true); return; }
   wake();
 }
 
-slot.addEventListener('pointermove', (e) => {
+// The slot is pointer-events: none (05 §3.3), so listen on the panel itself.
+panel.addEventListener('pointermove', (e) => {
   if (mode !== 'live' || e.pointerType === 'touch') return;
-  const r = slot.getBoundingClientRect(); pointer.x = e.clientX - r.left; pointer.y = e.clientY - r.top; pointer.active = true; pointer.dirty = true;
+  const r = panel.getBoundingClientRect(); pointer.x = e.clientX - r.left; pointer.y = e.clientY - r.top; pointer.active = true; pointer.dirty = true;
 }, { passive: true });
-slot.addEventListener('pointerleave', () => { pointer.active = false; }, { passive: true });
-// Start the resolve only when a third of the panel is visible; pause whenever it leaves.
-new IntersectionObserver((es) => { inView = es[es.length - 1].intersectionRatio >= 0.35; inView ? wake() : sleep(); }, { threshold: [0, 0.35] }).observe(slot.parentElement);
+panel.addEventListener('pointerleave', () => { pointer.active = false; }, { passive: true });
+new IntersectionObserver((es) => { inView = es[es.length - 1].intersectionRatio >= 0.25; inView ? wake() : sleep(); }, { threshold: [0, 0.25] }).observe(cv);
 document.addEventListener('visibilitychange', () => (document.hidden ? sleep() : wake()));
 let rw = 0, rh = 0;
 new ResizeObserver(() => {
-  const r = slot.getBoundingClientRect();
+  const r = panel.getBoundingClientRect();
   if (Math.round(r.width) === rw && Math.round(r.height) === rh) return;
   rw = Math.round(r.width); rh = Math.round(r.height);
   if (!started) return;
-  // Re-layout keeps the clock: after the intro the field re-samples and shows its end state at once.
-  const t = clock; sleep(); layout(); mode = decideMode(); clock = t;
+  // After the intro a resize re-samples and shows the end state at once.
+  const t = clock; sleep(); layout(); mode = decideMode(); clock = t; remeasured = t > 1.2;
   if (mode === 'still' || clock > introEnd) render(Infinity, true);
   wake();
-}).observe(slot);
+}).observe(panel);
 mqReduce.addEventListener('change', init);
 const boot = () => { started = true; document.fonts.ready.then(init); };
 'requestIdleCallback' in window ? requestIdleCallback(boot, { timeout: 1500 }) : setTimeout(boot, 1500);
