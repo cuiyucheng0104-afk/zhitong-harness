@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "智通数工AI",
   "version": "1.0.0",
-  "date": null,
+  "date": "2026-10-21",
   "base": "0.2.1-rc.2",
   "notes": [
     "首个正式版本：造价咨询对话式工作台，内置 Python 运行环境与 DWG 转换组件。",
@@ -10,9 +10,9 @@
   ],
   "platforms": {
     "mac-arm64": {
-      "file": null,
-      "sha256": null,
-      "size": null,
+      "file": "ztsgai-1.0.0-mac-arm64.dmg",
+      "sha256": "0619e3418061e875c463c149f16a1c2380e206390234be107e9a52d943000b07",
+      "size": 281676534,
       "notes": "适用于 Apple 芯片（M 系列）的 Mac。"
     },
     "win-x64": {
