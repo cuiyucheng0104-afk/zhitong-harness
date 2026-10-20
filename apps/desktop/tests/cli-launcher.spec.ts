@@ -24,7 +24,8 @@ function fixture() {
   const resources = join(application, ...platform === 'darwin' ? ['Contents', 'Resources'] : ['resources'])
   const cli = join(resources, 'runtime', 'cli')
   prepareDesktopCli(cli, platform)
-  const electron = join(application, ...platform === 'darwin' ? ['Contents', 'MacOS', 'DeepSeek Harness'] : ['DeepSeek Harness.exe'])
+  // zhitong increment: the launchers run Contents/MacOS/智通数工AI and ztsgai.exe.
+  const electron = join(application, ...platform === 'darwin' ? ['Contents', 'MacOS', '智通数工AI'] : ['ztsgai.exe'])
   mkdirSync(dirname(electron), { recursive: true })
   if (platform === 'win32') copyFileSync(process.execPath, electron)
   else symlinkSync(process.execPath, electron)

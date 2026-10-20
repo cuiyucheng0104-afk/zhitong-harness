@@ -107,7 +107,8 @@ export function createElectronBuilderConfig(
   const packaged = resolveDesktopBuildCommit(env)
   return {
     appId,
-    protocols: [{ name: 'DeepSeek Harness', schemes: ['dsh'] }],
+    // zhitong increment: product name 智通数工AI (zhitong/README.md §2); the dsh:// scheme is a protocol constant.
+    protocols: [{ name: '智通数工AI', schemes: ['dsh'] }],
     extraMetadata: {
       dshDesktopAppId: appId,
       dshDesktopUpdateChannel: update?.channel ?? 'nightly',
@@ -115,7 +116,9 @@ export function createElectronBuilderConfig(
       ...buildVersion === productVersion ? {} : { version: buildVersion },
       ...packaged === undefined ? {} : { dshBuildCommit: packaged.commit, dshBuildDirty: packaged.dirty },
     },
-    productName: 'DeepSeek Harness',
+    // zhitong increment: the macOS bundle is 智通数工AI.app. Electron userData stays under the package name
+    // (@deepseek-ai/dsh-desktop) because productName is not written into the packaged package.json.
+    productName: '智通数工AI',
     // Unsigned builds carry their own suffix so a shared file can never pass for a release artifact.
     artifactName: `deepseek-harness-\${version}-\${os}-\${arch}${output.suffix}.\${ext}`,
     directories: { output: output.directory },
@@ -161,13 +164,17 @@ export function createElectronBuilderConfig(
     mac: {
       icon: fileURLToPath(new URL('../resources/icon-macos.png', import.meta.url)),
       category: 'public.app-category.developer-tools',
-      // macOS matches the application locale against this bundle, not Electron Framework resources.
-      extendInfo: { CFBundleLocalizations: ['en', 'zh_CN'] },
       // Ad-hoc signing keeps the modified Electron executable runnable without a Developer ID.
       identity: unsigned ? '-' : macOSSigning?.signingIdentity,
       forceCodeSigning: !unsigned,
       hardenedRuntime: true,
-      extendInfo: { NSMicrophoneUsageDescription: 'DeepSeek Harness uses your microphone to transcribe speech into message drafts.' },
+      // macOS matches the application locale against this bundle, not Electron Framework resources.
+      // zhitong increment: one extendInfo object; a second `extendInfo` key in this literal replaced the first
+      // and dropped CFBundleLocalizations. Microphone copy names 智通数工AI.
+      extendInfo: {
+        CFBundleLocalizations: ['en', 'zh_CN'],
+        NSMicrophoneUsageDescription: '智通数工AI uses your microphone to transcribe speech into message drafts.',
+      },
       entitlements: fileURLToPath(new URL('./macos-entitlements.plist', import.meta.url)),
       entitlementsInherit: fileURLToPath(new URL('./macos-entitlements.plist', import.meta.url)),
       // Prepared runtime files retain their signatures; PAK resources are sealed by their enclosing bundle.
@@ -239,6 +246,10 @@ export function createElectronBuilderConfig(
     },
     win: {
       icon: fileURLToPath(new URL('../resources/icon-windows.png', import.meta.url)),
+      // zhitong increment: ASCII executable and installation directory (%LOCALAPPDATA%\Programs\ztsgai\ztsgai.exe);
+      // electron-builder falls back to the scoped package name for a non-ASCII product name, and cli/dsh.cmd runs
+      // under the console code page.
+      executableName: 'ztsgai',
       forceCodeSigning: !unsigned,
       signtoolOptions: {
         sign: windowsSigner,

@@ -28,7 +28,8 @@ const FILE_SETTINGS = ['DSH_DESKTOP_WINDOWS_CER_FILE', 'DSH_DESKTOP_WINDOWS_SIGN
 export function localMacOSPackageEnvironment(environment = process.env) {
   return {
     ...Object.fromEntries(Object.entries(environment).filter(([name]) => !AMBIENT_RELEASE_SETTING.test(name))),
-    DSH_DESKTOP_APP_ID: 'com.deepseek.harness',
+    // zhitong increment: 智通数工AI application identifier.
+    DSH_DESKTOP_APP_ID: 'com.ztsgai.harness',
     DSH_DESKTOP_UNSIGNED: '1',
   }
 }

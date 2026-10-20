@@ -4,7 +4,8 @@ import type { AfterPackContext, BeforePackContext } from 'app-builder-lib'
 export interface DesktopElectronBuilderConfig {
   readonly appId: string
   readonly artifactName: string
-  readonly protocols: readonly [{ readonly name: 'DeepSeek Harness'; readonly schemes: readonly ['dsh'] }]
+  // zhitong increment: protocol display name follows productName 智通数工AI.
+  readonly protocols: readonly [{ readonly name: '智通数工AI'; readonly schemes: readonly ['dsh'] }]
   readonly directories: {
     readonly output: string
   }
@@ -21,7 +22,8 @@ export interface DesktopElectronBuilderConfig {
     ...{ readonly from: string, readonly to: 'tray.ico' }[],
   ]
   readonly mac: {
-    readonly extendInfo: { readonly NSMicrophoneUsageDescription: string }
+    // zhitong increment: one extendInfo object carries both keys.
+    readonly extendInfo: { readonly CFBundleLocalizations: readonly string[], readonly NSMicrophoneUsageDescription: string }
     readonly entitlements: string
     readonly entitlementsInherit: string
     readonly identity: string | undefined

@@ -9,7 +9,8 @@ import { join } from 'node:path'
 
 function requireDesktopProfile(dir: string): void {
   if (!existsSync(join(dir, 'package.json'))) {
-    throw new Error('Open DeepSeek Harness Desktop once to initialize its profile, then fully quit it before running dsh plugin --profile desktop.')
+    // zhitong increment: the Desktop application is 智通数工AI.
+    throw new Error('Open the 智通数工AI desktop app once to initialize its profile, then fully quit it before running dsh plugin --profile desktop.')
   }
 }
 

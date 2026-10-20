@@ -137,7 +137,8 @@ if ($MyInvocation.InvocationName -ne '.') {
         try { $machinePath = [string]$machine.GetValue('Path', '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames) }
         finally { $machine.Dispose() }
         $sid = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
-        $state = Invoke-DshCommandPath -Request $request -EnvironmentKey 'Environment' -OwnerKey 'Software\DeepSeekHarness\Command' -MachinePath $machinePath -MutexName ('Global\DeepSeekHarness.Command.' + $sid)
+        # zhitong increment: 智通数工AI keeps its own command ownership record and mutex beside an upstream installation.
+        $state = Invoke-DshCommandPath -Request $request -EnvironmentKey 'Environment' -OwnerKey 'Software\Ztsgai\Command' -MachinePath $machinePath -MutexName ('Global\Ztsgai.Command.' + $sid)
         if ($request.operation -ne 'inspect') {
             Send-DshCommandEnvironmentChange
         }
