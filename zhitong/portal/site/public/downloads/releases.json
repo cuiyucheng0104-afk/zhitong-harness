@@ -16,9 +16,9 @@
       "notes": "适用于 Apple 芯片（M 系列）的 Mac。"
     },
     "win-x64": {
-      "file": null,
-      "sha256": null,
-      "size": null,
+      "file": "ztsgai-1.0.0-win-x64-setup.exe",
+      "sha256": "b30e00190fd91179f68217cdfc42910d033d2542a4140afa335e368a305bdc5f",
+      "size": 308536587,
       "notes": "适用于 64 位 Windows 10 / 11。"
     }
   }
