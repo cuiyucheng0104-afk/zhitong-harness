@@ -1,7 +1,8 @@
+# zhitong increment: fork 内只手动触发
 name: CI
 
 on:
-  pull_request:
+  workflow_dispatch:
 permissions:
   contents: read
 

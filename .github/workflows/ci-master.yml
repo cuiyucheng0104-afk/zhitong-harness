@@ -1,8 +1,7 @@
+# zhitong increment: fork 内只手动触发
 name: CI master
 
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
     inputs:
       suite:

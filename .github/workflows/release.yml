@@ -1,3 +1,4 @@
+# zhitong increment: fork 内只手动触发
 # Pack the dsh release sequence: every package under packages/ plus the apps/
 # entries, all on one version. The vendored framework and the native packages are
 # separate sequences with their own workflows and version lines.
@@ -8,9 +9,6 @@
 name: Release (dsh)
 
 on:
-  pull_request:
-  push:
-    branches: [master]
   workflow_dispatch:
 
 permissions:
