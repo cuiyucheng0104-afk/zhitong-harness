@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D4 尺寸线分隔</title>
+<style>
+:root{
+  --ink:#162943;--navy:#0b347d;--blue:#0666f5;--green:#12c68b;--muted:#5c6d82;
+  --grid-line:#dce8f4;--grid-line-strong:#c5d6ea;--canvas:#f5f8fd;--line:#d9e4f0;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:"PingFang SC","Microsoft YaHei","Noto Sans SC","WenQuanYi Zen Hei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:16px/1.8 var(--sans);color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+button{font:inherit}
+/* ---------- reference chrome ---------- */
+.refbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;height:40px;padding:0 16px;background:rgba(255,255,255,.95);border-bottom:1px solid var(--grid-line);font:12px/1 var(--mono);color:var(--muted)}
+.refbar a{color:var(--navy);text-decoration:none}.refbar b{color:var(--ink);font-weight:600}.refbar .sp{flex:1}
+.refbar button{height:26px;padding:0 10px;border:1px solid var(--grid-line-strong);border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font:12px var(--mono)}
+.refbar button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.refbar output{min-width:190px;text-align:right}
+@media (max-width:767px){.refbar .desc,.refbar output{display:none}}
+/* ---------- page mock ---------- */
+.container{width:min(1248px,calc(100% - 192px));margin-inline:auto}
+.sec{padding:96px 0}
+.sec .eyebrow{margin:0 0 10px;font:13px var(--mono);color:var(--blue)}
+.sec h2{margin:0;font-size:40px;line-height:1.3;letter-spacing:-.02em}
+.sec .bars{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
+.sec .bars i{display:block;height:160px;border:1px solid var(--line);border-radius:12px;background:#fbfdff}
+@media (max-width:1023px){.container{width:calc(100% - 96px)}}
+@media (max-width:767px){.container{width:calc(100% - 40px)}.sec{padding:64px 0}.sec h2{font-size:30px}.sec .bars{grid-template-columns:1fr}.sec .bars i{height:96px}}
+/* ---------- D4 DimensionDivider (component styles) ---------- */
+.dim{position:relative;height:56px}
+.dim svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.dim text{font:500 12px var(--mono);fill:var(--navy);letter-spacing:.04em}
+.dim .bub text{font-size:10px;fill:#7189a8;letter-spacing:0}
+@media (max-width:767px){.dim{height:44px}}
+</style>
+</head>
+<body>
+<header class="refbar">
+  <a href="index.html">← 动效参考</a><b>D4 · DimensionDivider</b><span class="desc">章节接缝 · 尺寸线随滚动标注（滚动页面查看）</span>
+  <span class="sp"></span><output id="stat">—</output>
+  <button id="replay" type="button">重播</button><button id="still" type="button" aria-pressed="false">静态终帧</button>
+</header>
+<main>
+  <section class="sec container"><p class="eyebrow">03</p><h2>三类使用者，各管一段</h2><div class="bars"><i></i><i></i><i></i></div></section>
+  <div class="container"><div class="dim" data-from="3" data-to="4" aria-hidden="true"></div></div>
+  <section class="sec container"><p class="eyebrow">04</p><h2>一个项目，一次对话做完</h2><div class="bars"><i></i><i></i><i></i></div></section>
+  <div class="container"><div class="dim" data-from="4" data-to="5" aria-hidden="true"></div></div>
+  <section class="sec container"><p class="eyebrow">05</p><h2>十二项能力</h2><div class="bars"><i></i><i></i><i></i></div></section>
+  <div class="container"><div class="dim" data-from="8" data-to="9" aria-hidden="true"></div></div>
+  <section class="sec container"><p class="eyebrow">09</p><h2>常见问题</h2><div class="bars"><i></i><i></i><i></i></div></section>
+</main>
+
+<script>
+(() => {
+'use strict';
+/**
+ * @typedef {Object} DimensionDividerConfig
+ * @property {number} start      viewport fraction where drawing starts (divider top crosses it)
+ * @property {number} span       viewport fraction scrolled from 0 to fully drawn
+ * @property {number} scrub      s for the drawn state to catch up with scroll (00 §5.2 SCRUB.soft)
+ * @property {number} lineY      dimension line y in the 56px box
+ * @property {number} tick       half-length of the 45° end ticks
+ * @property {Record<'desktop'|'tablet'|'mobile', number>} columns  grid columns marked as chained ticks
+ * @property {number} bubbleOut  px outside the container for end bubbles (desktop only)
+ */
+/** @type {DimensionDividerConfig} */
+const CFG = { start: 0.92, span: 0.36, scrub: 0.6, lineY: 34, tick: 4.5, columns: { desktop: 12, tablet: 8, mobile: 4 }, bubbleOut: 34 };
+const NS = 'http://www.w3.org/2000/svg';
+const mqReduce = matchMedia('(prefers-reduced-motion: reduce)');
+const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+/** Drawing convention: thousands separated by a space, no decimals for mm. */
+const fmt = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+function el(name, attrs, parent) { const e = document.createElementNS(NS, name); for (const k in attrs) e.setAttribute(k, attrs[k]); parent?.appendChild(e); return e; }
+
+/** One divider: builds its SVG for the current width and exposes set(progress). */
+function makeDivider(host) {
+  const svg = el('svg', { 'aria-hidden': 'true', focusable: 'false' }, host);
+  let parts = null, W = 0;
+  function build() {
+    W = Math.round(host.getBoundingClientRect().width);
+    const y = innerWidth < 768 ? 28 : CFG.lineY, mobile = innerWidth < 768;
+    svg.textContent = '';
+    svg.setAttribute('viewBox', `0 0 ${W} ${host.clientHeight}`);
+    const ext = [0, W].map((x) => el('line', { x1: x + 0.5 - (x ? 1 : 0), x2: x + 0.5 - (x ? 1 : 0), y1: y - 22, y2: y + 10, stroke: '#c5d6ea' }, svg));
+    const line = el('line', { x1: W / 2, x2: W / 2, y1: y + 0.5, y2: y + 0.5, stroke: '#9db4d3' }, svg);
+    // Chained column ticks: both edges of every gutter of the layout grid.
+    const n = mobile ? CFG.columns.mobile : innerWidth < 1024 ? CFG.columns.tablet : CFG.columns.desktop, gut = mobile ? 16 : 24, cw = (W - (n - 1) * gut) / n;
+    const ticks = [];
+    for (let k = 1; k < n; k++) for (const x of [k * (cw + gut) - gut, k * (cw + gut)])
+      ticks.push(el('line', { x1: x - 2.5, y1: y + 3, x2: x + 2.5, y2: y - 2, stroke: '#a9bfdc', opacity: 0 }, svg));
+    const ends = [0, W].map((x) => el('line', { x1: x - CFG.tick, y1: y + CFG.tick, x2: x + CFG.tick, y2: y - CFG.tick, stroke: '#0b347d', 'stroke-width': 1.5, 'stroke-linecap': 'round', opacity: 0 }, svg));
+    const text = el('text', { x: W / 2, y: y - 9, 'text-anchor': 'middle' }, svg);
+    const bubs = [];
+    if (innerWidth >= 1024) for (const [x, label] of [[-CFG.bubbleOut, host.dataset.from], [W + CFG.bubbleOut, host.dataset.to]]) {
+      const g = el('g', { class: 'bub', opacity: 0, transform: `translate(${x} ${y})` }, svg);
+      el('circle', { r: 9.5, fill: '#fff', stroke: '#bfd0e6' }, g);
+      el('text', { y: 3.5, 'text-anchor': 'middle' }, g).textContent = label;
+      el('line', { x1: x < 0 ? 9.5 : -9.5, x2: x < 0 ? CFG.bubbleOut : -CFG.bubbleOut, y1: 0.5, y2: 0.5, stroke: '#dce8f4' }, g);
+      bubs.push(g);
+    }
+    parts = { ext, line, ticks, ends, text, bubs, y };
+  }
+  let lastKey = '';
+  /** @param {number} p 0..1 drawn amount */
+  function set(p) {
+    const key = p.toFixed(4); if (key === lastKey) return; lastKey = key;
+    // Scroll-linked: length is linear in progress (EASE.linear); smoothness comes from the scrub damping.
+    const e = p, half = (W / 2) * e;
+    parts.line.setAttribute('x1', W / 2 - half); parts.line.setAttribute('x2', W / 2 + half);
+    parts.text.textContent = fmt(W * e);
+    parts.text.setAttribute('opacity', clamp01(p * 4));
+    for (const t of parts.ticks) { const x = +t.getAttribute('x1') + 2.5; t.setAttribute('opacity', Math.abs(x - W / 2) <= half ? 1 : 0); }
+    const endP = clamp01((p - 0.9) / 0.1);
+    for (const l of parts.ext) { l.setAttribute('y1', parts.y + 10 - 32 * endP); }
+    for (const l of parts.ends) l.setAttribute('opacity', endP);
+    for (const b of parts.bubs) b.setAttribute('opacity', clamp01((p - 0.96) / 0.04));
+  }
+  build();
+  return { host, build: () => { build(); lastKey = ''; }, set, shown: 0, inView: false };
+}
+
+const dividers = [...document.querySelectorAll('.dim')].map(makeDivider);
+
+/* ---------------- scroll scrub with damping (production: ScrollTrigger scrub: SCRUB.soft) ---------------- */
+const stats = { frames: 0, total: 0, max: 0, winFrames: 0, winTotal: 0,
+  record(ms) { this.frames++; this.total += ms; this.max = Math.max(this.max, ms); this.winFrames++; this.winTotal += ms; },
+  reset() { this.frames = this.total = this.max = this.winFrames = this.winTotal = 0; } };
+window.__deco = { stats };
+let raf = 0, prev = 0, still = false, forcedStill = false;
+const target = (d) => { const r = d.host.getBoundingClientRect(); return clamp01((innerHeight * CFG.start - r.top) / (innerHeight * CFG.span)); };
+
+function frame(now) {
+  raf = 0;
+  const dt = prev ? Math.min(0.05, (now - prev) / 1000) : 1 / 60; prev = now;
+  const t0 = performance.now();
+  let busy = false;
+  for (const d of dividers) {
+    const tg = target(d);
+    // Offscreen dividers jump to their scroll state; only visible ones animate.
+    if (!d.inView) { if (d.shown !== tg) { d.shown = tg; d.set(tg); } continue; }
+    // Exponential catch-up: ~95% of the gap closes in CFG.scrub seconds.
+    d.shown += (tg - d.shown) * (1 - Math.exp(-dt * 3 / CFG.scrub));
+    if (Math.abs(tg - d.shown) < 0.0005) d.shown = tg; else busy = true;
+    d.set(d.shown);
+  }
+  stats.record(performance.now() - t0);
+  if (busy) wake(); else prev = 0;
+}
+function wake() { if (!raf && !still && !document.hidden) raf = requestAnimationFrame(frame); }
+const io = new IntersectionObserver((es) => { for (const e of es) { const d = dividers.find((x) => x.host === e.target); d.inView = e.isIntersecting; } wake(); }, { rootMargin: '10% 0px' });
+dividers.forEach((d) => io.observe(d.host));
+addEventListener('scroll', wake, { passive: true });
+document.addEventListener('visibilitychange', wake);
+new ResizeObserver(() => { dividers.forEach((d) => { d.build(); d.set(still ? 1 : d.shown); }); }).observe(document.body);
+
+function init() {
+  still = forcedStill || mqReduce.matches;
+  if (raf) cancelAnimationFrame(raf); raf = 0; prev = 0;
+  // Reduced motion: every divider shows its end state; scroll does nothing.
+  for (const d of dividers) { d.shown = still ? 1 : 0; d.set(d.shown); }
+  wake();
+}
+mqReduce.addEventListener('change', init);
+init();
+
+/* ---------------- reference chrome ---------------- */
+const out = document.getElementById('stat');
+setInterval(() => {
+  const f = stats.winFrames, avg = f ? stats.winTotal / f : 0;
+  out.textContent = still ? '静态终帧' : f ? `脚本 ${avg.toFixed(3)} ms/帧 · ${f * 2} fps` : '循环休眠（滚动唤醒）';
+  stats.winFrames = 0; stats.winTotal = 0;
+}, 500);
+document.getElementById('replay').onclick = () => { stats.reset(); scrollTo(0, 0); init(); };
+const stillBtn = document.getElementById('still');
+stillBtn.onclick = () => { forcedStill = !forcedStill; stillBtn.setAttribute('aria-pressed', String(forcedStill)); init(); };
+window.__deco.replay = init;
+})();
+</script>
+</body>
+</html>
