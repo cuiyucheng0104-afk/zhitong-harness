@@ -1,11 +1,12 @@
 // node --test zhitong/scripts/tests/：桌面打包脚本与 bundle 的 skill 目录定位。
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { after, describe, it } from 'node:test'
-import { bareImports, dwg2dxfFiles, packageName, undeclaredImports } from '../pack-desktop.mjs'
+import { bareImports, dwg2dxfFiles, packageName, tarballFiles, tarballText, undeclaredImports } from '../pack-desktop.mjs'
 
 const require = createRequire(import.meta.url)
 const { physicalPath, skillsDir } = require('../../bundle/skills-dir.cjs')
@@ -50,6 +51,24 @@ describe('pack-desktop import checks', () => {
       'bin/darwin-arm64/dwg2dxf', 'bin/darwin-arm64/COPYING', 'bin/darwin-arm64/VERSION.txt', 'bin/darwin-arm64/SOURCE-OFFER.txt',
     ])
     assert.equal(dwg2dxfFiles('win32', 'x64')[0], 'bin/win32-x64/dwg2dxf.exe')
+  })
+})
+
+describe('pack-desktop tarball reading', () => {
+  it('lists Chinese-named entries and reads one file without the system tar', () => {
+    const root = temp()
+    const template = join(root, 'package', 'skills', 'zt-report', 'data', 'docx-templates')
+    mkdirSync(template, { recursive: true })
+    writeFileSync(join(root, 'package', 'package.json'), '{"name":"@zhitong/bundle"}')
+    writeFileSync(join(template, '咨询成果报告书（概算）.docx'), 'docx')
+    writeFileSync(join(root, 'package', 'skills', 'zt-report', 'SKILL.md'), '---\nname: zt-report\n---\n中文正文')
+    execFileSync('tar', ['-czf', 'bundle.tgz', 'package'], { cwd: root })
+    const tarball = join(root, 'bundle.tgz')
+    assert.deepEqual(tarballFiles(tarball).sort(), [
+      'package.json', 'skills/zt-report/SKILL.md', 'skills/zt-report/data/docx-templates/咨询成果报告书（概算）.docx',
+    ])
+    assert.equal(tarballText(tarball, 'skills/zt-report/SKILL.md'), '---\nname: zt-report\n---\n中文正文')
+    assert.throws(() => tarballText(tarball, 'missing.json'), /里没有 missing.json/u)
   })
 })
 

@@ -17,7 +17,7 @@
  * `ZT_ALLOW_MISSING_DWG2DXF=1` has the same effect as `--allow-missing-dwg2dxf` (DXF-only installers).
  */
 
-import { execFileSync, spawnSync } from 'node:child_process'
+import { spawnSync } from 'node:child_process'
 import { builtinModules, createRequire } from 'node:module'
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs'
 import { basename, dirname, join, relative, resolve } from 'node:path'
@@ -126,13 +126,46 @@ function copyWithoutCaches(from, to) {
   })
 }
 
-function tarballFiles(tarball) {
-  return execFileSync('tar', ['-tzf', tarball], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
-    .split(/\r?\n/u).filter(line => line !== '').map(line => line.replace(/^package\//u, ''))
+// The repository's node-tar (the library `pnpm pack` writes with). Windows' bsdtar cannot list the tarball:
+// it converts entry names to the console code page and skips the Chinese-named skill files as unreadable.
+const tar = createRequire(join(REPOSITORY, 'package.json'))('tar')
+
+/**
+ * Entry paths of a `pnpm pack` tarball without the leading `package/`.
+ * @param {string} tarball - Absolute `.tgz` path.
+ * @returns {string[]} File entries in archive order; directories are omitted.
+ */
+export function tarballFiles(tarball) {
+  const files = []
+  tar.list({
+    file: tarball,
+    sync: true,
+    onReadEntry: entry => { if (entry.type === 'File') files.push(entry.path.replace(/^package\//u, '')) },
+  })
+  return files
 }
 
-function tarballText(tarball, file) {
-  return execFileSync('tar', ['-xOzf', tarball, `package/${file}`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
+/**
+ * One file's text from a `pnpm pack` tarball.
+ * @param {string} tarball - Absolute `.tgz` path.
+ * @param {string} file - Entry path without the leading `package/`.
+ * @returns {string} UTF-8 content.
+ * @throws {Error} When the tarball has no such entry.
+ */
+export function tarballText(tarball, file) {
+  const chunks = []
+  let found = false
+  tar.list({
+    file: tarball,
+    sync: true,
+    onReadEntry: entry => {
+      if (entry.path !== `package/${file}`) return
+      found = true
+      entry.on('data', chunk => chunks.push(chunk))
+    },
+  })
+  if (!found) throw new Error(`pack-desktop: ${basename(tarball)} 里没有 ${file}`)
+  return Buffer.concat(chunks).toString('utf8')
 }
 
 function checkTarball(tarball, options) {
