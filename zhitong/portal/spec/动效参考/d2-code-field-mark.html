@@ -27,7 +27,7 @@ button{font:inherit}
 .section{padding:96px 0}
 .ctx{font-size:14px;color:var(--muted);margin:0 0 24px;font-family:var(--mono)}
 .panel{position:relative;isolation:isolate;overflow:hidden;border-radius:16px;color:#fff;padding:56px 64px;
-  display:grid;grid-template-columns:5fr 4fr 3fr;gap:24px;align-items:center;min-height:360px;
+  display:grid;grid-template-columns:minmax(0,5fr) minmax(0,4fr) minmax(220px,2.4fr);gap:24px;align-items:center;min-height:380px;
   /* D6 static base: hairline blueprint grid on navy (no JS, no animation) */
   background-color:var(--navy-900);
   background-image:linear-gradient(to right,rgba(255,255,255,.075) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.075) 1px,transparent 1px),linear-gradient(to right,rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.035) 1px,transparent 1px);
@@ -42,7 +42,7 @@ button{font:inherit}
 .btn-white{height:48px;padding:0 24px;border-radius:10px;border:0;background:#fff;color:var(--navy);font-size:16px;font-weight:600}
 .action small{font-size:12px;color:#c1d9fa}
 /* ---------- D2 CodeFieldMark (component styles) ---------- */
-.cf-slot{position:relative;align-self:stretch;margin:-56px 0;min-height:240px;pointer-events:auto}
+.cf-slot{position:relative;align-self:stretch;margin:-56px -24px;min-height:240px;pointer-events:auto}
 .cf-slot canvas{position:absolute;inset:0;width:100%;height:100%}
 @media (max-width:1023px){.container{width:calc(100% - 96px)}.panel{grid-template-columns:1fr 1fr;padding:48px}.cf-slot{display:none}}
 @media (max-width:767px){.container{width:calc(100% - 40px)}.section{padding:56px 0}
@@ -97,9 +97,12 @@ const CODES = ['010101001001','010101002001','010101004001','010103001001','0104
  * @property {number} fontPx        glyph size, CSS px
  * @property {number} cellW         cell pitch, CSS px
  * @property {number} cellH
+ * @property {{below:number,fontPx:number,cellW:number,cellH:number}} compact  finer cells when min(slot w, h) < below
  * @property {number} markScale     mark edge as a fraction of min(slot width, slot height)
  * @property {[number,number]} fieldAlpha  alpha range for codes outside the mark (before vignette)
- * @property {[number,number]} vignette    elliptical fade: full inside r0, zero at r1 (1 = slot edge)
+ * @property {number} halo          px over which the code field fades out with distance from the mark outline
+ * @property {number} edgeFade      px fade at the slot edges (no hard canvas border)
+ * @property {[number,number,number]} tileAlpha  tile alpha under body / white-stroke / accent cells (makes the outline read)
  * @property {number} lockStart     s before the first cell locks
  * @property {number} lockSpanIn    s for the lock wave to cross the mark (centre → edge)
  * @property {number} lockSpanOut   s for the wave to cross the surrounding field
@@ -113,12 +116,12 @@ const CODES = ['010101001001','010101002001','010101004001','010103001001','0104
  * @property {number} budgetMs      per-frame script budget; sustained overrun drops DPR to 1
  */
 /** @type {CodeFieldConfig} */
-const CFG = { fontPx: 11, cellW: 8, cellH: 12, markScale: 0.72, fieldAlpha: [0.12, 0.3], vignette: [0.42, 1],
+const CFG = { fontPx: 10, cellW: 7, cellH: 11, compact: { below: 260, fontPx: 7.5, cellW: 5, cellH: 8 }, markScale: 0.8, fieldAlpha: [0.07, 0.2], halo: 84, edgeFade: 28, tileAlpha: [0.12, 0.3, 0.3],
   lockStart: 0.45, lockSpanIn: 0.95, lockSpanOut: 0.8, lockJitter: 0.25, flashDur: 0.55,
   twinkleRate: 0.012, glintPeriod: 8, glintDur: 1.6, pointerR: 34, dprCap: 2, budgetMs: 3 };
-const FIELD_COLOR = '#6f9be8';
-const GLYPHS = '0123456789·';
-const DOT = 10, BLANK = 15;
+const FIELD_COLOR = '#5f8bd8';
+const GLYPHS = '0123456789·■'; // the last entry is the tile, drawn as a rect
+const DOT = 10, TILE = 11, BLANK = 15;
 const CLS_OUT = 0, CLS_BODY = 1, CLS_LIGHT = 2, CLS_ACC = 3;
 const STEPS = 12;
 const ROW_LIGHT = STEPS, ROW_ACC = STEPS + 1, ROW_FIELD = STEPS + 2, ROW_FLASH = STEPS + 3, ROW_FLASH_BOLD = STEPS + 4;
@@ -163,7 +166,14 @@ function gradColor(t) {
 }
 
 /* ---------------- state ---------------- */
-let W = 0, H = 0, dpr = 1, dprCap = CFG.dprCap, cols = 0, rows = 0, N = 0, offX = 0, offY = 0, introEnd = 0, markInfo = { cx: 0, cy: 0, S: 0 };
+/** Active cell metrics (regular or compact). */
+let CW = CFG.cellW, CH = CFG.cellH, FPX = CFG.fontPx;
+let W = 0, H = 0, dpr = 1, dprCap = CFG.dprCap, cols = 0, rows = 0, N = 0, offX = 0, offY = 0, introEnd = 0, markInfo = { cx: 0, cy: 0, S: 0, rx: 0 };
+/** Signed distance from (x, y) to the mark's rounded square (negative inside). */
+function markSdf(x, y) {
+  const h = markInfo.S / 2 - markInfo.rx, qx = Math.abs(x - markInfo.cx) - h, qy = Math.abs(y - markInfo.cy) - h;
+  return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - markInfo.rx;
+}
 /** @type {HTMLCanvasElement} */ let atlas = document.createElement('canvas');
 let glyph = new Uint8Array(0), cls = new Uint8Array(0), step = new Uint8Array(0), baseA = new Float32Array(0),
   lockAt = new Float32Array(0), rnd = new Float32Array(0), scrUntil = new Float32Array(0), glintP = new Float32Array(0), last = new Int32Array(0);
@@ -172,20 +182,21 @@ function buildAtlas() {
   const rowsSpec = [];
   for (let s = 0; s < STEPS; s++) rowsSpec.push([gradColor(s / (STEPS - 1)), 400]);
   rowsSpec.push(['#ffffff', 700], [ACC_COLOR, 700], [FIELD_COLOR, 400], ['#ffffff', 400], ['#ffffff', 700]);
-  const cw = Math.round(CFG.cellW * dpr), ch = Math.round(CFG.cellH * dpr);
+  const cw = Math.round(CW * dpr), ch = Math.round(CH * dpr);
   atlas.width = cw * GLYPHS.length; atlas.height = ch * rowsSpec.length;
   const a = atlas.getContext('2d'); a.clearRect(0, 0, atlas.width, atlas.height);
   a.textAlign = 'center'; a.textBaseline = 'middle';
   rowsSpec.forEach(([color, weight], r) => {
-    a.font = `${weight} ${Math.round(CFG.fontPx * dpr)}px ${MONO}`; a.fillStyle = color;
-    for (let g = 0; g < GLYPHS.length; g++) a.fillText(GLYPHS[g], g * cw + cw / 2, r * ch + ch / 2 + 0.5 * dpr);
+    a.font = `${weight} ${Math.round(FPX * dpr)}px ${MONO}`; a.fillStyle = color;
+    for (let g = 0; g < TILE; g++) a.fillText(GLYPHS[g], g * cw + cw / 2, r * ch + ch / 2 + 0.5 * dpr);
+    a.fillRect(TILE * cw + Math.round(dpr), r * ch + Math.round(dpr), cw - 2 * Math.round(dpr), ch - 2 * Math.round(dpr));
   });
 }
 
 /** Rasterise the mark into class channels (R body, G white strokes, B accent strokes) and average per cell. */
 function sampleMark() {
   const S = Math.round(Math.min(W, H) * CFG.markScale), mx = Math.round((W - S) / 2), my = Math.round((H - S) / 2);
-  markInfo = { cx: mx + S / 2, cy: my + S / 2, S };
+  markInfo = { cx: mx + S / 2, cy: my + S / 2, S, rx: MARK.rect.rx / MARK.box[2] * S };
   const off = document.createElement('canvas'); off.width = W; off.height = H;
   const c = off.getContext('2d', { willReadFrequently: true });
   const [bx, by, bw] = MARK.box, k = S / bw, R = MARK.rect;
@@ -198,13 +209,13 @@ function sampleMark() {
   const px = c.getImageData(0, 0, W, H).data;
   const G = MARK.grad, gdx = G.x2 - G.x1, gdy = G.y2 - G.y1, gl = gdx * gdx + gdy * gdy || 1;
   for (let i = 0; i < N; i++) {
-    const x0 = offX + (i % cols) * CFG.cellW, y0 = offY + ((i / cols) | 0) * CFG.cellH;
+    const x0 = offX + (i % cols) * CW, y0 = offY + ((i / cols) | 0) * CH;
     let r = 0, gg = 0, b = 0, n = 0;
-    for (let y = y0; y < y0 + CFG.cellH && y < H; y++) for (let x = x0; x < x0 + CFG.cellW && x < W; x++) {
+    for (let y = y0; y < y0 + CH && y < H; y++) for (let x = x0; x < x0 + CW && x < W; x++) {
       const p = (y * W + x) * 4, a = px[p + 3] / 255; r += px[p] * a; gg += px[p + 1] * a; b += px[p + 2] * a; n++;
     }
     n = n * 255 || 1; r /= n; gg /= n; b /= n;
-    const cx = x0 + CFG.cellW / 2, cy = y0 + CFG.cellH / 2;
+    const cx = x0 + CW / 2, cy = y0 + CH / 2;
     if (gg > 0.3) { cls[i] = CLS_LIGHT; baseA[i] = Math.min(1, gg / 0.55); }
     else if (b > 0.3) { cls[i] = CLS_ACC; baseA[i] = Math.min(1, b / 0.55); }
     else if (r + gg + b > 0.12) { cls[i] = CLS_BODY; baseA[i] = 0.92 * Math.pow(Math.min(1, r + gg + b), 0.7); }
@@ -220,10 +231,12 @@ function layout() {
   const r = slot.getBoundingClientRect();
   W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
   dpr = Math.min(dprCap, window.devicePixelRatio || 1);
+  const cm = Math.min(W, H) < CFG.compact.below ? CFG.compact : CFG;
+  CW = cm.cellW; CH = cm.cellH; FPX = cm.fontPx;
   cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.imageSmoothingEnabled = false;
-  cols = Math.floor(W / CFG.cellW); rows = Math.floor(H / CFG.cellH); N = cols * rows;
-  offX = Math.floor((W - cols * CFG.cellW) / 2); offY = Math.floor((H - rows * CFG.cellH) / 2);
+  cols = Math.floor(W / CW); rows = Math.floor(H / CH); N = cols * rows;
+  offX = Math.floor((W - cols * CW) / 2); offY = Math.floor((H - rows * CH) / 2);
   glyph = new Uint8Array(N); cls = new Uint8Array(N); step = new Uint8Array(N); baseA = new Float32Array(N);
   lockAt = new Float32Array(N); rnd = new Float32Array(N); scrUntil = new Float32Array(N); glintP = new Float32Array(N); last = new Int32Array(N).fill(-1);
   buildAtlas(); sampleMark();
@@ -235,9 +248,11 @@ function layout() {
     const inside = cls[i] !== CLS_OUT;
     glyph[i] = k === 12 ? (inside ? DOT : BLANK) : code.charCodeAt(k) - 48;
     rnd[i] = Math.random();
-    const x = offX + c * CFG.cellW + CFG.cellW / 2, y = offY + row * CFG.cellH + CFG.cellH / 2;
-    const d = Math.hypot((x - W / 2) / (W / 2), (y - H / 2) / (H / 2));
-    if (!inside) baseA[i] = (CFG.fieldAlpha[0] + (CFG.fieldAlpha[1] - CFG.fieldAlpha[0]) * rnd[i]) * (1 - smooth(CFG.vignette[0], CFG.vignette[1], d));
+    const x = offX + c * CW + CW / 2, y = offY + row * CH + CH / 2;
+    // Field alpha falls off with distance from the mark outline and near the slot edges.
+    const sd = Math.max(0, markSdf(x, y)), edge = Math.min(x, y, W - x, H - y);
+    const d = clamp01(sd / CFG.halo);
+    if (!inside) baseA[i] = (CFG.fieldAlpha[0] + (CFG.fieldAlpha[1] - CFG.fieldAlpha[0]) * rnd[i]) * (1 - smooth(0, 1, d)) * smooth(0, CFG.edgeFade, edge);
     const sIn = Math.hypot(x - markInfo.cx, y - markInfo.cy) / (markInfo.S * 0.72);
     lockAt[i] = CFG.lockStart + (inside ? CFG.lockSpanIn * clamp01(sIn) : CFG.lockSpanIn * 0.55 + CFG.lockSpanOut * clamp01(d)) + CFG.lockJitter * rnd[i];
     maxLock = Math.max(maxLock, lockAt[i]);
@@ -253,7 +268,7 @@ const scramble = (i, t) => (Math.imul(i + 1, 2654435761) ^ Math.imul(Math.floor(
 let mode = 'live';
 
 function render(t, still) {
-  const cwD = Math.round(CFG.cellW * dpr), chD = Math.round(CFG.cellH * dpr);
+  const cwD = Math.round(CW * dpr), chD = Math.round(CH * dpr);
   const fade = still ? 1 : clamp01(t / 0.35);
   const glintOn = !still && mode === 'live' && t > introEnd;
   const gpos = glintOn ? ((t - introEnd) % CFG.glintPeriod) / CFG.glintDur * 1.4 - 0.2 : -9;
@@ -270,7 +285,7 @@ function render(t, still) {
       if (!still) {
         const f = 1 - (t - lockAt[i]) / CFG.flashDur;          // lock flash
         if (f > 0) o = f * f * (c === CLS_OUT ? 0.45 : 0.9);
-        if (scrUntil[i] > t) { g = scramble(i, t) % 10; o = Math.max(o, c === CLS_OUT ? 0.25 : 0.45); if (c === CLS_OUT) a = Math.max(a, 0.18); }
+        if (scrUntil[i] > t) { g = scramble(i, t) % 10; o = Math.max(o, c === CLS_OUT ? 0.6 * a : 0.45); }
         if (c !== CLS_OUT && glintOn) { const d = Math.abs(glintP[i] - gpos); if (d < 0.12) o = Math.max(o, 0.42 * (1 - (d / 0.12) ** 2)); }
       }
     }
@@ -279,11 +294,12 @@ function render(t, still) {
     const key = g | row << 4 | aq << 9 | oq << 15 | (orow === ROW_FLASH_BOLD ? 1 << 20 : 0);
     if (key === last[i]) continue;
     last[i] = key; drawn++;
-    const x = offX + (i % cols) * CFG.cellW, y = offY + ((i / cols) | 0) * CFG.cellH;
-    ctx.clearRect(x, y, CFG.cellW, CFG.cellH);
+    const x = offX + (i % cols) * CW, y = offY + ((i / cols) | 0) * CH;
+    ctx.clearRect(x, y, CW, CH);
     if (!aq) continue;
-    ctx.globalAlpha = aq / 63; ctx.drawImage(atlas, g * cwD, row * chD, cwD, chD, x, y, CFG.cellW, CFG.cellH);
-    if (oq) { ctx.globalAlpha = oq / 31; ctx.drawImage(atlas, g * cwD, orow * chD, cwD, chD, x, y, CFG.cellW, CFG.cellH); }
+    if (c !== CLS_OUT && row !== ROW_FIELD) { ctx.globalAlpha = aq / 63 * CFG.tileAlpha[c - 1]; ctx.drawImage(atlas, TILE * cwD, row * chD, cwD, chD, x, y, CW, CH); }
+    ctx.globalAlpha = aq / 63; ctx.drawImage(atlas, g * cwD, row * chD, cwD, chD, x, y, CW, CH);
+    if (oq) { ctx.globalAlpha = oq / 31; ctx.drawImage(atlas, g * cwD, orow * chD, cwD, chD, x, y, CW, CH); }
   }
   ctx.globalAlpha = 1;
   return drawn;
@@ -306,10 +322,10 @@ function tick(t, dt) {
   if (pointer.dirty && pointer.active) {
     // Decode under the pointer: cells within pointerR re-scramble, then lock back.
     pointer.dirty = false;
-    const R = CFG.pointerR, c0 = Math.max(0, Math.floor((pointer.x - offX - R) / CFG.cellW)), c1 = Math.min(cols - 1, Math.floor((pointer.x - offX + R) / CFG.cellW));
-    const r0 = Math.max(0, Math.floor((pointer.y - offY - R) / CFG.cellH)), r1 = Math.min(rows - 1, Math.floor((pointer.y - offY + R) / CFG.cellH));
+    const R = CFG.pointerR, c0 = Math.max(0, Math.floor((pointer.x - offX - R) / CW)), c1 = Math.min(cols - 1, Math.floor((pointer.x - offX + R) / CW));
+    const r0 = Math.max(0, Math.floor((pointer.y - offY - R) / CH)), r1 = Math.min(rows - 1, Math.floor((pointer.y - offY + R) / CH));
     for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
-      const dx = offX + c * CFG.cellW + CFG.cellW / 2 - pointer.x, dy = offY + r * CFG.cellH + CFG.cellH / 2 - pointer.y;
+      const dx = offX + c * CW + CW / 2 - pointer.x, dy = offY + r * CH + CH / 2 - pointer.y;
       if (dx * dx + dy * dy < R * R) { const i = r * cols + c; scrUntil[i] = Math.max(scrUntil[i], t + 0.3 + 0.25 * rnd[i]); }
     }
   }
