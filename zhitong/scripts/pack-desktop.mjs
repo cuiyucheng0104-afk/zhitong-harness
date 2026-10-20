@@ -4,7 +4,8 @@
  * between the dsh and vendor release packs).
  *
  * 1. Build every zhitong plugin to `lib/index.js` with its `tsdown.config.ts`; the packed manifest exports that
- *    file through `publishConfig`.
+ *    file through `publishConfig`. The Web client plugin ui-brand also emits `lib/client.js`, its `./client` export
+ *    that the client module registry serves to the browser.
  * 2. Copy `zhitong/skills` and `zhitong/python/zt` into `zhitong/bundle/skills` and `zhitong/bundle/python/zt`
  *    (without bytecode caches) so the bundle tarball carries them; the copies are removed afterwards.
  * 3. `pnpm pack` the bundle and the plugins into `--out`, then check each tarball: the entry exists, every bare
@@ -25,7 +26,7 @@ import { parseArgs } from 'node:util'
 const ZHITONG = resolve(import.meta.dirname, '..')
 const REPOSITORY = resolve(ZHITONG, '..')
 const BUNDLE = join(ZHITONG, 'bundle')
-const PLUGINS = ['tool-tos', 'config-import', 'tool-cad']
+const PLUGINS = ['tool-tos', 'config-import', 'tool-cad', 'ui-brand']
 const STAGED = [
   { from: join(ZHITONG, 'skills'), to: join(BUNDLE, 'skills') },
   { from: join(ZHITONG, 'python', 'zt'), to: join(BUNDLE, 'python', 'zt') },
@@ -149,6 +150,10 @@ function checkTarball(tarball, options) {
   for (const prefix of options.requiredPrefixes ?? []) {
     if (![...files].some(file => file.startsWith(prefix))) problems.push(`没有 ${prefix} 下的文件`)
   }
+  if (options.client !== undefined && manifest.exports?.['./client'] !== `./${options.client}`) {
+    problems.push(`exports["./client"] 不是 ./${options.client}`)
+  }
+  if (options.client !== undefined && manifest.dsh?.client?.platform !== 'web') problems.push('缺少 dsh.client（platform: web）')
   if (problems.length > 0) throw new Error(`pack-desktop: ${basename(tarball)}：\n  - ${problems.join('\n  - ')}`)
   return manifest
 }
@@ -208,6 +213,11 @@ function main() {
     required: ['lib/index.js', 'assets/fonts/kst32b.shx', 'assets/fonts/NotoSansSC-Regular-GB2312.otf',
       ...missingConverter.length > 0 ? [] : converter],
     entry: 'lib/index.js',
+  })
+  checkTarball(find('@zhitong/ui-brand'), {
+    required: ['lib/index.js', 'lib/client.js', 'locale/zh.json', 'locale/en.json'],
+    entry: 'lib/index.js',
+    client: 'lib/client.js',
   })
   console.log(`pack-desktop: ${tarballs.length} tarballs in ${out.startsWith(REPOSITORY) ? relative(REPOSITORY, out) : out}（${skills.length} 个 skill${missingConverter.length > 0 ? '，未带 dwg2dxf' : ''}）`)
   if (missingConverter.length > 0) console.warn(`pack-desktop: 警告：未打包 dwg2dxf（${dirname(converter[0])}），安装后只能打开 DXF`)

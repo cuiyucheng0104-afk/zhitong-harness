@@ -55,6 +55,28 @@
         includeDefaultRoots: false
         bundledSkillDir: !!js "(() => { const { createRequire } = process.getBuiltinModule('node:module'); for (const anchor of [baseUrl, ctx.get('profileContext')?.installAnchor]) { if (!anchor) continue; try { return createRequire(anchor)('@zhitong/bundle/skills-dir.cjs').skillsDir() } catch (error) { if (error?.code !== 'MODULE_NOT_FOUND') throw error } } throw new Error('@zhitong/bundle: 从 profile 与 dsh 安装都解析不到本包，找不到 skill 目录') })()"
 
+# 品牌：上游 ui-brand-official 行只在 official 构建里填侧栏品牌位（DeepSeek 官方 artwork），这里禁用它，改由
+# @zhitong/ui-brand 在任何构建里填侧栏图标、侧栏名称与新会话页图标三个品牌位（文字标占位，可由设计师替换）；
+# 模型选择器里 deepseek-flash 的标签也由它显示为「DeepSeek V4.1 Flash 官方推荐」，所以禁用上游的 1017 标记行。
+- id: ui-brand-official
+  disabled: true
+
+- id: ui-deepseek-model-label-1017
+  disabled: true
+
+# 不提供 DeepSeek 账号登录：禁用账号界面行（设置页「账号」、侧栏账号菜单与登录、桌面版账号引导与充值页、
+# 首次运行里的登录弹窗）。首次运行的模型凭据步骤（ui-settings-models 的 DeepSeekOnboardingDialog）在
+# settings.models.sign-in 没有占位者时直接显示 deepseek-official 的 API Key 表单，写入 harness 凭据存储；
+# 自定义 OpenAI 兼容地址走「设置 → 模型 → 添加模型提供商 → 自定义模型 API」。
+# Host 侧的 deepseek-account / authorization / account-controller 行保留：桌面壳启动时读账号状态
+# （apps/desktop/src/welcome-backend.ts），禁用它们会让欢迎流程读失败；没有登录入口时它们始终是未登录。
+- id: ui-settings-account
+  disabled: true
+
+- insert:
+    - id: zhitong-ui-brand
+      name: '@zhitong/ui-brand'
+
 - id: agent-preset-registry
   config:
     default: zhitong

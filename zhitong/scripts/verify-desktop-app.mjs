@@ -2,11 +2,13 @@
 /**
  * Check an installed or unpacked 智通数工AI Desktop application without starting it.
  *
- * Usage: node zhitong/scripts/verify-desktop-app.mjs <DeepSeek Harness.app | install directory | resources directory>
+ * Usage: node zhitong/scripts/verify-desktop-app.mjs <智通数工AI.app | install directory | resources directory>
  *
  * Checks, printing one line each and exiting 1 when any fails:
  * - the runtime descriptor (`app.asar/dsh/desktop-runtime.json`, read through the unpacked twin when Node has
- *   no asar support) lists @zhitong/bundle and its three plugins;
+ *   no asar support) lists @zhitong/bundle and its four plugins;
+ * - the application executable carries the product name (macOS `Contents/MacOS/智通数工AI`, Windows `ztsgai.exe`)
+ *   and app.asar holds the `@zhitong/ui-brand` browser bundle the client module registry serves;
  * - `app.asar.unpacked/dsh/node_modules/@zhitong/bundle/skills` holds `_shared/zt_launch.py` and every zt-* SKILL.md,
  *   and `python/zt` sits beside it;
  * - the bundled Python (`runtime/primary-runtime`) runs each skill script with `--help` through the launcher,
@@ -21,7 +23,10 @@ import { join, resolve } from 'node:path'
 
 const EXPECTED_SKILLS = ['zt-archive', 'zt-ask', 'zt-cad', 'zt-estimate', 'zt-indicator', 'zt-knowledge', 'zt-project',
   'zt-quantity', 'zt-reconcile', 'zt-report', 'zt-tk', 'zt-volc']
-const ZHITONG_PACKAGES = ['@zhitong/bundle', '@zhitong/config-import', '@zhitong/tool-cad', '@zhitong/tool-tos']
+const ZHITONG_PACKAGES = ['@zhitong/bundle', '@zhitong/config-import', '@zhitong/tool-cad', '@zhitong/tool-tos', '@zhitong/ui-brand']
+/** macOS executable (productName) and Windows executable (win.executableName) in apps/desktop/scripts/electron-builder-config.mjs. */
+const MAC_EXECUTABLE = '智通数工AI'
+const WINDOWS_EXECUTABLE = 'ztsgai.exe'
 
 /**
  * Locate the Electron resources directory from an application path.
@@ -67,6 +72,33 @@ export function readAsarFile(archive, file) {
   return JSON.parse(bytes.subarray(start, start + node.size).toString('utf8'))
 }
 
+/**
+ * Whether an asar archive lists a file, packed or unpacked.
+ * @param {string} archive - Path of app.asar.
+ * @param {string} file - Archive-relative path with `/` separators.
+ * @returns {boolean} True when the header has a file entry at that path.
+ */
+export function asarHasFile(archive, file) {
+  const bytes = readFileSync(archive)
+  const jsonLength = bytes.readUInt32LE(12)
+  let node = JSON.parse(bytes.subarray(16, 16 + jsonLength).toString('utf8'))
+  for (const part of file.split('/')) {
+    node = node.files?.[part]
+    if (node === undefined) return false
+  }
+  return node.files === undefined
+}
+
+/**
+ * The application executable that sits beside a resources directory.
+ * @param {string} resources - Electron resources directory (`Contents/Resources` or `resources`).
+ * @returns {string} Absolute executable path for this layout.
+ */
+export function applicationExecutable(resources) {
+  const macOS = join(resources, '..', 'MacOS')
+  return existsSync(macOS) ? join(macOS, MAC_EXECUTABLE) : join(resources, '..', WINDOWS_EXECUTABLE)
+}
+
 function pythonPath(resources) {
   const root = join(resources, 'runtime', 'primary-runtime', 'dependencies', 'python')
   return process.platform === 'win32' ? join(root, 'python.exe') : join(root, 'bin', 'python3')
@@ -74,7 +106,7 @@ function pythonPath(resources) {
 
 function main() {
   const input = process.argv[2]
-  if (input === undefined) throw new Error('usage: node zhitong/scripts/verify-desktop-app.mjs <DeepSeek Harness.app | 安装目录 | resources 目录>')
+  if (input === undefined) throw new Error('usage: node zhitong/scripts/verify-desktop-app.mjs <智通数工AI.app | 安装目录 | resources 目录>')
   const resources = resourcesDirectory(input)
   const results = []
   const check = (name, test) => {
@@ -95,6 +127,15 @@ function main() {
     const missing = ZHITONG_PACKAGES.filter(name => !names.has(name))
     if (missing.length > 0) throw new Error(`缺少 ${missing.join(', ')}`)
     return ZHITONG_PACKAGES.join(', ')
+  })
+
+  check('应用名与品牌客户端包', () => {
+    const executable = applicationExecutable(resources)
+    if (!existsSync(executable)) throw new Error(`${executable} 不存在（应用名应为智通数工AI）`)
+    const archive = join(resources, 'app.asar')
+    const client = 'dsh/node_modules/@zhitong/ui-brand/lib/client.js'
+    if (!existsSync(archive) || !asarHasFile(archive, client)) throw new Error(`app.asar 里没有 ${client}`)
+    return executable
   })
 
   const bundle = join(resources, 'app.asar.unpacked', 'dsh', 'node_modules', '@zhitong', 'bundle')

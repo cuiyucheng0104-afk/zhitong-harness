@@ -23,7 +23,8 @@
   "dependencies": {
     "@zhitong/config-import": "workspace:*",
     "@zhitong/tool-cad": "workspace:*",
-    "@zhitong/tool-tos": "workspace:*"
+    "@zhitong/tool-tos": "workspace:*",
+    "@zhitong/ui-brand": "workspace:*"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "workspace:~"
