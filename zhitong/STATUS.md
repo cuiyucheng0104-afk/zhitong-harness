@@ -14,7 +14,7 @@
 | W5 tool-cad / zt-cad | 已合入（合并提交 `10f0b7b92`，bundle 已挂 `zhitong-tool-cad`） | `d06cac451` `ff978197f` `c8d8bac78` `81fd41991` | 合并后在主树复跑：tool-cad vitest 44 通过；`tsc --noEmit` 退出码 0；真实 DWG 用例依赖本机 `bin/linux-x64/dwg2dxf`（已构建，gitignore 排除） |
 | W6 zt-knowledge | 已合入 | `82c7d030c` | `check_knowledge.py --root knowledge-seed`：12 个目录、16 条、0 违规 |
 | W7 zt-volc | 已合入 | `e7f584cb0` | volc 102 通过（`ve` 输出为合成夹具） |
-| W8 迁移 | 未开始 | — | `zhitong/migration/` 不存在 |
+| W8 迁移 | 脚本、手册与测试已提交；未在真实 ECS、NAS、数据库备份与桶上运行过（[migration/runbook.md](migration/runbook.md)） | 见 git log `feat(zhitong/migration)` | `tests/migration` 52 通过（合成 NAS 与库行；upload.sh 用假 rclone）；全量 3097 通过 20 跳过 |
 | W9 安装包 | 代码与文档已合入；Mac / Windows 实机打包与 M0 验收待用户在目标机器上执行（[INSTALL.md](INSTALL.md) 第二至四部分） | `8f2201c28` `71ca9f9a7` `25872c4e4` `e987013f9` `6a5ecbf66` `810fba853` `67a1a2953` `9f45c916f` 及文档提交 | 见下「W9 验证」 |
 | W10 门户文案 | 已合入 | `d4a7fa2dc` | 无测试 |
 | W12 门户、图标、发布件 | 已合入 | `14c71e514` `f66bc947d` | 门户 vitest 48 通过、typecheck/build 通过；nginx 配置在宿主 nginx 1.24 实测；deploy.sh 本机 sshd 端到端；docker 容器模式未实跑 |
@@ -70,7 +70,7 @@ zhitong/plugins/config-import$ pnpm exec tsc --noEmit -p .   → exit 0
 
 - **zt.common**：`to_rel_posix("   ")` 不拒收纯空格路径，之后才报 `file_not_found`；实际使用无影响。
 - **CI**：可在有真实语料的机器上设置 `ZT_NAS_DATA`、`TG_GOLDEN_XLSX`，跑上面 7 个跳过用例。
-- **W8 迁移**：`upload.sh` 要排除 `knowledge-seed/_tools/`；生成项目说明时对齐 W1 的格式（可直接用 `zt.inventory.draft.draft_project_doc`）。
+- **W8 迁移**：排除 `knowledge-seed/_tools/`（`upload.sh` 与 `relayout.py --knowledge-seed` 都排除）与项目说明对齐 W1 格式（由 `draft_project_doc` 生成）两项已处理。待运行人决定：客户编号取哪一列（现取 `project.report_code`）、`knowledge_map.yaml` 的分类去向、未登记文件是否 `--include-orphans`、`missing_source` 是否放行；TOS 的 S3 兼容 endpoint 写法要在控制台核对。`python/README.md` 的 CLI 表还没有 `zt.migration` 一行（W0/W9 归属）。
 
 ### 数据签核与口径
 

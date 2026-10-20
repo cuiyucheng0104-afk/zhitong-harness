@@ -1,0 +1,26 @@
+# 旧系统知识库一级目录 → 桶 知识库/<子目录>（spec §5、§6 第 6 条）。relayout.py --knowledge-map 读本文件。
+# 旧目录名是「分类名__分类id」（旧仓 TenantKnowledgePaths）；匹配时用去掉「__id」后缀的分类名。
+# 判定顺序：exclude → exact → rules（按顺序，第一条命中即用）。哪一条都不命中的目录让 relayout 报错退出（knowledge_unmapped），
+# 不会悄悄归到某个子目录：看报错里列出的目录名，在 exact 里逐个写明去向后重跑。
+# 子目录只能是：规范 定额 费率 模板 公司经验。
+# 状态：草案，按分类名关键词猜的默认去向，迁移前由运行人对照旧系统知识库分类核对（runbook.md 第 4 步）。
+
+# 不迁移的一级目录（原样写目录名，不去 __id）。例：--knowledge 指向平铺的 knowledge/ 时，租户子目录 1/ 2/ 要单独处理。
+exclude: []
+
+# 目录名（可写原名「分类名__id」或去掉后缀的分类名）→ 子目录；直接放在知识库根下的文件用键「(根目录)」。
+exact: {}
+
+# 分类名关键词规则：contains 为子串，regex 为 Python 正则（search）。
+rules:
+  - { contains: 定额, to: 定额 }
+  - { contains: 费率, to: 费率 }
+  - { contains: 取费, to: 费率 }
+  - { contains: 费用标准, to: 费率 }
+  - { contains: 规范, to: 规范 }
+  - { contains: 标准, to: 规范 }
+  - { contains: 规程, to: 规范 }
+  - { contains: 清单, to: 规范 }
+  - { contains: 模板, to: 模板 }
+  - { contains: 范本, to: 模板 }
+  - { contains: 经验, to: 公司经验 }

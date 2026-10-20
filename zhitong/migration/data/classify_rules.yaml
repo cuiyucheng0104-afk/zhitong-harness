@@ -1,0 +1,314 @@
+# W8 迁移副本：复制自 zhitong/skills/zt-project/data/classify_rules.yaml（2026-10-20），只在文件头加了这两行，其余逐字相同；
+# relayout.py 只用它给每个文件打一次 doc_category/cost_stage 以生成「关键文件指引」与判图纸 PDF，结果不入库。改规则先改 zt-project 的那份，再重新复制（tests/migration/test_rules_copy.py 校验两份规则行一致）。
+# 迁移记录：原文件 /home/user/zhitong-cost-ai/engine-service/app/engine/data/classify_rules.yaml，规则行逐字未改。
+# 签核状态沿用原文件：底本（白名单 / 黑名单 / 归档名单）经客户核对（旧仓 D-035，2026-07-06 核对包回收）；
+# 其后 WS13 起的口径变更（note 里带 WS13-P** 的行）随旧仓「附录 B」送签，本仓没有收到客户确认，按「待签核」处理。
+# 本仓只用到文件名与祖先目录层（zt.inventory.rules）；正文标题信号、LLM 兜底不迁移。
+#
+# 分档规则库种子(L1 文件名层)
+# 来源:天工资料-入库筛选规则-20260629(白/黑/归档名单 + 四级判定)
+#      + 同文档「修正清单」9 条(P0/P1/P2)全部烧入
+#      + 文件名分类规则库-草稿-给客户核对-20260702.xlsx(31 条 L1 规则并入)
+# status=confirmed(D-035 2026-07-06:李总核对包回收,附件2 规则库 29/31 √ 转正;
+#   电气+审核→安装对比表 已符合「电气并入安装」口径,无独立"电气审核"类目需删);改规则=改数据行。
+#
+# 引擎匹配顺序(app/engine/classify_rules.py ClassifyEngine.classify_one,命中即停;
+#   WS13-P01 issue #720 重排,逐行对照见 docs/附录B-分类口径变更逐行对照-WS13.md):
+#   ①  noise(系统噪音,不自定档→needs_manual)
+#   ②  系统生成物(INDEX.md / .ocr.txt 旁车)—— WS13-P03(#759),引擎代码 system_artifact_kind 判,本文件无规则行
+#   ③  blacklist(跳过)—— 同时命中 upgrade_whitelist 则白胜(修正#7);
+#       含疑词(classify.blacklist_doubt_words)又无升档词 → skip/0.6/待复核
+#   ④  archive_ext(扩展名;二进制计价 needs_export→pending_export,类目按祖先目录补)
+#   ⑤  whitelist all_of 复合规则
+#   ⑥  whitelist 特指(tier 缺省 = specific)            ← 先于归档词:「施工图预算」不再被「施工图」截走
+#   ⑦  archive_keyword 带类目的归档词
+#   ⑧  设计文档 / CAD 细分
+#   ⑨  直属父目录 = 专业词(#C4)
+#   ⑩  ancestor_context 祖先目录继承(由近及远,needs_manual)
+#   ⑪  whitelist 裸词(tier: bare;0.65,needs_manual)
+#   ⑫  只命中无类目专业词 → archive/None/0.0/needs_manual(不再终止判定)
+#   ⑬  默认档 = classify.default_disposition(修正#9,种子 skip)
+#
+# 可选字段(WS13-P01/P09,不写保持旧语义):
+#   tier: bare            裸词,出厂 0.65 + needs_manual,排在祖先继承之后
+#   exclude_any: [..]     文件名含其中任一词时不命中
+#   require_any: [..]     文件名或任一祖先目录至少含其一时才命中
+#   veto_ancestors: [..]  任一祖先目录含其中任一词时不命中
+#   stage_policy: context 阶段按语境:文件名期次→施工过程,否则取最近带阶段的祖先目录,找不到为 null
+#
+# priority:同 kind 内小号先匹配;复合词必须小号(修正#3:招标控制价<控制价<招标;结算审定<结算)。
+# cost_stage 取 6 枚举(估算/概算/招标控制价/施工过程/结算/审定,需求表 §7.1);
+#   细粒度阶段标签(进度款/变更签证等)保留在 note 供追溯。
+# 已知张力(待客户核对):监理*/施工管理类在造价套=跳过,但城建档案套按 3-A 应收——
+#   Phase1 规则全局生效,套型级 overlay 列为开放问题(见设计说明 §七)。
+
+rules:
+  # ============ Step0 系统噪音(不自定档) ============
+  - { kind: noise, match: contains, pattern: 未命名, priority: 10, note: 目录场景导入管道递归下钻重判 }
+  - { kind: noise, match: contains, pattern: 项目资料, priority: 11 }
+  - { kind: noise, match: contains, pattern: 全部项目, priority: 12 }
+  - { kind: noise, match: regex, pattern: '^\d+#?$', priority: 20, note: 标段号 }
+  - { kind: noise, match: regex, pattern: '^[A-Z]?\d+标段?$', priority: 21, note: 标段号 }
+
+  # ============ Step1 跳过黑名单 ============
+  # 修正#1(P0):删裸词「报审表」,换精确非造价词(防误杀 变更费用报审/计量报审/索赔报审)
+  - { kind: blacklist, match: contains, pattern: 开工报审, priority: 10, note: 修正#1 替代裸词报审表 }
+  - { kind: blacklist, match: contains, pattern: 复工报审, priority: 11, note: 修正#1 }
+  - { kind: blacklist, match: contains, pattern: 技术文件报审, priority: 12, note: 修正#1 }
+  - { kind: blacklist, match: contains, pattern: 进度计划报审, priority: 13, note: 修正#1 }
+  - { kind: blacklist, match: contains, pattern: 开工报告, priority: 14, note: 修正#1 }
+  # 修正#8(P2):删裸词「承诺」,换精确词(防误杀 报价承诺函/让利承诺)
+  - { kind: blacklist, match: contains, pattern: 质量承诺, priority: 20, note: 修正#8 替代裸词承诺 }
+  - { kind: blacklist, match: contains, pattern: 安全承诺, priority: 21, note: 修正#8 }
+  - { kind: blacklist, match: contains, pattern: 资质承诺, priority: 22, note: 修正#8 }
+  # 施工技术/管理(非造价)
+  - { kind: blacklist, match: contains, pattern: 施工组织设计, priority: 30, note: 修正#6 父目录∈控制价/投标/招标时引擎降档 archive+needs_section_extract(措施费) }
+  - { kind: blacklist, match: contains, pattern: 施工方案, priority: 31, note: 修正#6 同上 }
+  - { kind: blacklist, match: contains, pattern: 施工日志, priority: 32 }
+  - { kind: blacklist, match: contains, pattern: 施工现场记录, priority: 33 }
+  - { kind: blacklist, match: contains, pattern: 分包, priority: 34 }
+  - { kind: blacklist, match: contains, pattern: 技术交底, priority: 35 }
+  - { kind: blacklist, match: contains, pattern: 复试报告, priority: 36 }
+  - { kind: blacklist, match: contains, pattern: 见证, priority: 37 }
+  - { kind: blacklist, match: contains, pattern: 检测, priority: 38 }
+  - { kind: blacklist, match: contains, pattern: 试验, priority: 39 }
+  - { kind: blacklist, match: contains, pattern: 沉降观测, priority: 40 }
+  - { kind: blacklist, match: contains, pattern: 开盘鉴定, priority: 41 }
+  - { kind: blacklist, match: contains, pattern: 旁站, priority: 42 }
+  - { kind: blacklist, match: contains, pattern: 监理规划, priority: 43, note: 监理决算不含此词,不受影响;城建档案套张力见文件头 }
+  - { kind: blacklist, match: contains, pattern: 监理月报, priority: 44 }
+  - { kind: blacklist, match: contains, pattern: 监理日志, priority: 45 }
+  - { kind: blacklist, match: contains, pattern: 监理通知, priority: 46 }
+  - { kind: blacklist, match: contains, pattern: 监理细则, priority: 47 }
+  - { kind: blacklist, match: contains, pattern: 质量控制, priority: 48 }
+  - { kind: blacklist, match: contains, pattern: 安全管理, priority: 49 }
+  - { kind: blacklist, match: contains, pattern: 资料移交, priority: 50 }
+  - { kind: blacklist, match: contains, pattern: 危险性较大, priority: 51 }
+  - { kind: blacklist, match: contains, pattern: 取样送检, priority: 52 }
+  # 资质证明
+  - { kind: blacklist, match: contains, pattern: 资质证书, priority: 60 }
+  - { kind: blacklist, match: contains, pattern: 岗位证书, priority: 61 }
+  - { kind: blacklist, match: contains, pattern: 执照, priority: 62 }
+  # 前期审批(与标准清单冲突的词已降档到 archive_keyword,见下)
+  - { kind: blacklist, match: contains, pattern: 项目建议书, priority: 70 }
+  - { kind: blacklist, match: contains, pattern: 选址, priority: 71 }
+  - { kind: blacklist, match: contains, pattern: 规划意见, priority: 72 }
+  - { kind: blacklist, match: contains, pattern: 用地批准, priority: 73 }
+  - { kind: blacklist, match: contains, pattern: 规划许可, priority: 74 }
+  - { kind: blacklist, match: contains, pattern: 节能设计备案, priority: 75 }
+  - { kind: blacklist, match: contains, pattern: 拆迁, priority: 76 }
+  - { kind: blacklist, match: contains, pattern: 安置, priority: 77 }
+  - { kind: blacklist, match: contains, pattern: 土地使用, priority: 78 }
+  # 地勘设计(非造价;地质勘察已降档归档,见下)
+  - { kind: blacklist, match: contains, pattern: 水文地质, priority: 80 }
+  - { kind: blacklist, match: contains, pattern: 设计计算书, priority: 81 }
+  - { kind: blacklist, match: contains, pattern: 方案设计, priority: 82 }
+  - { kind: blacklist, match: contains, pattern: 设计方案审查, priority: 83 }
+  - { kind: blacklist, match: contains, pattern: 初步设计文件, priority: 84 }
+
+  # ============ 升档词(修正#7 通用规则:黑白同命中→白胜;修正#5 补词) ============
+  - { kind: upgrade_whitelist, match: contains, pattern: 价款, priority: 10 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 结算, priority: 11 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 变更费用, priority: 12 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 进度款, priority: 13 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 索赔, priority: 14 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 计量, priority: 15 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 决算, priority: 16 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 暂估价, priority: 20, note: 修正#5 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 暂列金额, priority: 21, note: 修正#5 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 认价, priority: 22, note: 修正#5 含材料认价 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 价差, priority: 23, note: 修正#5 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 调差, priority: 24, note: 修正#5 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 计日工, priority: 25, note: 修正#5 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 费用确认, priority: 26, note: 修正#5 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 工程量确认, priority: 27, note: 修正#5 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 签认, priority: 28, note: 修正#5 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 监理决算, priority: 30, note: 从监理包中单独捞出 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 签证, priority: 31, note: WS13-P01 桩基检测费用签证单被「检测」误杀 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 费用, priority: 32, note: WS13-P01 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 合同价, priority: 33, note: WS13-P01 }
+  - { kind: upgrade_whitelist, match: contains, pattern: 合同, priority: 34, note: WS13-P01 专业分包工程合同被「分包」误杀 }
+
+  # ============ Step2 归档扩展名(先于一切白名单;二进制计价打 needs_export) ============
+  - { kind: archive_ext, match: ext, pattern: dwg, priority: 10, note: CAD 图形 }
+  - { kind: archive_ext, match: ext, pattern: dwf, priority: 10, note: CAD 图形(与引擎 cad_drawing_exts 同构,防漂移;准确性检验 2026-07-21 补) }
+  - { kind: archive_ext, match: ext, pattern: jpg, priority: 11 }
+  - { kind: archive_ext, match: ext, pattern: jpeg, priority: 12 }
+  - { kind: archive_ext, match: ext, pattern: png, priority: 13 }
+  - { kind: archive_ext, match: ext, pattern: gbq7, needs_export: true, priority: 20, note: 广联达计价,导出计价表后回流入RAG(§3.5) }
+  - { kind: archive_ext, match: ext, pattern: gbq, needs_export: true, priority: 21 }
+  - { kind: archive_ext, match: ext, pattern: yss, needs_export: true, priority: 22 }
+  - { kind: archive_ext, match: ext, pattern: ydg, needs_export: true, priority: 23 }
+  - { kind: archive_ext, match: ext, pattern: gad, needs_export: true, priority: 24 }
+  - { kind: archive_ext, match: ext, pattern: gtj, needs_export: true, priority: 25 }
+  - { kind: archive_ext, match: ext, pattern: stz, needs_export: true, priority: 26 }
+  - { kind: archive_ext, match: ext, pattern: gcrx, needs_export: true, priority: 27 }
+  - { kind: archive_ext, match: ext, pattern: 清单审计, needs_export: true, priority: 28, note: WS13-P10 D65 计价工程文件(文件头 PROJECTFILE.XM),生产实测 }
+  - { kind: archive_ext, match: ext, pattern: ssq6, needs_export: true, priority: 29, note: WS13-P10 D65 生产实测 }
+
+  # ============ Step2.5 白名单 all_of 复合(专业底料,特指胜泛指,排归档关键词前) ============
+  - { kind: whitelist, match: all_of, pattern: 支付+审核, doc_category: 进度款支付, cost_stage: 施工过程, priority: 1, note: WS13-P01 进度款审核先于「审核+报告」 }
+  - { kind: whitelist, match: all_of, pattern: 进度款+审核, doc_category: 进度款支付, cost_stage: 施工过程, priority: 2, note: WS13-P01 }
+  - { kind: whitelist, match: all_of, pattern: 工程款+审核, doc_category: 进度款支付, cost_stage: 施工过程, priority: 3, note: WS13-P01 }
+  - { kind: whitelist, match: all_of, pattern: 审核+报告, doc_category: 审核报告, cost_stage: 审定, exclude_any: [目录, 封面, 扉页], priority: 4, note: xlsx 成果;#210 裁定审定;WS13-P01 整体后移 3;WS13-P03 目录页/封面/扉页不冒充报告 }
+  - { kind: whitelist, match: all_of, pattern: 土建+对比, doc_category: 土建对比表, cost_stage: 审定, priority: 5, note: xlsx 底料;WS13-P09 文件名带期次时阶段改判施工过程 }
+  - { kind: whitelist, match: all_of, pattern: 安装+对比, doc_category: 安装对比表, cost_stage: 审定, priority: 6, note: WS13-P09 同上 }
+  - { kind: whitelist, match: all_of, pattern: 电气+审核, doc_category: 安装对比表, cost_stage: 审定, priority: 7, note: 特指胜归档词「电气」;评审修复:电气并入安装(1-C 口径),不再造清单外类目 }
+  - { kind: whitelist, match: all_of, pattern: 市政+审核, doc_category: 市政审核表, cost_stage: 审定, priority: 8, note: 特指胜归档词「市政」 }
+  - { kind: whitelist, match: all_of, pattern: 绿化+审核, doc_category: 绿化审核表, cost_stage: 审定, priority: 9, note: 特指胜归档词「绿化」 }
+  - { kind: whitelist, match: all_of, pattern: 工程量+清单, doc_category: 工程量清单, cost_stage: 招标控制价, priority: 10, veto_ancestors: [进度款, 产值, 付款, 支付, 结算, 审核终稿, 套价], note: xlsx;WS13-P01 进度款/结算目录下的清单不是招标清单 }
+  - { kind: whitelist, match: all_of, pattern: 招标控制价+封面, doc_category: 招标控制价, cost_stage: 招标控制价, priority: 11, note: 特指胜白名单「封面」;控制价封面属控制价成果(PM 拍板 2026-07-21) }
+
+  # ============ Step3 归档关键词(图纸/影像;复合词小号) ============
+  - { kind: archive_keyword, match: contains, pattern: 图纸会审, doc_category: 图纸会审, priority: 9, note: 评审修复:清单★应收,先于裸「图纸」;含造价答疑升RAG待客户核对 }
+  - { kind: archive_keyword, match: contains, pattern: 初步设计图, doc_category: 初步设计图, priority: 10 }
+  - { kind: archive_keyword, match: contains, pattern: 扩初, doc_category: 扩初设计图, priority: 11 }
+  - { kind: archive_keyword, match: contains, pattern: 竣工图, doc_category: 竣工图, priority: 12 }
+  - { kind: archive_keyword, match: contains, pattern: 施工图, doc_category: 施工图, priority: 13 }
+  - { kind: archive_keyword, match: contains, pattern: 招标图, doc_category: 招标图纸, priority: 14 }
+  - { kind: archive_keyword, match: contains, pattern: 图纸, priority: 30 }
+  - { kind: archive_keyword, match: contains, pattern: CAD, priority: 31 }
+  - { kind: archive_keyword, match: contains, pattern: 现场照片, doc_category: 前期现场照片, priority: 32 }
+  - { kind: archive_keyword, match: contains, pattern: 照片, priority: 33 }
+  - { kind: archive_keyword, match: contains, pattern: 原貌, priority: 34 }
+  - { kind: archive_keyword, match: contains, pattern: 竣工新貌, priority: 35 }
+  - { kind: archive_keyword, match: contains, pattern: 建筑, priority: 40 }
+  - { kind: archive_keyword, match: contains, pattern: 结构, priority: 41 }
+  - { kind: archive_keyword, match: contains, pattern: 电气, priority: 42 }
+  - { kind: archive_keyword, match: contains, pattern: 给排水, priority: 43 }
+  - { kind: archive_keyword, match: contains, pattern: 暖通, priority: 44 }
+  - { kind: archive_keyword, match: contains, pattern: 通风, priority: 45 }
+  - { kind: archive_keyword, match: contains, pattern: 空调, priority: 46 }
+  - { kind: archive_keyword, match: contains, pattern: 消防, priority: 47 }
+  - { kind: archive_keyword, match: contains, pattern: 幕墙, priority: 48 }
+  - { kind: archive_keyword, match: contains, pattern: 钢结构, priority: 49 }
+  - { kind: archive_keyword, match: contains, pattern: 桩基, priority: 50 }
+  - { kind: archive_keyword, match: contains, pattern: 基坑, priority: 51 }
+  - { kind: archive_keyword, match: contains, pattern: 围护, priority: 52 }
+  - { kind: archive_keyword, match: contains, pattern: 精装修, priority: 53 }
+  - { kind: archive_keyword, match: contains, pattern: 景观, priority: 54 }
+  - { kind: archive_keyword, match: contains, pattern: 绿化, priority: 55 }
+  - { kind: archive_keyword, match: contains, pattern: 市政, priority: 56 }
+  - { kind: archive_keyword, match: contains, pattern: 智能化, priority: 57 }
+  - { kind: archive_keyword, match: contains, pattern: 泛光照明, priority: 58 }
+  - { kind: archive_keyword, match: contains, pattern: 总图, priority: 59 }
+  # —— 从黑名单降档(与标准清单★应收冲突,跳过会导致永远缺件;待客户核对) ——
+  - { kind: archive_keyword, match: contains, pattern: 开竣工记录, doc_category: 开竣工记录, priority: 80, note: 降档:全过程套★应收,原黑名单跳过会永缺 }
+  - { kind: archive_keyword, match: contains, pattern: 隐蔽, doc_category: 隐蔽记录, priority: 81, note: 降档:全过程套/结算审核套★应收 }
+  - { kind: archive_keyword, match: contains, pattern: 可行性研究, doc_category: 可行性研究, priority: 82, note: 降档:全过程套★应收 }
+  - { kind: archive_keyword, match: contains, pattern: 可研, doc_category: 可行性研究, priority: 83, note: xlsx 规则 }
+  - { kind: archive_keyword, match: contains, pattern: 立项, doc_category: 项目立项, priority: 84, note: 降档:全过程套★应收 }
+  - { kind: archive_keyword, match: contains, pattern: 地质勘察, doc_category: 地质勘察报告, priority: 85, note: 降档:全过程套★应收 }
+  - { kind: archive_keyword, match: contains, pattern: 地勘, doc_category: 地质勘察报告, priority: 86, note: xlsx 规则 }
+  - { kind: archive_keyword, match: contains, pattern: 施工许可, doc_category: 施工许可, priority: 87, note: 降档:城建档案套★应收 }
+  - { kind: archive_keyword, match: contains, pattern: 会议纪要, doc_category: 会议纪要·联系函, priority: 90, note: 评审修复:全过程套★应收,归档计收;造价往来纪要升RAG的张力待客户核对 }
+  - { kind: archive_keyword, match: contains, pattern: 联系函, doc_category: 会议纪要·联系函, priority: 91, note: 同上 }
+
+  # ============ Step4 入RAG白名单(复合词小号,修正#3 有序化) ============
+  # —— 成果件(xlsx L1) ——
+  - { kind: whitelist, match: contains, pattern: 审定单, doc_category: 审定单, cost_stage: 审定, priority: 8, note: 复合词先于裸「审定」 }
+  - { kind: whitelist, match: contains, pattern: 审定表, doc_category: 审定单, cost_stage: 审定, priority: 8, note: 试点项目标定:真实叫法「审定表」=审定单(xlsx 备注 审定表/审定单) }
+  - { kind: whitelist, match: contains, pattern: 定案表, doc_category: 审定单, cost_stage: 审定, priority: 8, note: WS13-P14 结算定案表=审定单(原被裸「结算」截成结算价文件,命不中 42017) }
+  - { kind: whitelist, match: contains, pattern: 目录, doc_category: 目录, cost_stage: null, stage_policy: context, priority: 11, note: 试点项目标定补漏:xlsx 规则库原有(含目录,769 命中);WS13-P09 阶段按语境(原写死审定) }
+  - { kind: whitelist, match: contains, pattern: 封面, doc_category: 封面, cost_stage: null, stage_policy: context, priority: 9, note: WS13-P09 阶段按语境(原写死审定) }
+  - { kind: whitelist, match: contains, pattern: 扉页, doc_category: 扉页, cost_stage: null, stage_policy: context, priority: 10, note: WS13-P09 阶段按语境(原写死审定) }
+  - { kind: whitelist, match: contains, pattern: 汇总, doc_category: 汇总表, cost_stage: null, stage_policy: context, tier: bare, require_any: [审核, 结算, 审定, 造价], priority: 85, note: 评审修复:裸词退到全部复合词/四算词之后;WS13-P01 裸词须有审核/结算/审定/造价语境;WS13-P09 阶段按语境 }
+  # —— 对比/指标复合词(评审修复:先于裸 概算/结算/预算,产出清单原词) ——
+  - { kind: whitelist, match: contains, pattern: 概算预算对比, doc_category: 概算预算对比, cost_stage: 审定, priority: 12, note: 评审修复:防被裸「概算」「价对比」截胡 }
+  - { kind: whitelist, match: contains, pattern: 结算指标, doc_category: 结算指标, cost_stage: 审定, priority: 13, note: 评审修复:防被裸「结算」截胡 }
+  - { kind: whitelist, match: contains, pattern: 预算指标, doc_category: 预算指标, cost_stage: 审定, priority: 14, note: 评审修复:防被裸「预算」截胡 }
+  # —— 结算/审定复合词(必须先于裸「结算」「审定」) ——
+  - { kind: whitelist, match: contains, pattern: 结算审定, doc_category: 结算审定稿, cost_stage: 审定, priority: 15, note: 修正#3 复合词优先 }
+  - { kind: whitelist, match: contains, pattern: 结算送审, doc_category: 结算送审稿, cost_stage: 结算, priority: 16, note: 修正#3 }
+  - { kind: whitelist, match: contains, pattern: 招标控制价, doc_category: 招标控制价, cost_stage: 招标控制价, priority: 17, note: 修正#3 先于裸「招标」「控制价」 }
+  - { kind: whitelist, match: contains, pattern: 最高限价, doc_category: 招标控制价, cost_stage: 招标控制价, priority: 18 }
+  - { kind: whitelist, match: contains, pattern: 施工图预算, doc_category: 施工图预算, cost_stage: 概算, priority: 19, note: 修正#3 先于裸「预算」;阶段口径 draft }
+  - { kind: whitelist, match: contains, pattern: 投标报价, doc_category: 投标报价书, cost_stage: 招标控制价, priority: 20 }
+  - { kind: whitelist, match: contains, pattern: 价款对比, doc_category: 价款对比分析, cost_stage: null, stage_policy: context, priority: 21, note: WS13-P09 阶段按语境(原写死审定) }
+  - { kind: whitelist, match: contains, pattern: 价对比, doc_category: 价款对比分析, cost_stage: null, stage_policy: context, priority: 22, note: WS13-P09 阶段按语境(原写死审定) }
+  - { kind: whitelist, match: contains, pattern: 指标对比, doc_category: 指标对比, cost_stage: 审定, priority: 23 }
+  - { kind: whitelist, match: contains, pattern: 造价指标, doc_category: 造价指标, cost_stage: 审定, priority: 24 }
+  - { kind: whitelist, match: contains, pattern: 合同价, doc_category: 合同价款约定, cost_stage: 施工过程, priority: 25, veto_ancestors: [进度款, 产值, 付款, 支付, 结算, 审核终稿, 套价], note: 签约价;阶段口径 draft(6枚举无合同段);WS13-P01 过程/结算目录下的合同价表不是价款约定 }
+  # —— 施工合同(评审修复:两套型★应收,原无任何白名单词整类被默认跳过) ——
+  - { kind: whitelist, match: contains, pattern: 施工合同, doc_category: 施工合同及补充协议, cost_stage: 施工过程, priority: 26, note: 评审修复:产出清单原词计收 }
+  - { kind: whitelist, match: contains, pattern: 补充协议, doc_category: 施工合同及补充协议, cost_stage: 施工过程, priority: 27, note: 评审修复 }
+  # —— 修正#5 七词补进主白名单(评审修复:原只进升档名单,独立命名文件仍漏入库) ——
+  - { kind: whitelist, match: contains, pattern: 暂估价, doc_category: 材料调差, cost_stage: 施工过程, priority: 37, tier: bare, veto_ancestors: [招标, 控制价, 清单], note: 评审修复:修正#5 落全;WS13-P01 裸词,招标清单里的暂估价表不是调差 }
+  - { kind: whitelist, match: contains, pattern: 暂列金额, doc_category: 材料调差, cost_stage: 施工过程, priority: 38, tier: bare, veto_ancestors: [招标, 控制价, 清单], note: 评审修复;WS13-P01 裸词 }
+  - { kind: whitelist, match: contains, pattern: 价差, doc_category: 材料调差, cost_stage: 施工过程, priority: 39, tier: bare, note: 评审修复;WS13-P01 裸词 }
+  - { kind: whitelist, match: contains, pattern: 计日工, doc_category: 变更签证费用, cost_stage: 施工过程, priority: 40, tier: bare, veto_ancestors: [招标, 控制价, 清单], note: 评审修复;WS13-P01 裸词,招标清单里的计日工表不是签证 }
+  - { kind: whitelist, match: contains, pattern: 费用确认, doc_category: 变更签证费用, cost_stage: 施工过程, priority: 41, note: 评审修复 }
+  - { kind: whitelist, match: contains, pattern: 工程量确认, doc_category: 变更签证费用, cost_stage: 施工过程, priority: 42, note: 评审修复 }
+  - { kind: whitelist, match: contains, pattern: 签认, doc_category: 变更签证费用, cost_stage: 施工过程, priority: 43, note: 评审修复 }
+  # —— 修正#4 补漏(投资控制月报/咨询合同类) ——
+  - { kind: whitelist, match: contains, pattern: 投资控制, doc_category: 投资控制月报, cost_stage: 施工过程, priority: 30, note: 修正#4 造价咨询核心月度产出 }
+  - { kind: whitelist, match: contains, pattern: 投资偏差, doc_category: 投资控制月报, cost_stage: 施工过程, priority: 31, note: 修正#4 }
+  - { kind: whitelist, match: contains, pattern: 概算执行, doc_category: 投资控制月报, cost_stage: 施工过程, priority: 32, note: 修正#4 }
+  - { kind: whitelist, match: contains, pattern: 造价咨询, doc_category: 造价综合文件, cost_stage: null, priority: 33, note: 修正#4 }
+  - { kind: whitelist, match: contains, pattern: 监理合同, doc_category: 监理合同, cost_stage: 施工过程, priority: 34, note: 修正#4 监理费=取费基数 }
+  - { kind: whitelist, match: contains, pattern: 勘察合同, doc_category: 勘察合同, cost_stage: 施工过程, priority: 35, note: 修正#4 }
+  - { kind: whitelist, match: contains, pattern: 设计合同, doc_category: 设计合同, cost_stage: 施工过程, priority: 36, note: 修正#4 }
+  # —— WS13-P01 新增特指行(issue #720;附录 B 送签,D59/D64) ——
+  - { kind: whitelist, match: contains, pattern: 验工计价, doc_category: 进度款支付, cost_stage: 施工过程, priority: 44, note: WS13-P01 验工计价建议书原被裸「计价」判成造价综合文件 }
+  - { kind: whitelist, match: regex, pattern: '第\s*[0-9一二三四五六七八九十]+\s*期.*(计价|支付|审核|汇总|对比|计量)', doc_category: 进度款支付, cost_stage: 施工过程, priority: 45, note: WS13-P01 期次过程文件 }
+  - { kind: whitelist, match: regex, pattern: '(审核|审定|结算).{0,6}汇总', doc_category: 汇总表, cost_stage: null, stage_policy: context, priority: 46, note: WS13-P01 汇总表特指;WS13-P09 阶段按语境 }
+  - { kind: whitelist, match: regex, pattern: '立项批复|可研批复|初设批复|初步设计批复|概算批复', doc_category: 项目立项, cost_stage: 概算, priority: 47, note: WS13-P01/P14 各类批复=42001 项目立项批复(原种子别名是死配置) }
+  - { kind: whitelist, match: contains, pattern: 招标代理, doc_category: 咨询服务合同, cost_stage: null, priority: 48, note: WS13-P01 D64 新类目,不参与核查;原被裸「招标」判成招标文件 }
+  - { kind: whitelist, match: regex, pattern: '答疑|补遗|澄清', doc_category: 答疑补遗, cost_stage: 招标控制价, priority: 49, exclude_any: [会审], note: WS13-P01 D64 新类目,不参与核查;排除会审(图纸会审答疑仍归图纸会审,42010) }
+  - { kind: whitelist, match: contains, pattern: 竣工验收, doc_category: 竣工验收报告, cost_stage: 结算, priority: 50, note: WS13-P01 D64 新类目,不参与核查 }
+  # —— 估概预结四算 + 过程造价(裸词,大号;WS13-P01 标 tier: bare —— 0.65 + needs_manual,排在祖先继承之后) ——
+  - { kind: whitelist, match: contains, pattern: 估算, doc_category: 投资估算书, cost_stage: 估算, priority: 50, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 概算, doc_category: 设计概算书, cost_stage: 概算, priority: 51, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 预算, doc_category: 施工图预算, cost_stage: 概算, priority: 52, tier: bare, exclude_any: [勘察, 设计费, 测绘, 咨询], note: 阶段口径 draft }
+  - { kind: whitelist, match: contains, pattern: 控制价, doc_category: 招标控制价, cost_stage: 招标控制价, priority: 53, tier: bare, veto_ancestors: [进度款, 产值, 付款, 支付, 结算, 审核终稿, 套价] }
+  - { kind: whitelist, match: contains, pattern: 清单, doc_category: 工程量清单, cost_stage: 招标控制价, priority: 54, tier: bare, veto_ancestors: [进度款, 产值, 付款, 支付, 结算, 审核终稿, 套价] }
+  - { kind: whitelist, match: contains, pattern: 招标, doc_category: 招标文件, cost_stage: 招标控制价, priority: 55, tier: bare, exclude_any: [代理] }
+  - { kind: whitelist, match: contains, pattern: 中标, doc_category: 中标通知书, cost_stage: 招标控制价, priority: 56, tier: bare, note: xlsx;中标价入RAG }
+  - { kind: whitelist, match: contains, pattern: 投标, doc_category: 投标文件, cost_stage: 招标控制价, priority: 57, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 报价, doc_category: 投标报价书, cost_stage: 招标控制价, priority: 58, tier: bare, exclude_any: [评估, 测绘, 勘察, 服务, 咨询, 地灾, 地质灾害, 环评, 能评, 风评, 监理, 设计费, 定级] }
+  - { kind: whitelist, match: contains, pattern: 价款, doc_category: 合同价款约定, cost_stage: 施工过程, priority: 59, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 工程量计算, doc_category: 工程量计算书, cost_stage: null, priority: 60, tier: bare, note: 阶段跟随父目录(需求表:继承父目录阶段) }
+  - { kind: whitelist, match: contains, pattern: 进度款, doc_category: 进度款支付, cost_stage: 施工过程, priority: 61, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 支付申请, doc_category: 进度款支付, cost_stage: 施工过程, priority: 62, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 支付证书, doc_category: 进度款支付, cost_stage: 施工过程, priority: 63, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 工程款, doc_category: 进度款支付, cost_stage: 施工过程, priority: 64, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 变更费用, doc_category: 变更签证费用, cost_stage: 施工过程, priority: 65, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 费用报审, doc_category: 变更签证费用, cost_stage: 施工过程, priority: 66, tier: bare, note: 修正#1 得以生效的造价报审 }
+  - { kind: whitelist, match: contains, pattern: 签证, doc_category: 变更签证费用, cost_stage: 施工过程, priority: 67, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 变更, doc_category: 变更签证费用, cost_stage: 施工过程, priority: 68, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 索赔, doc_category: 费用索赔, cost_stage: 施工过程, priority: 69, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 调差, doc_category: 材料调差, cost_stage: 施工过程, priority: 70, tier: bare, note: xlsx;含材料价差 }
+  - { kind: whitelist, match: contains, pattern: 认价, doc_category: 材料调差, cost_stage: 施工过程, priority: 71, tier: bare, note: 修正#5 材料认价单高频 }
+  - { kind: whitelist, match: contains, pattern: 送审, doc_category: 结算送审书, cost_stage: 结算, priority: 72, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 审定, doc_category: 结算审定书, cost_stage: 审定, priority: 73, tier: bare, exclude_any: [规划, 意见书] }
+  - { kind: whitelist, match: contains, pattern: 复审, doc_category: 审计/复审稿, cost_stage: 审定, priority: 74, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 审计, doc_category: 审计/复审稿, cost_stage: 审定, priority: 75, tier: bare, exclude_any: [合同, 采购, 服务, 委托] }
+  - { kind: whitelist, match: contains, pattern: 决算, doc_category: 竣工决算书, cost_stage: 审定, priority: 76, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 结算, doc_category: 结算价文件, cost_stage: 结算, priority: 77, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 对比, doc_category: 价款对比分析, cost_stage: null, stage_policy: context, priority: 78, tier: bare, note: WS13-P09 阶段按语境(原写死审定) }
+  - { kind: whitelist, match: contains, pattern: 指标, doc_category: 造价指标, cost_stage: 审定, priority: 79, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 土建, doc_category: 土建对比表, cost_stage: 审定, priority: 80, tier: bare, note: xlsx 底料 }
+  - { kind: whitelist, match: contains, pattern: 月报, doc_category: 投资控制月报, cost_stage: 施工过程, priority: 81, tier: bare, note: xlsx;监理月报已被黑名单先截 }
+  - { kind: whitelist, match: contains, pattern: 造价, doc_category: 造价综合文件, cost_stage: null, priority: 90, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 计价, doc_category: 造价综合文件, cost_stage: null, priority: 91, tier: bare }
+  - { kind: whitelist, match: contains, pattern: 工程概况, doc_category: 工程概况, cost_stage: null, priority: 92, note: 辅助元数据 }
+
+  # ============ ⑩ 祖先目录继承(WS13-P02 issue #720;替代原 classify.parent_context_keywords 10 词) ============
+  # 由近及远逐段匹配,第一个命中就用;同一段内按 priority 特指先于泛指(「招标文件」先于「控制价」)。
+  # 出厂 confidence = max(0.6, 0.7 − 0.05×深度),needs_manual=True,evidence=ancestor_inherit。
+  # 语境阶段(stage_policy: context)与 LLM 结果的阶段也取这里最近一个带阶段的命中。
+  - { kind: ancestor_context, match: regex, pattern: '进度款|产值|支付|付款|计量', doc_category: 进度款支付, cost_stage: 施工过程, priority: 5 }
+  - { kind: ancestor_context, match: regex, pattern: '签证|变更|联系单', doc_category: 变更签证费用, cost_stage: 施工过程, priority: 6 }
+  - { kind: ancestor_context, match: contains, pattern: 招标文件, doc_category: 招标文件, cost_stage: 招标控制价, priority: 10 }
+  - { kind: ancestor_context, match: contains, pattern: 控制价, doc_category: 招标控制价, cost_stage: 招标控制价, priority: 20 }
+  - { kind: ancestor_context, match: contains, pattern: 清单, doc_category: 工程量清单, cost_stage: 招标控制价, priority: 22 }
+  - { kind: ancestor_context, match: contains, pattern: 招标, doc_category: 招标文件, cost_stage: 招标控制价, priority: 24 }
+  - { kind: ancestor_context, match: contains, pattern: 投标, doc_category: 投标文件, cost_stage: 招标控制价, priority: 26 }
+  - { kind: ancestor_context, match: contains, pattern: 合同, doc_category: 施工合同及补充协议, cost_stage: 施工过程, priority: 30 }
+  # —— 以下照旧(原 parent_context_keywords 里的四算词,类目/阶段与白名单同名行一致) ——
+  - { kind: ancestor_context, match: contains, pattern: 结算, doc_category: 结算价文件, cost_stage: 结算, priority: 40 }
+  - { kind: ancestor_context, match: contains, pattern: 决算, doc_category: 竣工决算书, cost_stage: 审定, priority: 41 }
+  - { kind: ancestor_context, match: contains, pattern: 审定, doc_category: 结算审定书, cost_stage: 审定, priority: 42 }
+  - { kind: ancestor_context, match: contains, pattern: 概算, doc_category: 设计概算书, cost_stage: 概算, priority: 43 }
+  - { kind: ancestor_context, match: contains, pattern: 预算, doc_category: 施工图预算, cost_stage: 概算, priority: 44 }
+  - { kind: ancestor_context, match: contains, pattern: 估算, doc_category: 投资估算书, cost_stage: 估算, priority: 45 }

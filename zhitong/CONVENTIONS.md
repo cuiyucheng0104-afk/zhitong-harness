@@ -17,6 +17,7 @@ zhitong/
     zt/report/                                                                                W3
     zt/quantity/ zt/estimate/                                                                 W4
     zt/volc/                                                                                  W7
+    zt/migration/         NAS → 桶镜像的导出、整理、对账（zhitong/migration/ 的脚本只调它）          W8
     tests/<area>/         与上面同名分区；夹具放 tests/<area>/fixtures/
   skills/<name>/          SKILL.md + scripts/（薄 CLI）+ data/（规则与模板）                    各工单
   skills/_shared/         各 skill 共用的说明与 zt_launch.py（解释器与 zt 定位，无 SKILL.md）     W9
