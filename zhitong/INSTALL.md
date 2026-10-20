@@ -61,7 +61,8 @@ bundle 做了这些事（详见 `zhitong/bundle/cordis.patch.yml`）：
 - 挂 `zhitong-tool-tos`（`tos_ls`/`tos_stat`/`tos_pull`/`tos_push`）与 `zhitong-config-import`（`config_import`）。
 - 挂只读 `zhitong/skills` 的 skill 目录（provider 名 `zhitong`）。
 - 新增默认预设「智通数工AI」（`preset-zhitong`），系统提示词使用造价人设；沙箱沿用 `workspace-write + ask`。
-- 品牌：禁用上游 `ui-brand-official`，由 `zhitong-ui-brand` 显示「智通数工AI」文字标（侧栏与新会话页），模型选择器里 `deepseek-flash` 显示为「DeepSeek V4.1 Flash 官方推荐」；禁用 `ui-settings-account`（没有 DeepSeek 账号登录、账号菜单与充值页），首次运行直接弹出模型 API Key 表单。
+- 品牌：禁用上游 `ui-brand-official`，由 `zhitong-ui-brand` 在侧栏与新会话页显示品牌图形（内联 SVG，蓝色渐变圆角方块）与「智通数工AI」字标，模型选择器里 `deepseek-flash` 显示为「DeepSeek V4.1 Flash 官方推荐」；禁用 `ui-settings-account`（没有 DeepSeek 账号登录、账号菜单与充值页），首次运行直接弹出模型 API Key 表单。
+- 模型：禁用账号路由 `llm-deepseek-account`，只留 API Key 路由 `deepseek-official`；默认模型由 `zhitong-default-model` 行持有（`deepseek-official` / `deepseek-flash`），上游 `agent-default-model` 行禁用，旧安装留在用户层的默认模型（例如账号登录后写入的 `deepseek-account`）因此不再生效。
 
 开发 profile 里插件以源码（`src/index.ts`）入口运行，依赖源码启动的 tsx 加载器。安装包用的是 `pnpm --dir zhitong/plugins/<插件> run build`（tsdown）产出的 `lib/index.js`，由打包流程自动构建（见第二部分）。
 
@@ -271,10 +272,10 @@ Windows 用户名含中文时，`%USERPROFILE%\.dsh` 与 `%TEMP%` 都在中文�
 
 | 检查 | 期望 |
 |---|---|
-| 品牌 | 窗口标题、Dock / 任务栏、关于、托盘、菜单（隐藏 / 退出）都是「智通数工AI」；侧栏左上角与新会话页是「智通数工AI」文字标，不是 deepseek 鲸鱼与 HARNESS 字标；设置里没有「账号」页 |
+| 品牌 | 窗口标题、Dock / 任务栏、关于、托盘、菜单（隐藏 / 退出）都是「智通数工AI」；侧栏左上角与新会话页标题左边是品牌图形（蓝色渐变圆角方块、白十字、绿短划，不是空白方块），侧栏图形右边是「智通数工AI」字标，不是 deepseek 鲸鱼与 HARNESS 字标；新会话页标题「造价咨询工作台」加「预览版」标签，输入框占位「描述你要做的造价任务，/ 调用指令，@ 文件或对话」；设置里没有「账号」页 |
 | 首次运行 | 欢迎窗口第一页就是 API Key 表单，没有「登录」按钮；保存后直接进入工作区 |
-| 新会话的预设 | 「智通数工AI」（预设列表第一个，造价人设） |
-| 默认模型 | 模型选择器里显示「DeepSeek V4.1 Flash 官方推荐」（`deepseek-official` / `deepseek-flash`；设置页另选的模型优先） |
+| 新会话的预设 | 「智通数工AI」（预设列表第一个，造价人设）；设置 →「Agent 预设」里它在「内置」区，标签「新任务默认」 |
+| 默认模型 | 只填过欢迎页的 API Key，新会话的模型选择器就显示「DeepSeek V4.1 Flash 官方推荐」（`deepseek-official` / `deepseek-flash`；输入框里另选的模型之后优先），不是「请选择模型」；发一句话不报「请先登录 DeepSeek」；设置 → 模型只有一个「DeepSeek」提供商 |
 | 问 agent「列出可用的 skill」，或看 `skill` 工具的目录 | 12 个：zt-project、zt-ask、zt-archive、zt-reconcile、zt-indicator、zt-tk、zt-report、zt-quantity、zt-estimate、zt-knowledge、zt-volc、zt-cad；没有 `_shared` |
 | 工具 | `tos_ls`、`tos_stat`、`tos_pull`、`tos_push`、`config_import`、`cad_open` 等 10 个 `cad_*`，以及上游的 `load_workspace_dependencies` |
 | Python | 让 agent 跑任一 skill 脚本（例如「用 zt-tk 看一下帮助」）：它先调 `load_workspace_dependencies` 取 `python`，再运行 `<python> <skill 目录>/scripts/tk.py --help`，输出子命令列表；不应出现 `zt_not_importable` |

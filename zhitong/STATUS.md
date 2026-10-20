@@ -20,6 +20,7 @@
 | W12 门户、图标、发布件 | 已合入 | `14c71e514` `f66bc947d` | 门户 vitest 48 通过、typecheck/build 通过；nginx 配置在宿主 nginx 1.24 实测；deploy.sh 本机 sshd 端到端；docker 容器模式未实跑 |
 | W13 Windows Actions、fork CI | 已合入 | `bf804f97c` `4e3ccaf76` `d6c929de9` | actionlint 0 问题；Windows 真实打包待首次运行；上游 5 条断言触发方式的测试会失败（ci-workflow.spec 702/1470、ci-master-platforms.spec 77/97、ci-release-selfhosted.spec 89） |
 | W11 品牌替换 | 代码与文档已提交；打包后的应用名、Finder / 开始菜单显示与首次运行待目标机器验证 | 见 git log `feat(zhitong/brand)` | 见下「W11 上游改动」与交付报告 |
+| W14 Mac 实机四个问题 | 已提交，待打包后实机复核 | 见 git log `fix(zhitong/brand)` `fix(zhitong/bundle)` | 见下「W14 修复」 |
 
 ## 测试原始结果
 
@@ -61,7 +62,7 @@ zhitong/plugins/config-import$ pnpm exec tsc --noEmit -p .   → exit 0
 - **Python 依赖**：上游 `scripts/primary-runtime/lock.json` 五个目标都加了 pydantic 2.14.1、pydantic-core 2.50.1、annotated-types 0.8.0、typing-inspection 0.4.4、pypdf 6.21.1、PyYAML 6.0.3（typing-extensions 4.16.0、openpyxl、python-docx、lxml、et-xmlfile 原已在内）。`zt` 不进 wheel 列表（lock 只接受远程 URL）：打包时复制进 `@zhitong/bundle/python/zt`，与 skills 一起解到 asar 外。
 - **打包内容**：`skills/`（含 `_shared/`、各 `data/`、`templates/`、`references/`）与 `python/zt` 随 `@zhitong/bundle` 进 `app.asar/dsh`，asarUnpack 到 `app.asar.unpacked/`；`bundledSkillDir` 由 `@zhitong/bundle/skills-dir.cjs` 算出并换成 asar 外路径。`_shared/` 没有 SKILL.md，skill-filesystem 读不到文件时静默跳过、不告警（`readSkillText` 对 ENOENT 返回 undefined）。
 - **zt-volc 接入 config-import**：`volc.profile`、`volc.region`、`ssh.hosts[].alias` 写进只有名称的 `$DSH_HOME/zhitong/volc.config.json`，zt-volc 在 `ZT_VOLC_CONFIG` 未设置时读它；`host`、`port`、`user` 写进 `~/.ssh/config` 开头的受管块，私钥写 `~/.ssh/zhitong/<alias>`（0600）。CONFIG-PACKAGE.md 写明 `ve configure set`。
-- **模型**：bundle 重述 `agent-default-model` 为 `deepseek-official` / `deepseek-flash`（DeepSeek-V4.1-Flash）；设置页保存的选择仍优先。
+- **模型**：bundle 重述 `agent-default-model` 为 `deepseek-official` / `deepseek-flash`（DeepSeek-V4.1-Flash）；设置页保存的选择仍优先。W14 起默认模型改由 `zhitong-default-model` 行持有，见「W14 修复」。
 - **python/README.md**：补各分区 CLI 入口表与运行时依赖说明；CONVENTIONS 目录表加 `zt/volc/`、`skills/_shared/`、`scripts/`。
 - **lockfile**：`pnpm-lock.yaml` 的 `zhitong/bundle` 条目补上 W5 合入时漏掉的 `@zhitong/tool-cad`。
 
@@ -140,7 +141,7 @@ zhitong/plugins/config-import$ pnpm exec tsc --noEmit -p .   → exit 0
 
 ### zhitong 侧（不是上游改动，列出备查）
 
-- `@zhitong/ui-brand`（`zhitong/plugins/ui-brand/`）：填 `sidebar.brand.mark`、`sidebar.brand.name`、`conversation.hero.brand.mark`（占位文字标，主题 token 取色，深浅两色自动切换）与 `conversation.input.model.label`（`deepseek-flash` 显示「DeepSeek V4.1 Flash」+「官方推荐」）。
+- `@zhitong/ui-brand`（`zhitong/plugins/ui-brand/`）：填 `sidebar.brand.mark`、`sidebar.brand.name`、`conversation.hero.brand.mark`（W14 起图标是内联的品牌图形，字标是文字，见「W14 修复」）与 `conversation.input.model.label`（`deepseek-flash` 显示「DeepSeek V4.1 Flash」+「官方推荐」）。
 - `bundle/cordis.patch.yml`：禁用 `ui-brand-official`、`ui-deepseek-model-label-1017`、`ui-settings-account`，插入 `zhitong-ui-brand`。禁用 `ui-settings-account` 后 `settings.models.sign-in` 无占位者，Web 首次运行的 `DeepSeekOnboardingDialog` 直接显示 `deepseek-official` 的 API Key 表单（复用设置页 `ProviderEditor`），设置页没有「账号」页，侧栏设置按钮回到上游默认样式。Host 侧 `deepseek-account`、`authorization`、`account-controller` 保留：桌面主进程启动时读账号状态（`welcome-backend.ts` 的 `account.state()`），禁用会让欢迎流程失败。
 - `scripts/pack-desktop.mjs` 构建并打包 ui-brand，检查 `lib/client.js` 与 `exports["./client"]`；`scripts/verify-desktop-app.mjs` 检查五个 `@zhitong/*` 包、可执行文件名与 `app.asar` 里的品牌客户端包。
 
@@ -157,6 +158,45 @@ zhitong/plugins/config-import$ pnpm exec tsc --noEmit -p .   → exit 0
 | `apps/desktop/scripts/development-app.ts`（Harness Dev） | 只在开发机上出现的开发版应用 |
 | 启动冲突提示里的「DSH」 | 上游缩写，品牌规范允许 |
 | `docs/`、`.agents/`、各包 README 与 `package.json` 描述 | 开发者文档 |
+
+## W14 修复（Mac 实机反馈，2026-10-20）
+
+### 1. 填了 API Key 仍每轮报 `ACCOUNT_SIGN_IN_REQUIRED`、输入框「请选择模型」
+
+- 上游机制：`deepseek-official` 只走 API Key（`llm-deepseek-api-key`，凭据引用 `llm-deepseek.apiKeyEnv`，默认 `DEEPSEEK_API_KEY`；没有 Key 时目录为空、请求报 `MISSING_CREDENTIAL`）。`deepseek-account` 只走账号令牌（`llm-deepseek-account`），`ACCOUNT_SIGN_IN_REQUIRED` 只在这里抛出（`resolveToken` 取不到令牌），从不回退到 API Key。桌面欢迎页（`welcome-backend.ts` 的 `save`）与 Web 首次运行都把 Key 写到 `DEEPSEEK_API_KEY`，与 `deepseek-official` 读的是同一个引用，这一段没有问题。
+- 根因：会话的模型取 `agentDefaultModel.currentSelection()`；上游在账号登录后调用 `session.initializeDefaultModel`，把默认模型存成 `deepseek-account`，写进 profile 用户层（`~/.dsh/profiles/desktop/cordis.patch.yml`）的 `agent-default-model` 行。用户层排在 bundle 之后，bundle 里重述的 `deepseek-official` 被覆盖。`~/.dsh` 与上游 DeepSeek Harness 桌面版、带登录的早期构建共用，旧选择一直留着：账号路由已登出、目录为空，默认模型不在目录里，输入框显示「请选择模型」，每轮请求走 `deepseek-account` 报未登录；而「DeepSeek」行有 Key（绿点），可用模型都在 `deepseek-official` 下。在临时 DSH_HOME 里按这个状态复现：Web Host 的 `session/modelCatalog` 返回 `default = deepseek-account/deepseek-flash`、`routable = false`，存 Key 后仍是这样；headless 一轮报 `ACCOUNT_SIGN_IN_REQUIRED`。
+- 改法（`bundle/cordis.patch.yml`）：禁用 `llm-deepseek-account`；禁用上游 `agent-default-model` 行，新插入 `zhitong-default-model`（同一插件，`deepseek-official` / `deepseek-flash`）。旧安装写在用户层 `agent-default-model` 上的选择落在被禁用的行上，不再生效；之后在输入框另选的模型写进用户层的 `zhitong-default-model`。设置 → 模型默认只有「DeepSeek」一行（pi-ai 目录里的小写 `deepseek` 是用户自己添加的 OpenAI 兼容路由，不添加就不出现）。
+- 设置页 API 地址：`deepseek-official` 讲 Anthropic Messages 协议，默认地址是 `https://api.deepseek.com/anthropic`（设置页占位符就是它）。不能预填 `https://api.deepseek.com`：Messages 请求发往 `<baseURL>/v1/messages`，根地址没有这个接口。欢迎页与首次运行文案里的「https://api.deepseek.com」指的是同一个官方服务。
+
+### 2. 侧栏与新会话页的图标是空白圆角方块
+
+- 根因：不是 asset 路径问题，旧图标本来就是内联 SVG。方块用 `--dsw-alias-brand-primary` 填色，「智」字用 `--dsw-alias-brand-primary-invert`；`packages/client/ui-theme/src/styles/design-platform.css` 里这两个 token 在浅色与深色主题中取值相同（都是 `neutral-bluish-1000` 或都是 `neutral-bluish-50`），字与底同色。
+- 改法：`ui-brand` 的 `ZhitongBrandMark` 改画 `zhitong/brand/brand-mark.svg` 的图形（内联 SVG，颜色写死，不引用文件）；每个实例用 `useId` 生成渐变 id（侧栏同时渲染展开、收起两份）。删除 `assets/mark-{light,dark}.svg` 与 `markGlyph` 文案。
+
+### 3. 新会话页文案
+
+locale 服务每个（命名空间, 语言）只允许一个注册者，`ui-brand` 不能覆盖 `conversation` 命名空间，新会话页标题也不是 slot，所以直接改上游中文字典：`hero.headline` →「造价咨询工作台」（「预览版」保留），`placeholder.hero` →「描述你要做的造价任务，/ 调用指令，@ 文件或对话」。英文字典未改（仍是 `Into the Unknown` 等），Web e2e 的英文期望因此不动。
+
+### 4. Agent 预设页
+
+- 上游判定（`packages/preset/agent-preset-registry/src/display.ts` 的 `isBuiltInPreset`）：id 在内置表里、且预设不发布 `name` 的才算「内置」，名称与说明来自 `ui-agent-preset` 的 locale 字典；bundle 的 `preset-zhitong` 写了 `name: 智通数工AI`，被归入「自定义」。预设页本身没有删除按钮，「可删除」的观感来自「自定义」分组。
+- 改法：内置表加 `zhitong`（`presetZhitongName` / `presetZhitongDescription`），中英字典给出名称与说明；`preset-zhitong` 行去掉 `name` 与 `description`（`agent-preset-registry` 默认仍是 `zhitong`，标签「新任务默认」）。中文字典里「扩展 DSH 的能力」「用对话定制 DSH」「制作属于你的 DSH 插件」改为 ZTH（按用户原话；品牌定稿后可再改这三处）；英文字典未改。
+
+### W14 上游改动
+
+| 文件 | 改动 |
+|---|---|
+| `packages/preset/agent-preset-registry/src/display.ts`（及 `tests/display.spec.ts`） | 内置预设表与 `BuiltInPresetCopyKey` 加 `zhitong` |
+| `packages/client/ui-agent-preset/src/client/locales.ts`（及 `tests/locales.client.spec.ts`、`tests/section.client.spec.tsx`） | `presetZhitongName` / `presetZhitongDescription`；中文 DSH → ZTH 三处 |
+| `packages/client/ui-conversation/src/client/locales.ts`（及 `tests/skeleton.client.spec.tsx`） | 中文新会话标题与输入框占位 |
+| `apps/web/tests/support.ts`、`apps/web/tests/expected/agent-preset-authoring/section.expected.md`、`snapshots/web/lifecycle-chrome/plan-active-zh.expected.md` | 对应中文期望（Linux 上未运行 Web e2e） |
+
+### 打包后需实机确认
+
+- 原来就装着的 Mac 上：升级后新会话的模型选择器显示「DeepSeek V4.1 Flash 官方推荐」，发一句话能得到回答。已有会话若日志里已记下 `deepseek-account` 的请求，会话沿用日志里的模型（这条路由现已禁用），仍会失败：在该会话的输入框里改选一次模型，或新建会话。
+- 设置 → 模型：用户自己建的小写「deepseek」行仍在（用户数据，未删），可在设置页删除；干净安装只有「DeepSeek」一行。
+- 侧栏（展开与收起）与新会话页标题左边都是蓝色渐变图标；深色主题下同样可见。
+- 设置 →「Agent 预设」：「智通数工AI」在「内置」区、标签「新任务默认」。
 
 ## W9 验证（Linux 容器，2026-10-19）
 

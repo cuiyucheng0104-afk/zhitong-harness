@@ -10,15 +10,33 @@
 #   安装包里是本包内的 skills/（asar 外的 app.asar.unpacked 路径），仓库里是 zhitong/skills。
 #   本包先从 profile 目录解析（link: 安装，INSTALL.md 第一部分），再从 dsh 安装解析（桌面安装包自带；
 #   运行时解析表不收录 bundle 层自身，所以要用 profileContext.installAnchor 作为第二个锚点）。
-# - agent-default-model：固定 DeepSeek V4.1 Flash（上游目录 id deepseek-flash）；设置页另选的模型仍优先。
+# - 模型：只走 API Key 路由 deepseek-official（凭据引用 llm-deepseek.apiKeyEnv，默认 DEEPSEEK_API_KEY；
+#   桌面欢迎页与 Web 首次运行都写这个引用），默认 DeepSeek V4.1 Flash（上游目录 id deepseek-flash）。
+#   账号路由与默认模型行的处理见下面「模型路由」一节。
 # - preset-zhitong：默认预设。插件列表照抄 packages/bundle/web-app/presets/standard.patch.yml，
 #   只把人设换成造价人设；合入上游后需要对照 standard 预设同步。
 # - 沙箱沿用 dsh-base 的 workspace-write + ask，这里不覆盖。
 
+# 模型路由。
+# - llm-deepseek-account（deepseek-account，只认 DeepSeek 账号令牌，未登录时每轮报 ACCOUNT_SIGN_IN_REQUIRED，
+#   从不回退到 API Key）禁用：本产品不提供账号登录，模型只走 API Key 路由 deepseek-official。
+# - 默认模型改由 zhitong-default-model 行持有，上游 agent-default-model 行禁用。上游在账号登录后把默认模型存成
+#   deepseek-account（session-controller 的 initializeDefaultModel，经 config-editor 写进 profile 用户层的
+#   agent-default-model 行），用户层排在 bundle 之后，bundle 改不动它；换一个行 id 后，旧安装（上游 DeepSeek Harness
+#   或带登录的早期构建）留在用户层的旧选择不再生效，新会话一律从 DeepSeek V4.1 Flash 开始。之后在输入框里
+#   另选的模型写进用户层的 zhitong-default-model 行，照常优先。
+- id: llm-deepseek-account
+  disabled: true
+
 - id: agent-default-model
-  config:
-    provider: deepseek-official
-    model: deepseek-flash
+  disabled: true
+
+- insert:
+    - id: zhitong-default-model
+      name: '@deepseek-ai/dsh-agent-default-model'
+      config:
+        provider: deepseek-official
+        model: deepseek-flash
 
 - id: system-prompt
   config:
@@ -56,7 +74,7 @@
         bundledSkillDir: !!js "(() => { const { createRequire } = process.getBuiltinModule('node:module'); for (const anchor of [baseUrl, ctx.get('profileContext')?.installAnchor]) { if (!anchor) continue; try { return createRequire(anchor)('@zhitong/bundle/skills-dir.cjs').skillsDir() } catch (error) { if (error?.code !== 'MODULE_NOT_FOUND') throw error } } throw new Error('@zhitong/bundle: 从 profile 与 dsh 安装都解析不到本包，找不到 skill 目录') })()"
 
 # 品牌：上游 ui-brand-official 行只在 official 构建里填侧栏品牌位（DeepSeek 官方 artwork），这里禁用它，改由
-# @zhitong/ui-brand 在任何构建里填侧栏图标、侧栏名称与新会话页图标三个品牌位（文字标占位，可由设计师替换）；
+# @zhitong/ui-brand 在任何构建里填侧栏图标、侧栏名称与新会话页图标三个品牌位（内联品牌图形与文字字标）；
 # 模型选择器里 deepseek-flash 的标签也由它显示为「DeepSeek V4.1 Flash 官方推荐」，所以禁用上游的 1017 标记行。
 - id: ui-brand-official
   disabled: true
@@ -82,13 +100,14 @@
     default: zhitong
 
 # 智通数工AI 默认预设（照抄 standard 预设，人设替换为上面的造价人设）。
+# 不写 name / description：Agent 预设页把「不发布 name、id 在内置表里」的预设归入「内置」，id zhitong 已加进
+# packages/preset/agent-preset-registry/src/display.ts 的内置表，名称与说明由 ui-agent-preset 的 locale 字典
+# （presetZhitongName / presetZhitongDescription）提供。写了 name 会被当成用户自建预设，显示在「自定义」区。
 - insert:
     - id: preset-zhitong
       name: '@deepseek-ai/dsh-agent-preset'
       config:
         id: zhitong
-        name: 智通数工AI
-        description: 造价咨询工作台：核对、指标、投控、清单、概算、报告、看图、问答
         order: 0
         plugins:
           - id: persona
