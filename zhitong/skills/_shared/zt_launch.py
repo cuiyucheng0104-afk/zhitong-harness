@@ -190,6 +190,17 @@ def prepare_imports(here, chosen):
         raise LaunchError("{} 缺少 zt 的依赖：{}".format(where, "、".join(missing)), hint)
 
 
+def force_utf8_stdio():
+    """把 stdout/stderr 切到 UTF-8：Windows 控制台与 GitHub runner 默认是本地代码页，中文帮助文本会抛 UnicodeEncodeError。"""
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            try:
+                reconfigure(encoding="utf-8", errors="replace")
+            except (ValueError, OSError):  # 流已关闭或不可重配：保持原样
+                pass
+
+
 def ensure(script, environ=None, argv=None):
     """脚本入口调用：必要时换解释器重跑，然后保证 ``zt`` 可导入；失败时输出错误 JSON 并退出。
 
@@ -200,6 +211,7 @@ def ensure(script, environ=None, argv=None):
     environ = os.environ if environ is None else environ
     argv = sys.argv[1:] if argv is None else argv
     here = Path(__file__)
+    force_utf8_stdio()
     try:
         chosen = (None, None)
         main = getattr(sys.modules.get("__main__"), "__file__", None)
