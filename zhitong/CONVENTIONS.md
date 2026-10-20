@@ -22,6 +22,8 @@ zhitong/
   skills/_shared/         各 skill 共用的说明与 zt_launch.py（解释器与 zt 定位，无 SKILL.md）     W9
   scripts/                pack-desktop.mjs（桌面安装包打包 bundle、插件、skills 与 zt）           W9
   knowledge-seed/                                                                             W6
+  portal/                 门户站点（site/）、部署件（deploy/）、门户文案                              W12
+  brand/                  品牌源文件与生成的应用/网站图标；scripts/brand-icons/ 生成器                 W12
   migration/                                                                                  W8
 ```
 

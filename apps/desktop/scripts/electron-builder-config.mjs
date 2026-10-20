@@ -157,12 +157,12 @@ export function createElectronBuilderConfig(
     asarUnpack: unpack,
     extraResources: [
       { from: buildPaths.runtime, to: 'runtime' },
-      { from: fileURLToPath(new URL('../resources/icon-windows.png', import.meta.url)), to: 'icon.png' },
+      { from: fileURLToPath(new URL('../resources/zhitong-icon-windows.png', import.meta.url)), to: 'icon.png' } /* zhitong increment: brand icon */,
       // Windows tray bitmaps; macOS keeps the Dock and ships no menu bar icon.
-      ...(packagesWindows ? [{ from: fileURLToPath(new URL('../resources/tray-windows.ico', import.meta.url)), to: 'tray.ico' }] : []),
+      ...(packagesWindows ? [{ from: fileURLToPath(new URL('../resources/zhitong-tray-windows.ico', import.meta.url)), to: 'tray.ico' }] : []),
     ],
     mac: {
-      icon: fileURLToPath(new URL('../resources/icon-macos.png', import.meta.url)),
+      icon: fileURLToPath(new URL('../resources/zhitong-icon.icns', import.meta.url)), // zhitong increment: brand icon
       category: 'public.app-category.developer-tools',
       // Ad-hoc signing keeps the modified Electron executable runnable without a Developer ID.
       identity: unsigned ? '-' : macOSSigning?.signingIdentity,
@@ -245,7 +245,7 @@ export function createElectronBuilderConfig(
       )
     },
     win: {
-      icon: fileURLToPath(new URL('../resources/icon-windows.png', import.meta.url)),
+      icon: fileURLToPath(new URL('../resources/zhitong-icon.ico', import.meta.url)), // zhitong increment: brand icon
       // zhitong increment: ASCII executable and installation directory (%LOCALAPPDATA%\Programs\ztsgai\ztsgai.exe);
       // electron-builder falls back to the scoped package name for a non-ASCII product name, and cli/dsh.cmd runs
       // under the console code page.

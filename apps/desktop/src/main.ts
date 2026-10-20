@@ -929,7 +929,7 @@ async function main(): Promise<void> {
     updates.dispose()
   })
 
-  const applicationIconPath = development ? join(app.getAppPath(), 'resources', 'icon-windows.png')
+  const applicationIconPath = development ? join(app.getAppPath(), 'resources', 'zhitong-icon-windows.png') /* zhitong increment */
     : join(process.resourcesPath, 'icon.png')
   app.setAboutPanelOptions({
     // zhitong increment: product name 智通数工AI (zhitong/README.md §2).
@@ -989,7 +989,7 @@ async function main(): Promise<void> {
     tray?.relabel()
   }
   refreshApplicationMenu()
-  const trayIconPath = development ? join(app.getAppPath(), 'resources', 'tray-windows.ico') : join(process.resourcesPath, 'tray.ico')
+  const trayIconPath = development ? join(app.getAppPath(), 'resources', 'zhitong-tray-windows.ico') /* zhitong increment */ : join(process.resourcesPath, 'tray.ico')
   if (process.platform === 'win32') {
     // The tray is the way back to a hidden window; without it, relaunching the application still focuses it.
     try {

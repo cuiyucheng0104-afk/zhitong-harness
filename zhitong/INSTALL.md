@@ -213,7 +213,7 @@ notepad apps\desktop\.env.windows
 ```
 
 ```dotenv
-DSH_DESKTOP_APP_ID=com.deepseek.harness
+DSH_DESKTOP_APP_ID=com.ztsgai.harness
 DSH_DESKTOP_AUTO_UPDATE_ENV=production
 DSH_DESKTOP_MANDATORY_UPDATE_PROD_ORIGIN=https://update.invalid
 ```
@@ -230,7 +230,7 @@ pnpm run package:desktop:win:x64:unsigned
 产物：`apps\desktop\.desktop-build\targets\win-x64\unsigned-artifacts\deepseek-harness-0.2.1-rc.2-win-x64-unsigned.exe`。运行它安装到当前用户；SmartScreen 拦截时点「更多信息 → 仍要运行」。安装后可做离线自检（路径换成实际安装目录）：
 
 ```powershell
-node zhitong\scripts\verify-desktop-app.mjs "$env:LOCALAPPDATA\Programs\DeepSeek Harness"
+node zhitong\scripts\verify-desktop-app.mjs "$env:LOCALAPPDATA\Programs\ztsgai"
 ```
 
 Windows 用户名含中文时，`%USERPROFILE%\.dsh` 与 `%TEMP%` 都在中文路径下：官方 win64 的 dwg2dxf 用 ANSI `fopen`，tool-cad 已把输入拷成 ASCII 文件名，但临时目录本身仍在 `%TEMP%`；遇到 DWG 打不开时，先把用户环境变量 `TEMP`、`TMP` 改到纯英文路径（如 `C:\Temp`）再重启应用。

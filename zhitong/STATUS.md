@@ -17,6 +17,8 @@
 | W8 迁移 | 未开始 | — | `zhitong/migration/` 不存在 |
 | W9 安装包 | 代码与文档已合入；Mac / Windows 实机打包与 M0 验收待用户在目标机器上执行（[INSTALL.md](INSTALL.md) 第二至四部分） | `8f2201c28` `71ca9f9a7` `25872c4e4` `e987013f9` `6a5ecbf66` `810fba853` `67a1a2953` `9f45c916f` 及文档提交 | 见下「W9 验证」 |
 | W10 门户文案 | 已合入 | `d4a7fa2dc` | 无测试 |
+| W12 门户、图标、发布件 | 已合入 | `14c71e514` `f66bc947d` | 门户 vitest 48 通过、typecheck/build 通过；nginx 配置在宿主 nginx 1.24 实测；deploy.sh 本机 sshd 端到端；docker 容器模式未实跑 |
+| W13 Windows Actions、fork CI | 已合入 | `bf804f97c` `4e3ccaf76` `d6c929de9` | actionlint 0 问题；Windows 真实打包待首次运行；上游 5 条断言触发方式的测试会失败（ci-workflow.spec 702/1470、ci-master-platforms.spec 77/97、ci-release-selfhosted.spec 89） |
 | W11 品牌替换 | 代码与文档已提交；打包后的应用名、Finder / 开始菜单显示与首次运行待目标机器验证 | 见 git log `feat(zhitong/brand)` | 见下「W11 上游改动」与交付报告 |
 
 ## 测试原始结果
@@ -179,3 +181,7 @@ pnpm install --frozen-lockfile（排除 documentpreview）                    �
 - macOS 上 `build-dwg2dxf.sh`（clang 静态链接、`otool -L` 检查、ad-hoc 签名）与 ad-hoc 签名应用里子进程能否执行；Gatekeeper 首次打开流程。
 - Windows：`fetch-dwg2dxf-win64.ps1`（没有 PowerShell，未执行；zip 的 sha256 与根目录文件清单已在 Linux 上核对）、`.env.windows` 最小配置下打包、NSIS 安装、中文用户名路径。
 - 打开应用后的验收清单（预设、12 个 skill、`load_workspace_dependencies` 对智通预设可见、`cad_open`、`config_import` 写 ssh/volc）与两台干净机器的 M0 验收。
+
+## 集成提交（品牌图标接线）
+
+`apps/desktop/scripts/electron-builder-config.mjs`（4 处）、`apps/desktop/src/main.ts`（2 处）、`apps/desktop/tests/installer-packaging.spec.ts`（2 处）、`apps/desktop/tests/main-startup.spec.ts`（1 处）改为 `apps/desktop/resources/zhitong-*` 图标；`zhitong/INSTALL.md` 第三部分的应用 ID 与自检路径改为 `com.ztsgai.harness` / `Programs\ztsgai`。版本号决定：应用内保持 0.2.1-rc.2，对外安装包与网站按 1.0.0 命名（`release-manifest.mjs` 记录 `base`）。
