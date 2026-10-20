@@ -153,7 +153,8 @@ restore() {
   else rm -f "$conf"; fi
 }
 # 用一次性容器按同样的挂载测配置，不碰正在服务的 zt-nginx。
-if ! "${compose[@]}" run --rm --no-deps -T nginx nginx -t; then restore; exit 1; fi
+# </dev/null：compose run 默认交互，否则它会把 bash -s 正在读的本脚本余下部分从 stdin 吞掉，up -d 与 reload 永远不执行。
+if ! "${compose[@]}" run --rm --no-deps -T nginx nginx -t </dev/null; then restore; exit 1; fi
 owner="$(docker inspect -f '{{ index .Config.Labels "com.docker.compose.project" }}' zt-nginx 2>/dev/null || true)"
 if [ -n "$owner" ] && [ "$owner" != ztsgai ]; then
   echo "zt-nginx 仍属于旧 compose 项目「${owner}」：先按 runbook.md 第 3 步停掉旧服务，再重跑" >&2
