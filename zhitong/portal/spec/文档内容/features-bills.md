@@ -70,13 +70,13 @@ sources:
 7. **汇报并写待确认清单**。确认后用 `tos_push` 推到 `成果/`。
 :::
 
-### 示例：2026-007 滨江综合办公楼（示例数据）
+### 示例：2026-007 某综合办公楼（示例数据）
 
 您说："按竣工图总说明里的工程做法表出一份清单框架。"
 
 ```text
 quantity.py prepare --files "资料/3 竣工资料/竣工图/竣工图总说明.pdf" \
-  --project-name 滨江综合办公楼 --out 工作/2026-10-20-清单/prepare/
+  --project-name 某综合办公楼 --out 工作/2026-10-20-清单/prepare/
 ```
 
 助手作答（`工作/2026-10-20-清单/answers.json` 节选）：
@@ -113,7 +113,7 @@ quantity.py render --result 工作/2026-10-20-清单/finalize/result.json \
 
 ::: filetree
 ```text
-项目/2026-007-滨江综合办公楼/
+项目/2026-007-某综合办公楼/
   工作/
     2026-10-20-清单/
       prepare/
