@@ -1,0 +1,13 @@
+{
+  "name": "zhitong-brand-icons",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Render 智通数工AI application, installer and website icons from zhitong/brand/brand-mark.svg (see zhitong/brand/README.md).",
+  "type": "module",
+  "scripts": {
+    "render": "node render-brand-icons.mjs"
+  },
+  "devDependencies": {
+    "sharp": "0.35.5"
+  }
+}
