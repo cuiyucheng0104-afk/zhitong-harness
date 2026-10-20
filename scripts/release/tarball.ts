@@ -7,8 +7,8 @@
  */
 
 import { readFileSync } from 'node:fs'
-import { basename, dirname, join } from 'node:path'
-import { capture } from './process.ts'
+import { join } from 'node:path'
+import { list } from 'tar'
 
 /** Name of the file recording the order in which a packed family uploads. */
 export const PUBLISH_ORDER_FILE = 'publish-order.txt'
@@ -27,8 +27,33 @@ export interface PackedIdentity {
  * @returns Every path inside the archive.
  */
 export function tarballFiles(tarball: string): string[] {
-  // GNU tar reads the colon in a Windows drive path as a remote-host separator, so tar runs beside the tarball.
-  return capture('tar', ['-tzf', basename(tarball)], { cwd: dirname(tarball) }).split(/\r?\n/u).filter(line => line !== '')
+  // node-tar, not the system tar: Windows' bsdtar skips members whose names its console code page cannot
+  // encode (zhitong increment: the bundle carries Chinese-named skill files) and exits non-zero.
+  const files: string[] = []
+  list({ file: tarball, sync: true, onReadEntry: entry => { files.push(entry.path) } })
+  return files
+}
+
+/**
+ * Read one member's bytes from a tarball.
+ * @param tarball - Absolute tarball path.
+ * @param member - Member path as the archive names it.
+ * @returns The member's content.
+ */
+function tarballMember(tarball: string, member: string): Buffer {
+  const chunks: Buffer[] = []
+  let found = false
+  list({
+    file: tarball,
+    sync: true,
+    onReadEntry: entry => {
+      if (entry.path !== member) return
+      found = true
+      entry.on('data', chunk => { chunks.push(chunk) })
+    },
+  })
+  if (!found) throw new Error(`${tarball} has no ${member}`)
+  return Buffer.concat(chunks)
 }
 
 /**
@@ -37,7 +62,7 @@ export function tarballFiles(tarball: string): string[] {
  * @returns The packed package.json object.
  */
 export function packedManifest(tarball: string): Record<string, unknown> {
-  const manifest: unknown = JSON.parse(capture('tar', ['-xOzf', basename(tarball), 'package/package.json'], { cwd: dirname(tarball) }))
+  const manifest: unknown = JSON.parse(tarballMember(tarball, 'package/package.json').toString('utf8'))
   if (manifest === null || typeof manifest !== 'object' || Array.isArray(manifest)) throw new Error(`${tarball} has no manifest`)
   return manifest as Record<string, unknown>
 }
