@@ -18,7 +18,17 @@ SHA256=62ebb73b984f865960f20ed26619ea5f8789d5e3fd088fa40a2598384da81275
 URL="https://github.com/LibreDWG/libredwg/releases/download/${VERSION}/libredwg-${VERSION}.tar.xz"
 
 here=$(cd "$(dirname "$0")/.." && pwd)
-work=${1:-$(mktemp -d)}
+# automake refuses to configure inside a directory whose name it deems unsafe
+# (spaces, quotes, `#`, `$`, `&`, backticks, non-ASCII); on macOS the mktemp
+# location under /var/folders has tripped it, so default to a plain ASCII
+# directory under the home cache instead. An explicit first argument wins.
+work=${1:-${XDG_CACHE_HOME:-$HOME/.cache}/zhitong/dwg2dxf-build}
+case "$work" in
+  *[\\\"\#\$\&\'\`\ ]*|*[![:ascii:]]*)
+    echo "build dir contains characters autotools reject: $work" >&2
+    echo "pass a plain ASCII directory as the first argument" >&2
+    exit 2 ;;
+esac
 case "$(uname -s)" in
   Linux) platform=linux ;;
   Darwin) platform=darwin ;;

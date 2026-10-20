@@ -27,8 +27,8 @@ pnpm run build
 
 ```sh
 cd zhitong/python
-uv sync            # 建 .venv，安装 zt（可编辑）与依赖
-uv run pytest      # 可选：跑 Python 测试
+uv sync
+uv run pytest
 ```
 
 skill 脚本（`skills/<名>/scripts/*.py`）开头经 `skills/_shared/zt_launch.py` 选解释器：`ZT_PYTHON` → 桌面版 primary runtime（`~/.dsh/dsh-runtimes/dsh-primary-runtime`）→ 当前解释器；`zt` 从 skills 旁的 `python/` 加入 `sys.path`。开发时启动 harness 前把 `ZT_PYTHON` 指向这个虚拟环境的解释器：
@@ -127,8 +127,10 @@ pnpm install --frozen-lockfile
 ### 3. 构建 dwg2dxf
 
 ```sh
-sh zhitong/plugins/tool-cad/scripts/build-dwg2dxf.sh
+sh zhitong/plugins/tool-cad/scripts/build-dwg2dxf.sh "$HOME/.cache/zhitong/dwg2dxf-build"
 ```
+
+构建目录必须是不含空格与非 ASCII 字符的路径（automake 会拒绝，macOS 的临时目录也触发过这个错误），所以显式传一个。命令块里不要带 `#` 注释：zsh 交互式 shell 默认不识别行内注释，会把 `#` 之后的词当参数传给命令。
 
 脚本下载 LibreDWG 0.14 源码包（sha256 钉死），静态链接 libredwg 编出 `dwg2dxf`，检查只链接系统库，strip 后做 ad-hoc 签名，装到 `zhitong/plugins/tool-cad/bin/darwin-arm64/`，同目录生成 `COPYING`（GPLv3）、`VERSION.txt`、`SOURCE-OFFER.txt`。耗时几分钟。验证：
 
@@ -142,7 +144,7 @@ zhitong/plugins/tool-cad/bin/darwin-arm64/dwg2dxf --version
 ### 4. 打包
 
 ```sh
-pnpm run package:desktop:mac:arm64:unsigned --check   # 只检查配置与工具，几秒钟
+pnpm run package:desktop:mac:arm64:unsigned --check
 pnpm run package:desktop:mac:arm64:unsigned
 ```
 
