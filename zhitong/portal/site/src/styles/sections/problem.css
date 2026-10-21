@@ -1,0 +1,537 @@
+/* 它解决什么（03 章 §2.3）。默认即非钉住 / 静态终态；钉住模式见文件后部的媒体查询。 */
+.problem-heading h2 {
+  font-size: var(--fs-h2);
+  line-height: 1.25;
+}
+.problem-heading > p:last-child {
+  font-size: var(--fs-note);
+  line-height: 1.7;
+}
+
+/* 场景 */
+.problem-scene {
+  position: relative;
+  margin-top: 48px;
+}
+.scene-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+.scene-captions {
+  display: none;
+  position: relative;
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.scene-captions > li {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--ink);
+}
+.scene-captions > li + li {
+  opacity: 0;
+}
+.scene-captions__no {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--brand-blue);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* 计数器 */
+.problem-counter {
+  position: relative;
+}
+.counter-main {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+}
+.counter-value {
+  font-size: 40px;
+  line-height: 1.1;
+  font-weight: 600;
+  color: var(--brand-navy);
+}
+.counter-head {
+  display: inline-block;
+}
+.counter-tail {
+  transition: opacity var(--dur-short) var(--ease-out);
+}
+.counter-tail.is-hidden {
+  opacity: 0;
+  transition: none;
+}
+.counter-unit {
+  font-size: 15px;
+  color: var(--ink);
+}
+.counter-note {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+.counter-new {
+  display: none;
+}
+
+/* 主体：网格 60% / 线程 36% / 间距 4% */
+.scene-body {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 4%;
+  margin-top: 24px;
+}
+.scene-legacy {
+  position: relative;
+  flex: 0 0 60%;
+  min-width: 0;
+}
+.scene-thread {
+  position: relative;
+  flex: 0 0 36%;
+  min-width: 0;
+}
+.scene-thread__box {
+  position: relative;
+}
+.scene-caption {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+/* 旧方式网格 */
+.legacy-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.legacy-panel {
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 5 / 4;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.lp-bar {
+  display: flex;
+  align-items: center;
+  height: 20%;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--grid-line);
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 600;
+  color: var(--ink);
+}
+.lp-btn {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  top: 28%;
+  height: 12%;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--text-muted);
+  overflow: hidden;
+  white-space: nowrap;
+}
+.lp-pick {
+  left: 8%;
+  width: 32%;
+}
+.lp-start {
+  left: 44%;
+  width: 20%;
+}
+.lp-export {
+  left: 8%;
+  width: 26%;
+  top: 82%;
+}
+@container (max-width: 119px) {
+  .lp-btn > span {
+    display: none;
+  }
+}
+.lp-row {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 2px;
+  background: var(--grid-line);
+}
+.lp-last {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: var(--canvas);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--text-muted);
+}
+.lp-retired {
+  position: absolute;
+  right: 6px;
+  top: 4%;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: var(--danger-bg);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--danger-text);
+}
+.pending-mark {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: var(--warning-text);
+  transform: rotate(45deg);
+}
+.click-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: rgba(6, 102, 245, 0.85);
+  box-shadow: 0 0 0 2px #fff;
+}
+.click-ripple {
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--brand-blue);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+.legacy-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.lo-fan {
+  fill: none;
+  stroke: var(--brand-blue);
+  stroke-width: 1.25;
+}
+.lo-seq {
+  fill: none;
+  stroke: var(--brand-navy);
+  stroke-width: 1.25;
+  stroke-dasharray: 5 4;
+}
+.lo-no {
+  fill: #fff;
+  stroke: var(--brand-navy);
+  stroke-width: 1.25;
+}
+.lo-no-t {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  fill: var(--brand-navy);
+}
+.lo-strike {
+  fill: none;
+  stroke: var(--danger-text);
+  stroke-width: 1.5;
+}
+.lo-tag {
+  fill: #fff;
+  stroke: var(--brand-blue);
+  stroke-width: 1;
+}
+.lo-tag-t {
+  font-family: var(--font-body);
+  font-size: 12px;
+  fill: var(--ink);
+}
+
+/* 对话线程 */
+.conv {
+  padding: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.conv__title {
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--text-muted);
+}
+.conv__bubble {
+  max-width: 88%;
+  margin: 8px 0 8px auto;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--blue-tint);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+.conv__rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.conv-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: center;
+  column-gap: 8px;
+  min-height: var(--row-h, 44px);
+  padding: 2px 0;
+}
+.conv-row::before {
+  content: '';
+  order: 1;
+  flex-basis: 100%;
+  height: 0;
+}
+.conv-row > .zt-tool {
+  display: contents;
+}
+.conv-row .zt-tool-label {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+}
+.conv-row .zt-tool-name {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--text-muted);
+}
+.conv-row .zt-tool-detail {
+  order: 2;
+  flex-basis: auto;
+  padding-left: 24px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ink);
+}
+.conv-row__manual {
+  order: 3;
+}
+.conv-row .zt-status.is-sm {
+  height: 18px;
+  padding: 0 6px;
+  font-size: 12px;
+}
+.conv-row.is-idle {
+  opacity: 0.45;
+}
+.conv-row.is-idle .zt-tool-icon svg {
+  display: none;
+}
+.conv-row.is-idle .zt-tool-icon::before {
+  content: '';
+  width: 8px;
+  height: 1.5px;
+  margin: auto;
+  background: var(--text-muted);
+}
+.conv-row .zt-tool-name:empty {
+  display: none;
+}
+
+/* 桌面：“对应旧方式”只供读屏 */
+
+/* 钉住模式（03 章 §0 条件，且 html.motion-ready） */
+@media (min-width: 1024px) and (min-height: 640px) and (prefers-reduced-motion: no-preference) {
+  .motion-ready .problem-scene {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    height: clamp(528px, calc(100vh - 64px - 48px), 760px);
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background-color: #fff;
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--grid-line) 60%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--grid-line) 60%, transparent) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .motion-ready .scene-bar {
+    flex: none;
+    height: 64px;
+  }
+  .motion-ready .scene-captions {
+    display: block;
+    align-self: stretch;
+  }
+  .motion-ready .problem-counter {
+    text-align: right;
+  }
+  .motion-ready .counter-main {
+    justify-content: flex-end;
+  }
+  .motion-ready .counter-new {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    white-space: nowrap;
+  }
+  .motion-ready .scene-body {
+    flex: none;
+    height: calc(100% - 64px - 16px);
+    margin-top: 16px;
+    container-type: size;
+    --row-h: clamp(38px, calc((100cqh - 100px) / 8), 44px);
+  }
+  .motion-ready .scene-legacy,
+  .motion-ready .scene-thread,
+  .motion-ready .scene-thread__box,
+  .motion-ready .legacy-grid {
+    height: 100%;
+  }
+  .motion-ready .legacy-grid {
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+  }
+  .motion-ready .legacy-panel {
+    aspect-ratio: auto;
+  }
+  .motion-ready .legacy-overlay {
+    display: block;
+  }
+  .motion-ready .scene-caption {
+    display: none;
+  }
+  /* 气泡在 36% 宽度下实际为 3 行（spec 验算按 56px 估），按 --row-h 固定行高会在 1366×650 溢出约 45px；
+     改为线程行平分剩余高度（上限 --row-h 的 44px），保证 8 行完整可见（AC-03-26）。 */
+  .motion-ready .conv {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    height: 100%;
+    overflow: hidden;
+  }
+  .motion-ready .conv__bubble {
+    flex: none;
+    margin-block: 6px;
+    padding: 6px 10px;
+  }
+  .motion-ready .conv__rows {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .motion-ready .conv-row {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: var(--row-h);
+    padding: 0;
+  }
+  .motion-ready .conv-row .zt-tool-label,
+  .motion-ready .conv-row .zt-tool-name,
+  .motion-ready .conv-row .zt-tool-detail {
+    line-height: 16px;
+  }
+  .motion-ready .conv-row .zt-status.is-sm {
+    height: 16px;
+  }
+}
+
+@media (max-width: 1023px) {
+
+  .problem-heading h2 br {
+    display: none;
+  }
+}
+@media (max-width: 767px) {
+  .scene-bar {
+    display: block;
+  }
+  .counter-value {
+    font-size: 34px;
+  }
+  .scene-body {
+    flex-direction: column;
+    gap: 32px;
+  }
+  .scene-legacy,
+  .scene-thread {
+    flex-basis: auto;
+    width: 100%;
+  }
+  .legacy-grid {
+    gap: 10px;
+  }
+  .lp-bar {
+    padding: 0 6px;
+    font-size: 12px;
+  }
+  .lp-last,
+  .lp-retired {
+    right: 3px;
+    padding: 0 3px;
+    font-size: 12px;
+    line-height: 16px;
+  }
+  .click-dot {
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    box-shadow: 0 0 0 1.5px #fff;
+  }
+
+}
+@media print {
+  .legacy-overlay {
+    display: none !important;
+  }
+  .scene-body {
+    display: block;
+  }
+  .scene-thread {
+    margin-top: 24px;
+  }
+}
+.lo-seq-mask {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 6;
+}

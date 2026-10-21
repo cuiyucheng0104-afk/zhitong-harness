@@ -1,0 +1,87 @@
+/* 页面级样式：页面切换（01 章 §13）、404 页（01 章 §12、06 章 §7.16）、隐私说明占位。 */
+.page-leave-active {
+  transition: opacity var(--dur-micro) var(--ease-out);
+}
+.page-enter-active {
+  transition:
+    opacity var(--dur-short) var(--ease-out),
+    transform var(--dur-short) var(--ease-out);
+}
+.page-leave-to {
+  opacity: 0;
+}
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-leave-active,
+  .page-enter-active {
+    transition: none;
+  }
+}
+
+main:focus {
+  outline: none;
+}
+
+.notfound-page {
+  min-height: calc(100dvh - var(--header-h));
+  display: flex;
+  align-items: center;
+  padding-block: 96px;
+  background-color: var(--navy-900);
+  color: #fff;
+}
+.notfound-grid {
+  display: grid;
+  grid-template-columns: 4fr 7fr;
+  gap: 48px;
+  align-items: center;
+}
+.notfound-copy h1 {
+  color: #fff;
+  font-size: 44px;
+  line-height: 1.25;
+}
+.notfound-copy > p {
+  margin-top: 16px;
+  font-size: 17px;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.86);
+}
+.notfound-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+.notfound-copy > .notfound-path {
+  margin-top: 20px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.72);
+  overflow-wrap: anywhere;
+}
+.notfound-deco {
+  min-width: 0;
+}
+@media (max-width: 1023px) {
+  .notfound-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 767px) {
+  .notfound-page {
+    padding-block: 64px;
+  }
+  .notfound-copy h1 {
+    font-size: 32px;
+  }
+}
+
+.privacy-page {
+  padding-block: 64px 96px;
+}
+.privacy-page h1 {
+  font-size: var(--fs-h2);
+}

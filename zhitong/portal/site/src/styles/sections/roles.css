@@ -1,0 +1,766 @@
+/* 适用岗位（03 章 §1.3）。通用控件的悬停 / 按下 / 聚焦在 states.css。 */
+.roles-section {
+  position: relative;
+  padding-block: var(--section-pad);
+}
+.roles-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--col-gap);
+  align-items: start;
+}
+.roles-side {
+  grid-column: 1 / 5;
+}
+.roles-main {
+  grid-column: 6 / 13;
+  min-width: 0;
+}
+.roles-heading h2 {
+  font-size: var(--fs-h2);
+  line-height: 1.25;
+}
+.roles-heading > p:last-child {
+  font-size: var(--fs-note);
+  line-height: 1.7;
+}
+.roles-art {
+  margin-top: 32px;
+}
+.role-art {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  height: clamp(180px, calc(100vh - 394px), 260px);
+  overflow: visible;
+}
+
+/* 页签：下划线 2px 由 useHoverIndicator（css 驱动）写 --ind-x / --ind-w，clip-path 过渡 */
+.role-tabs {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.role-tabs > button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 16px 14px;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.role-tab__inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.role-tabs .icon {
+  width: 18px;
+  height: 18px;
+}
+.role-tabs > button[aria-selected='true'] {
+  color: var(--brand-blue);
+  font-weight: 600;
+}
+.role-tabs__indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--brand-blue);
+  pointer-events: none;
+  clip-path: inset(0 calc(100% - var(--ind-x, 0px) - var(--ind-w, 0px)) 0 var(--ind-x, 0px));
+  opacity: var(--ind-o, 0);
+  transition:
+    clip-path var(--dur-short) var(--ease-out),
+    opacity var(--dur-micro) var(--ease-out);
+}
+/* 水合前（含无 JS）由选中页签自带下划线 */
+.roles-section:not(.is-hydrated) .role-tabs > button[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--brand-blue);
+}
+
+/* 面板：水合后三个面板同格，容器高度恒为最高面板 */
+.role-panels {
+  padding-top: 28px;
+}
+.role-panels.is-hydrated {
+  display: grid;
+}
+.role-panels.is-hydrated > .role-panel {
+  grid-area: 1 / 1;
+}
+.role-panels.is-hydrated > .role-panel:not(.is-shown) {
+  visibility: hidden;
+}
+.role-panel__title {
+  font-size: var(--fs-h3);
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--ink);
+}
+.role-panel__body {
+  max-width: 36em;
+  margin-top: 12px;
+  font-size: var(--fs-body);
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+
+/* 任务入口 */
+.task-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 28px;
+  margin-top: 20px;
+}
+.task-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  border-radius: 6px;
+  color: var(--brand-blue);
+  text-decoration: none;
+}
+.task-chip__inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.task-chip__no {
+  font-size: 12px;
+  color: var(--text-muted);
+  transition: color var(--dur-micro) var(--ease-out);
+}
+.task-chip__label {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.task-chip__arrows {
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  overflow: hidden;
+  transition: transform var(--dur-short) var(--ease-out);
+}
+.task-chip__arrows > span {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.task-chip__arrows .icon {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+.task-chip__arrows .a2 {
+  opacity: 0;
+  transform: translateX(-16px);
+}
+.task-chip__line {
+  position: absolute;
+  left: 4px;
+  right: 28px;
+  bottom: 10px;
+  height: 1px;
+  background: var(--brand-blue);
+  transform: scaleX(0);
+  transform-origin: left center;
+  pointer-events: none;
+}
+.task-chip:hover .task-chip__no,
+.task-chip:focus-visible .task-chip__no,
+.task-chip[aria-expanded='true'] .task-chip__no {
+  color: var(--brand-blue);
+}
+.task-chip[aria-expanded='true'] .task-chip__arrows {
+  transform: rotate(90deg);
+}
+/* 动效未加载 / 减少动效：只用 CSS，下划线直接画满，无过渡 */
+html:not(.motion-ready) .task-chip:hover .task-chip__line,
+html:not(.motion-ready) .task-chip:focus-visible .task-chip__line,
+.task-chip[aria-expanded='true'] .task-chip__line {
+  transform: scaleX(1);
+}
+@media (hover: none) {
+  .task-chip:active {
+    background: var(--blue-050);
+  }
+}
+
+/* 钉住模式的比例尺 */
+.roles-ruler {
+  --rp: 0;
+  display: none;
+  position: absolute;
+  left: -48px;
+  top: 0;
+  width: 32px;
+  height: 240px;
+  pointer-events: none;
+}
+.roles-ruler__base {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 240px;
+  background: var(--grid-line-strong);
+}
+.roles-ruler__tick {
+  position: absolute;
+  left: 0;
+  width: 4px;
+  height: 1px;
+  background: var(--grid-line-strong);
+}
+.roles-ruler__tick.is-major {
+  width: 10px;
+}
+.roles-ruler__tick.is-current {
+  background: var(--brand-blue);
+}
+.roles-ruler__no {
+  position: absolute;
+  left: 18px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-muted);
+  transform: translateY(-8px);
+}
+.roles-ruler__no.is-current {
+  color: var(--brand-blue);
+}
+.roles-ruler__fill {
+  position: absolute;
+  left: -0.5px;
+  top: 0;
+  width: 2px;
+  height: 240px;
+  background: var(--brand-blue);
+  transform: scaleY(var(--rp));
+  transform-origin: top;
+}
+.roles-ruler__cursor {
+  position: absolute;
+  left: 3px;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+  border-right: 5px solid var(--brand-blue);
+  transform: translateY(calc(var(--rp) * 240px - 3.5px));
+}
+
+/* 钉住模式（03 章 §0：≥ 1024px、高 ≥ 640px、未减少动效，且 html.motion-ready） */
+@media (min-width: 1024px) and (min-height: 640px) and (prefers-reduced-motion: no-preference) {
+  .motion-ready .roles-section {
+    padding-block: 0;
+  }
+  .motion-ready .roles-stage {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    height: calc(100vh - 64px);
+    padding-block: 40px;
+  }
+  .motion-ready .roles-stage > .roles-layout {
+    width: calc(100% - 2 * var(--gutter));
+  }
+  .motion-ready .roles-ruler {
+    display: block;
+  }
+}
+
+/* 岗位图 RoleArt（§1.4） */
+.role-art text {
+  font-family: var(--font-body);
+  font-size: 12px;
+}
+.role-art .art-mono {
+  font-family: var(--font-mono);
+}
+.art-grid {
+  fill: none;
+  stroke: var(--grid-line);
+  stroke-width: 0.75;
+}
+.art-frame {
+  fill: none;
+  stroke: var(--grid-line-strong);
+  stroke-width: 1;
+}
+.art-s,
+.art-link {
+  fill: none;
+  stroke: var(--brand-navy);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.art-thin {
+  stroke-width: 0.9;
+}
+.art-dash,
+.art-tray {
+  stroke-dasharray: 4 3;
+}
+.art-tray {
+  fill: none;
+  stroke: var(--brand-navy);
+  stroke-width: 1.25;
+}
+.art-box {
+  fill: #fff;
+  stroke: var(--brand-navy);
+  stroke-width: 1.25;
+}
+.art-fill {
+  fill: #fff;
+}
+.art-ghost {
+  fill: none;
+  stroke: var(--grid-line-strong);
+  stroke-width: 1.25;
+}
+.art-t {
+  fill: var(--ink);
+}
+.art-muted,
+.art-no {
+  fill: var(--text-muted);
+}
+.art-strong {
+  font-weight: 600;
+}
+.art-bar {
+  fill: var(--grid-line-strong);
+}
+.art-dot {
+  fill: var(--brand-navy);
+}
+.art-stamp.tone-ok {
+  fill: var(--green-tint);
+}
+.art-stamp.tone-info {
+  fill: var(--blue-tint);
+}
+.art-stamp.tone-warn {
+  fill: var(--warning-bg);
+}
+.art-stamp-t.tone-ok {
+  fill: var(--success-text);
+}
+.art-stamp-t.tone-info {
+  fill: var(--brand-blue);
+}
+.art-stamp-t.tone-warn {
+  fill: var(--warning-text);
+}
+[data-node] .art-box,
+[data-node] .art-link,
+[data-node] .art-t,
+[data-node] .art-dot {
+  transition:
+    fill var(--dur-micro) var(--ease-out),
+    stroke var(--dur-micro) var(--ease-out),
+    stroke-width var(--dur-micro) var(--ease-out);
+}
+[data-node].is-hot .art-box {
+  fill: var(--blue-tint);
+  stroke: var(--brand-blue);
+}
+[data-node].is-hot .art-t {
+  fill: var(--brand-blue);
+}
+[data-node].is-hot .art-link {
+  stroke: var(--brand-blue);
+  stroke-width: 1.5;
+}
+[data-node].is-hot .art-dot {
+  fill: var(--brand-blue);
+}
+
+/* 说明卡（§1.3）：标题由 ZtPopover 渲染，眉题经 order 排到标题之前，小动画区与动作行排在最后 */
+.task-pop.zt-popover {
+  width: min(400px, calc(100vw - 32px));
+  box-shadow: 0 24px 64px rgba(11, 52, 125, 0.16);
+}
+.task-pop .zt-popover-body {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+.task-pop.zt-popover .zt-popover-body {
+  max-height: min(calc(100vh - 32px), var(--zt-pop-avail, 100vh));
+}
+.task-pop .zt-popover-title {
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+.task-pop__eyebrow {
+  order: -1;
+  margin-bottom: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--brand-blue);
+}
+.task-pop__summary {
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.task-pop__rows {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 0;
+}
+.task-pop__rows > div {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 8px;
+}
+.task-pop__rows dt {
+  font-size: 13px;
+  line-height: 1.85;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.task-pop__rows dd {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.task-pop__note {
+  margin-top: 12px;
+  padding-left: 10px;
+  border-left: 2px solid var(--warning-text);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+.task-pop .zt-popover-art {
+  order: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 112px;
+  margin-top: 16px;
+  border-radius: 8px;
+  background-color: var(--canvas);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+.task-pop__actions {
+  order: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+  margin-top: 16px;
+}
+.task-micro {
+  display: grid;
+  place-items: center;
+  width: 160px;
+  height: 96px;
+}
+.task-micro .micro {
+  width: 160px;
+  height: 96px;
+  overflow: visible;
+}
+.zt-popover-sheet.task-pop .zt-popover-art {
+  height: 168px;
+}
+.zt-popover-sheet.task-pop .task-micro,
+.zt-popover-sheet.task-pop .task-micro .micro {
+  width: 240px;
+  height: 144px;
+}
+
+/* 十二个小动画（§1.5.7） */
+.micro text {
+  font-family: var(--font-body);
+  font-size: 12px;
+  fill: var(--ink);
+}
+.micro .m-mono,
+.micro text.m-mono {
+  font-family: var(--font-mono);
+}
+.micro .m-strong {
+  font-weight: 600;
+}
+.micro .m-muted {
+  fill: var(--text-muted);
+}
+.micro .m-blue {
+  fill: var(--brand-blue);
+}
+.micro .m-warn {
+  fill: var(--warning-text);
+}
+.micro .m-ok {
+  fill: var(--success-text);
+}
+.micro .m-danger {
+  fill: var(--danger-text);
+}
+.micro .m-reduce {
+  fill: var(--reduce-text);
+}
+.micro .m-white {
+  fill: #fff;
+}
+.micro .m-term-dim {
+  fill: var(--grid-line);
+}
+.micro .m-term-ok {
+  fill: var(--brand-green);
+}
+.m-s {
+  fill: none;
+  stroke: var(--brand-navy);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.m-thin {
+  stroke-width: 1;
+}
+.m-dash {
+  stroke-dasharray: 3 3;
+}
+.m-blue-s {
+  stroke: var(--brand-blue);
+}
+.m-muted-s {
+  stroke: var(--text-muted);
+}
+.m-fill {
+  fill: #fff;
+}
+.m-ok-s {
+  fill: none;
+  stroke: var(--success-text);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.m-warn-s {
+  fill: none;
+  stroke: var(--warning-text);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+}
+.m-bg-ok {
+  fill: var(--green-tint);
+}
+.m-bg-warn {
+  fill: var(--warning-bg);
+}
+.m-bg-danger {
+  fill: var(--danger-bg);
+}
+.m-bg-blue {
+  fill: var(--blue-tint);
+}
+.m-bg-canvas {
+  fill: var(--canvas);
+}
+.m-page,
+.m-btn {
+  fill: #fff;
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.m-btn-primary {
+  fill: var(--brand-blue);
+}
+.m-cell {
+  fill: #fff;
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.m-cell-ok {
+  fill: none;
+  stroke: var(--success-text);
+}
+.m-bar {
+  fill: var(--grid-line-strong);
+}
+.m-scan {
+  stroke: var(--brand-blue);
+  stroke-width: 1;
+}
+.m-peer {
+  fill: #8aa3c2;
+}
+.m-self,
+.m-dot {
+  fill: var(--brand-blue);
+}
+.m-room {
+  fill: none;
+  stroke: var(--brand-blue);
+  stroke-width: 2;
+}
+.m-progress {
+  fill: var(--brand-blue);
+}
+.m-term {
+  fill: var(--code-bg);
+}
+.m-cursor {
+  fill: var(--ink);
+  stroke: #fff;
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+/* 平板：标题通栏、页签通栏，其下面板 1–7 列、岗位图 8–12 列 */
+@media (max-width: 1023px) {
+  .roles-side,
+  .roles-main {
+    display: contents;
+  }
+  .roles-heading {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+  .roles-heading h2 br {
+    display: none;
+  }
+  .role-tabs {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-top: 32px;
+  }
+  .role-panels {
+    grid-column: 1 / 8;
+    grid-row: 3;
+  }
+  .roles-art {
+    grid-column: 8 / 13;
+    grid-row: 3;
+    margin-top: 28px;
+  }
+}
+
+/* 手机：单列，页签三等分，岗位图最高 200px，入口 2×2 卡片 */
+@media (max-width: 767px) {
+  .roles-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .roles-heading,
+  .role-tabs,
+  .role-panels,
+  .roles-art {
+    grid-column: 1;
+  }
+  .role-tabs {
+    gap: 0;
+    margin-top: 28px;
+  }
+  .role-tabs > button {
+    flex: 1 1 0;
+    justify-content: center;
+    min-height: 44px;
+    height: auto;
+    padding: 6px 4px 12px;
+    font-size: 14px;
+  }
+  .role-tabs .icon {
+    width: 16px;
+    height: 16px;
+  }
+  .roles-art {
+    grid-row: 3;
+    margin-top: 20px;
+  }
+  .role-art {
+    max-width: none;
+    height: auto;
+    max-height: 200px;
+  }
+  .role-panels {
+    grid-row: 4;
+    padding-top: 20px;
+  }
+  .task-chips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .task-chip {
+    display: flex;
+    min-height: 52px;
+    padding: 0 14px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  .task-chip__inner {
+    width: 100%;
+  }
+  .task-chip__arrows {
+    margin-left: auto;
+  }
+  .task-chip__line {
+    display: none;
+  }
+}
+@media (max-width: 374px) {
+  .role-tabs > button {
+    font-size: 13px;
+  }
+  .role-tab__inner {
+    gap: 4px;
+  }
+}
+
+@media print {
+  .roles-section {
+    padding-block: 30px;
+  }
+  .role-tabs,
+  .roles-ruler {
+    display: none !important;
+  }
+  .role-panels,
+  .role-panels.is-hydrated {
+    display: block !important;
+  }
+  .role-panel,
+  .role-panel[hidden],
+  .role-panels.is-hydrated > .role-panel:not(.is-shown) {
+    display: block !important;
+    visibility: visible !important;
+  }
+  .role-panel + .role-panel {
+    margin-top: 24px;
+  }
+}

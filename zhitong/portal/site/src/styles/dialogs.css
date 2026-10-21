@@ -1,0 +1,474 @@
+/* BaseDialog 底部弹层与获取安装包弹层（01 章 §7.3）。 */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* 底部弹层（BaseDialog variant=sheet / auto 在 ≤ 767px） */
+.zt-dialog.is-sheet {
+  width: 100%;
+  max-width: none;
+  max-height: 92dvh;
+  margin: auto 0 0;
+  padding: 0;
+  inset: auto 0 0 0;
+  border: 0;
+  border-radius: 16px 16px 0 0;
+  background: #fff;
+  color: var(--ink);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-shadow: 0 -12px 40px rgba(8, 36, 87, 0.18);
+}
+.zt-dialog.is-sheet::backdrop {
+  background: rgba(8, 36, 87, 0.36);
+}
+.sheet-handle {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 6px;
+  background: #fff;
+  cursor: grab;
+  touch-action: none;
+}
+.sheet-handle > span {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--grid-line-strong);
+}
+
+/* 获取安装包 */
+.acquire-dialog {
+  width: 720px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 48px);
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 24px 80px rgba(11, 31, 66, 0.2);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.acquire-dialog::backdrop {
+  background: rgba(8, 36, 87, 0.36);
+  backdrop-filter: blur(4px);
+}
+.acquire-dialog-body {
+  padding: 32px;
+}
+.dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.dialog-heading > .icon-button {
+  margin-right: -10px;
+}
+.acquire-dialog h2 {
+  font-size: 28px;
+  line-height: 1.35;
+}
+.acquire-dialog h3 {
+  font-size: 18px;
+  line-height: 1.4;
+}
+.dialog-description {
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+.release-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.release-meta > .mono {
+  font-weight: 600;
+  color: var(--brand-navy);
+}
+.acquire-platforms,
+.acquire-config,
+.acquire-contact {
+  margin-top: 28px;
+}
+.acquire-mobile-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--blue-050);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.platform-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.platform-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+.platform-card.is-matched {
+  border-color: rgba(6, 102, 245, 0.45);
+}
+.platform-card.is-upcoming {
+  background: var(--canvas);
+  border: 1px dashed var(--grid-line-strong);
+}
+.platform-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.platform-card-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--brand-navy);
+}
+.platform-card-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.platform-match {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--blue-tint);
+  color: var(--brand-blue);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.platform-arch {
+  padding: 1px 8px;
+  border-radius: 6px;
+  background: var(--blue-tint);
+  color: var(--brand-navy);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.platform-fits {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.platform-file {
+  font-size: 12px;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+.platform-download {
+  position: relative;
+  width: 100%;
+  min-height: 48px;
+}
+.platform-download-label {
+  display: inline-grid;
+}
+.platform-download-label > span {
+  grid-area: 1 / 1;
+  transition: opacity var(--dur-micro) var(--ease-out);
+}
+.platform-download .label-started,
+.platform-download.is-started .label-idle {
+  opacity: 0;
+}
+.platform-download.is-started .label-started {
+  opacity: 1;
+}
+.platform-download-icons {
+  display: inline-grid;
+}
+.platform-download-icons > .icon {
+  grid-area: 1 / 1;
+}
+.platform-download .icon-down {
+  transition:
+    transform var(--dur-micro) var(--ease-out),
+    opacity var(--dur-micro) var(--ease-out);
+}
+.platform-download .icon-check {
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    transform var(--dur-short) var(--ease-spring),
+    opacity var(--dur-short) var(--ease-out);
+}
+.platform-download.is-started .icon-down {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.platform-download.is-started .icon-check {
+  opacity: 1;
+  transform: none;
+}
+.platform-hash {
+  position: relative;
+  padding: 10px 44px 10px 12px;
+  border-radius: 8px;
+  background: var(--canvas);
+}
+.platform-hash-label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.platform-hash-value {
+  display: block;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--ink);
+  max-width: calc(32ch + 1.2ch);
+}
+.platform-hash-value > span {
+  display: inline-block;
+  margin-right: 0.6ch;
+}
+.platform-copy {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 44px;
+}
+.platform-copy .icon {
+  width: 16px;
+  height: 16px;
+  grid-area: 1 / 1;
+  transition: opacity var(--dur-micro) var(--ease-out);
+}
+.platform-copy {
+  display: inline-grid;
+  place-items: center;
+}
+.platform-copy .icon-check,
+.platform-copy.is-copied .icon-copy {
+  opacity: 0;
+}
+.platform-copy.is-copied .icon-check {
+  opacity: 1;
+}
+.platform-sha-file {
+  min-height: 32px;
+  font-size: 13px;
+}
+.platform-first > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.platform-first-body {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+.platform-first-body ol {
+  margin: 0 0 8px;
+  padding-left: 1.2em;
+}
+.platform-command {
+  position: relative;
+  margin-top: 6px;
+  padding: 10px 44px 10px 12px;
+  border-radius: 8px;
+  background: var(--canvas);
+}
+.platform-command code {
+  font-size: 12px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.platform-base {
+  margin-top: 8px;
+}
+.platform-upcoming-badge {
+  align-self: flex-start;
+  padding: 2px 10px;
+  border-radius: 10px;
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  font-size: 13px;
+  font-weight: 500;
+}
+.platform-upcoming-text {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.acquire-config {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 24px;
+  align-items: start;
+}
+.acquire-config-copy p {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+.acquire-config-copy .text-link {
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+/* 配置包三步示意 */
+.config-strip {
+  margin: 0;
+}
+.config-strip svg {
+  display: block;
+  width: 240px;
+  height: 120px;
+  fill: none;
+  stroke: var(--brand-navy);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.config-strip .cs-input {
+  stroke: var(--grid-line-strong);
+}
+.config-strip .cs-zip {
+  stroke: var(--brand-blue);
+}
+.config-strip .cs-link {
+  stroke: var(--brand-blue);
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.config-strip-steps {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.config-strip-steps > li {
+  flex: 1;
+  text-align: center;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .config-strip.is-playing .cs-link {
+    animation: cs-draw 600ms var(--ease-out) backwards;
+  }
+  .config-strip.is-playing .cs-link-2 {
+    animation-delay: 200ms;
+  }
+  .config-strip.is-playing .cs-zip {
+    animation: cs-drop var(--dur-base) var(--ease-out) 500ms backwards;
+  }
+}
+@keyframes cs-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes cs-drop {
+  from {
+    transform: translateY(-12px);
+  }
+}
+
+/* 联系服务方 */
+.acquire-contact {
+  padding: 20px;
+  border-radius: 12px;
+  background: var(--canvas);
+}
+.acquire-contact > p {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.acquire-contact dl {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 6px 12px;
+  margin: 12px 0 0;
+  font-size: 14px;
+}
+.acquire-contact dt {
+  color: var(--text-muted);
+}
+.acquire-contact dd {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.acquire-close-mobile {
+  display: none;
+  margin-top: 24px;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .acquire-dialog {
+    width: 640px;
+  }
+  .acquire-config {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 767px) {
+  .acquire-dialog.is-sheet {
+    width: 100%;
+    max-width: none;
+    max-height: 92dvh;
+    border-radius: 16px 16px 0 0;
+    border: 0;
+  }
+  .acquire-dialog-body {
+    padding: 8px 20px max(20px, env(safe-area-inset-bottom));
+  }
+  .acquire-dialog h2 {
+    font-size: 24px;
+  }
+  .platform-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .acquire-config {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .acquire-close-mobile {
+    display: flex;
+  }
+}
+@media print {
+  dialog {
+    display: none;
+  }
+}

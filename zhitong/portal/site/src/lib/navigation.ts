@@ -1,3 +1,10 @@
+/** 页签键盘与锚点导航。`scrollToSection` 的实现在 smooth-scroll.ts（00 章 §5.3）。 */
+export { scrollToSection, scrollToTop } from './smooth-scroll';
+
+/**
+ * 页签组键盘操作：方向键、Home、End，焦点与选择同步，首尾循环（00 章 §10）。
+ * @param event - tablist 上的 keydown 事件。
+ */
 export function onTabKeydown(event: KeyboardEvent) {
   const list = event.currentTarget as HTMLElement;
   const tabs = [...list.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
@@ -13,17 +20,4 @@ export function onTabKeydown(event: KeyboardEvent) {
   event.preventDefault();
   tabs[next]?.focus();
   tabs[next]?.click();
-}
-
-export function scrollToSection(id: string, focus = true, instant = false) {
-  const node = document.getElementById(id);
-  if (!node) return;
-  const header = document.querySelector('.site-header')?.getBoundingClientRect().height ?? 72;
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  window.scrollTo({
-    top: Math.max(0, node.getBoundingClientRect().top + window.scrollY - header - 24),
-    behavior: instant || reduced ? 'instant' : 'smooth',
-  });
-  if (focus) node.focus({ preventScroll: true });
-  history.replaceState(null, '', `#${id}`);
 }

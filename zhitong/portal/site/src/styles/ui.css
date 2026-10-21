@@ -1,0 +1,349 @@
+/* ui 基础件（00 章 §6、§8.3；01 章 §11）。 */
+
+/* 说明卡 ZtPopover */
+.zt-popover {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  width: min(360px, calc(100vw - 32px));
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 16px 40px rgba(11, 52, 125, 0.14);
+  overflow: visible;
+}
+.zt-popover:focus {
+  outline: none;
+}
+.zt-popover:focus-visible {
+  box-shadow:
+    0 16px 40px rgba(11, 52, 125, 0.14),
+    var(--focus-ring);
+}
+.zt-popover-arrow {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-right: 0;
+  border-bottom: 0;
+  transform: rotate(45deg);
+  top: -6px;
+}
+.zt-popover[data-placement^='top'] .zt-popover-arrow {
+  top: auto;
+  bottom: -6px;
+  transform: rotate(225deg);
+}
+.zt-popover-body {
+  position: relative;
+  padding: 16px 18px;
+  /* --zt-pop-avail 由 floating-ui 的 size() 写入（可用高度）。 */
+  max-height: min(70vh, 520px, var(--zt-pop-avail, 100vh));
+  overflow-y: auto;
+}
+.zt-popover-title {
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.zt-popover-lead {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+.zt-popover-rows {
+  margin: 10px 0 0;
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.zt-popover-rows > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+}
+.zt-popover-rows dt {
+  color: var(--brand-navy);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.zt-popover-rows dd {
+  margin: 0;
+  color: var(--ink);
+}
+.zt-popover-art {
+  margin-top: 12px;
+  width: 160px;
+  height: 96px;
+}
+.zt-popover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 12px;
+}
+.zt-popover-sheet .zt-popover-body {
+  max-height: none;
+  padding: 4px 20px max(24px, env(safe-area-inset-bottom));
+}
+
+/* 结果状态与告警徽标 ZtStatus */
+.zt-status {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.zt-status.is-sm {
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 11px;
+}
+.tone-ok {
+  background: var(--green-tint);
+  color: var(--success-text);
+}
+.tone-warn {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+.tone-error {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+.tone-info {
+  background: var(--blue-tint);
+  color: var(--brand-navy);
+}
+.tone-muted {
+  background: var(--canvas);
+  color: var(--text-muted);
+}
+.tone-manual {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  box-shadow: inset 0 0 0 1px rgba(130, 86, 0, 0.25);
+}
+.zt-status-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.zt-status-counts {
+  display: inline-flex;
+  gap: 6px;
+  font-size: 13px;
+}
+.zt-status-count {
+  padding: 0 6px;
+  border-radius: 6px;
+  line-height: 22px;
+}
+.zt-status-lines {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.zt-status-lines > li {
+  background: none;
+  color: var(--ink);
+}
+.zt-status-level {
+  margin-right: 6px;
+  font-weight: 500;
+}
+.zt-status-lines > .tone-warn .zt-status-level {
+  color: var(--warning-text);
+}
+.zt-status-lines > .tone-error .zt-status-level {
+  color: var(--danger-text);
+}
+.zt-status-lines > .tone-info .zt-status-level {
+  color: var(--brand-navy);
+}
+
+/* 工具调用条 ZtToolCall */
+.zt-tool {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  min-height: 32px;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.zt-tool-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+}
+.zt-tool-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.zt-tool-spinner {
+  stroke: var(--brand-blue);
+  animation: zt-spin 0.8s linear infinite;
+}
+.zt-tool-check {
+  stroke: var(--success-text);
+}
+.zt-tool-error {
+  stroke: var(--danger-text);
+}
+@keyframes zt-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.zt-tool-name,
+.zt-tool-args,
+.zt-tool-times,
+.zt-tool-elapsed {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.zt-tool-name {
+  color: var(--brand-navy);
+}
+.zt-tool-elapsed {
+  margin-left: auto;
+}
+.zt-tool-detail {
+  flex-basis: 100%;
+  padding-left: 24px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.zt-tool-warnings {
+  flex-basis: 100%;
+  margin: 0;
+  padding: 0 0 0 24px;
+  list-style: none;
+  font-size: 13px;
+  color: var(--warning-text);
+}
+
+/* 流式文字 ZtStream */
+.zt-stream-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin-left: 1px;
+  vertical-align: -0.15em;
+  background: var(--brand-blue);
+  opacity: 0;
+  transition: opacity var(--dur-short) var(--ease-out);
+}
+.zt-stream.is-typing .zt-stream-caret {
+  opacity: 1;
+  animation: zt-caret 0.9s steps(1) infinite;
+}
+@keyframes zt-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* 复制提示 ZtToast */
+.zt-toast {
+  position: fixed;
+  inset: auto auto 32px 50%;
+  margin: 0;
+  transform: translate(-50%, 0);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 16px 8px 12px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--navy-900);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  box-shadow: 0 12px 32px rgba(8, 36, 87, 0.28);
+  overflow: visible;
+}
+.zt-toast[hidden] {
+  display: none !important;
+}
+.zt-toast .icon {
+  width: 16px;
+  height: 16px;
+  color: var(--brand-green);
+}
+.zt-toast.is-error .icon {
+  color: #ffb59a;
+}
+@media (max-width: 767px) {
+  .zt-toast {
+    bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+}
+
+/* 光斑 useSpotlight */
+.zt-spotlight {
+  position: relative;
+}
+.zt-spotlight::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), rgba(6, 102, 245, 0.08), transparent 60%);
+  box-shadow: inset 0 0 0 1px rgba(6, 102, 245, 0.35);
+  opacity: 0;
+  transition: opacity var(--dur-short) var(--ease-out);
+}
+.zt-spotlight.is-spotlit::after {
+  opacity: 1;
+}
+
+/* 数字滚动 useCountUp */
+.is-counting {
+  position: relative;
+  color: transparent !important;
+}
+.count-up-shadow {
+  position: absolute;
+  inset: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 等宽数字（00 章 §4.3） */
+.mono,
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.icon-bold {
+  stroke-width: 2;
+}

@@ -1,98 +1,147 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+/**
+ * 顶栏（01 章 §1–§6）：品牌、导航（滑块吸附 + 当前章节）、文档、主按钮、菜单按钮、比例尺进度。
+ * `position: fixed`，盒子恒为 72px（≤ 767px 64px）；紧凑只用 transform（背景层 scaleY、内容行上移 4px）。
+ * 状态写在根元素 `data-state="top|scrolled|docs"`；预渲染输出 top（首页）或 docs。
+ * 首页链接 `#id` 由 goToSection 接管；文档页与 404 页为 `RouterLink to="/#id"`。
+ */
+import { computed, onMounted, ref, toRef } from 'vue';
+import { useRoute } from 'vue-router';
 import AppIcon from './AppIcon.vue';
+import HeaderRuler from './header/HeaderRuler.vue';
+import MobileMenu from './header/MobileMenu.vue';
 import brandMark from '../../assets/brand-mark.svg';
-import { useMediaQuery } from '../composables/useMediaQuery';
+import { DOCS_LINK, NAV_LINKS, type NavSectionId } from '../data/nav';
+import { goToSection, navSpy } from '../lib/home-state';
+import { useHeaderState, type PageLayout } from '../composables/useHeaderState';
+import { useHoverIndicator } from '../composables/useHoverIndicator';
 
-defineProps<{ activeSection: string }>();
-const emit = defineEmits<{ acquire: [event: MouseEvent]; navigate: [id: string] }>();
-const menuOpen = ref(false);
-const header = ref<HTMLElement | null>(null);
+const props = defineProps<{ layout: PageLayout }>();
+const emit = defineEmits<{ acquire: [trigger: HTMLElement] }>();
+
+const route = useRoute();
+const { state } = useHeaderState(toRef(props, 'layout'));
+const nav = ref<HTMLElement | null>(null);
+const indicator = ref<HTMLElement | null>(null);
 const menuButton = ref<HTMLButtonElement | null>(null);
-const compact = useMediaQuery('(max-width: 1023px)');
-const links = [
-  { id: 'capabilities', label: '产品能力' },
-  { id: 'workflow', label: '使用流程' },
-  { id: 'trust', label: '数据与复核' },
-  { id: 'faq', label: '常见问题' },
-];
-function navigate(id: string) {
-  menuOpen.value = false;
-  emit('navigate', id);
+const menuOpen = ref(false);
+const mounted = ref(false);
+
+const isHome = computed(() => props.layout === 'home');
+const isDocs = computed(() => props.layout === 'docs' && route.path.startsWith('/docs/'));
+const current = computed<NavSectionId | ''>(() => (isHome.value ? navSpy.active.value : ''));
+
+useHoverIndicator({
+  container: nav,
+  indicator,
+  driver: 'css',
+  active: () => {
+    const root = nav.value;
+    if (!root) return null;
+    if (isDocs.value) return root.querySelector<HTMLElement>('[data-nav="docs"]');
+    return current.value ? root.querySelector<HTMLElement>(`[data-nav="${current.value}"]`) : null;
+  },
+});
+
+function onNav(event: MouseEvent, id: NavSectionId) {
+  if (!isHome.value) return;
+  event.preventDefault();
+  void goToSection(id);
+}
+function onBrand(event: MouseEvent) {
+  if (!isHome.value) return;
+  event.preventDefault();
+  void goToSection('main');
 }
 function acquire(event: MouseEvent) {
-  menuOpen.value = false;
-  emit('acquire', event);
+  emit('acquire', event.currentTarget as HTMLElement);
 }
-function keydown(event: KeyboardEvent) {
-  if (event.key === 'Escape' && menuOpen.value) {
-    menuOpen.value = false;
-    menuButton.value?.focus();
-  }
+function menuNavigate(id: NavSectionId) {
+  void goToSection(id);
 }
-function outside(event: MouseEvent) {
-  if (!header.value?.contains(event.target as Node)) menuOpen.value = false;
+function menuAcquire() {
+  if (menuButton.value) emit('acquire', menuButton.value);
 }
-watch(compact, () => {
-  menuOpen.value = false;
-});
-onMounted(() => {
-  document.addEventListener('keydown', keydown);
-  document.addEventListener('click', outside);
-});
-onBeforeUnmount(() => {
-  document.removeEventListener('keydown', keydown);
-  document.removeEventListener('click', outside);
-});
+
+onMounted(() => (mounted.value = true));
 </script>
 
 <template>
-  <header id="top" ref="header" class="site-header">
+  <header id="top" class="site-header" :data-state="state" :data-layout="layout">
+    <div class="site-header__bg" aria-hidden="true"></div>
+    <HeaderRuler v-if="mounted" :layout="layout" :active-id="current" />
     <div class="container header-inner">
-      <a
-        class="brand"
-        href="#main"
-        aria-label="智通数工AI，返回首页"
-        @click.prevent="navigate('main')"
+      <RouterLink class="brand" to="/" aria-label="智通数工AI 首页" @click="onBrand"
         ><img class="brand-mark" :src="brandMark" alt="" width="36" height="36" /><span
           >智通数工<span class="brand-ai">AI</span></span
-        ></a
+        ></RouterLink
       >
-      <nav class="desktop-nav" aria-label="主导航">
-        <a
-          v-for="link in links"
-          :key="link.id"
-          :href="`#${link.id}`"
-          :class="{ active: activeSection === link.id }"
-          :aria-current="activeSection === link.id ? 'location' : undefined"
-          @click.prevent="navigate(link.id)"
-          >{{ link.label }}</a
+      <nav ref="nav" class="desktop-nav" aria-label="主导航">
+        <span ref="indicator" class="nav-indicator" aria-hidden="true"></span>
+        <template v-for="link in NAV_LINKS" :key="link.id">
+          <a
+            v-if="isHome"
+            v-magnetic="'link'"
+            :href="`#${link.id}`"
+            class="nav-link"
+            :class="{ active: current === link.id }"
+            :data-nav="link.id"
+            data-indicator-item
+            :aria-current="current === link.id ? 'location' : undefined"
+            @click="onNav($event, link.id)"
+            ><span data-magnetic-label>{{ link.label }}</span></a
+          >
+          <RouterLink
+            v-else
+            :to="`/#${link.id}`"
+            class="nav-link"
+            :data-nav="link.id"
+            data-indicator-item
+            ><span>{{ link.label }}</span></RouterLink
+          >
+        </template>
+        <span class="nav-divider" aria-hidden="true"></span>
+        <RouterLink
+          v-magnetic="isHome ? 'link' : false"
+          :to="DOCS_LINK.to"
+          class="nav-link nav-docs"
+          :class="{ active: isDocs }"
+          data-nav="docs"
+          data-indicator-item
+          :aria-current="isDocs ? 'page' : undefined"
+          ><span data-magnetic-label><AppIcon name="book" />{{ DOCS_LINK.label }}</span></RouterLink
         >
       </nav>
-      <button class="button button-primary header-cta" @click="acquire">
-        获取安装与配置包<AppIcon name="arrow" />
+      <button
+        v-magnetic="isHome ? 'button' : false"
+        type="button"
+        class="button button-primary header-cta"
+        aria-haspopup="dialog"
+        aria-controls="acquire-dialog"
+        @click="acquire"
+      >
+        <span data-magnetic-label>获取安装包<AppIcon name="arrow" /></span>
       </button>
       <button
         ref="menuButton"
+        type="button"
         class="menu-toggle icon-button"
-        :aria-label="menuOpen ? '关闭导航菜单' : '打开导航菜单'"
+        :class="{ 'is-open': menuOpen }"
+        aria-label="打开导航菜单"
         :aria-expanded="menuOpen"
         aria-controls="mobile-menu"
-        @click="menuOpen = !menuOpen"
+        @click="menuOpen = true"
       >
         <span></span><span></span>
       </button>
     </div>
-    <nav id="mobile-menu" class="mobile-menu" aria-label="移动端导航" :hidden="!menuOpen">
-      <a
-        v-for="link in links"
-        :key="link.id"
-        :href="`#${link.id}`"
-        @click.prevent="navigate(link.id)"
-        >{{ link.label }}<AppIcon name="arrow" /></a
-      ><button class="button button-primary" @click="acquire">
-        获取安装与配置包<AppIcon name="arrow" />
-      </button>
-    </nav>
+    <MobileMenu
+      v-model="menuOpen"
+      :layout="layout"
+      :active-id="current"
+      :trigger="menuButton"
+      @navigate="menuNavigate"
+      @acquire="menuAcquire"
+    />
   </header>
 </template>

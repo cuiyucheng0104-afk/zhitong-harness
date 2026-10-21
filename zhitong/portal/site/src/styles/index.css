@@ -1,4 +1,25 @@
+/*
+ * 样式入口与加载顺序：设计变量 → 字体 → 基础 → 顶栏 → 各章（sections/）→ 装饰 → 文档 → ui 基础件 → 弹层 → 页面
+ * → 全局交互状态（须在各章之后，01 章 §9）→ 通用断点 → 动效降级与打印。
+ */
 @import './tokens.css';
+@import './fonts.css';
 @import './base.css';
-@import './sections.css';
+@import './header.css';
+@import './sections/hero.css';
+@import './sections/roles.css';
+@import './sections/problem.css';
+@import './sections/capabilities.css';
+@import './sections/workflow.css';
+@import './sections/trust.css';
+@import './sections/install.css';
+@import './sections/faq.css';
+@import './sections/footer.css';
+@import './deco.css';
+@import './docs.css';
+@import './ui.css';
+@import './dialogs.css';
+@import './pages.css';
+@import './states.css';
 @import './responsive.css';
+@import './motion.css';

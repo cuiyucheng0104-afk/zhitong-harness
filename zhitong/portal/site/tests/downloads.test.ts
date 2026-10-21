@@ -81,7 +81,7 @@ describe('安装包清单', () => {
   });
 });
 
-describe('获取安装与配置包弹层', () => {
+describe('获取安装包弹层', () => {
   async function mountWith(raw: unknown) {
     vi.resetModules();
     vi.doMock('../src/data/downloads', async (importOriginal) => {
@@ -89,18 +89,20 @@ describe('获取安装与配置包弹层', () => {
       return { ...actual, release: actual.downloadRelease(parseReleaseManifest(raw)) };
     });
     const { default: AcquireDialog } = await import('../src/components/AcquireDialog.vue');
-    const { default: InstallSection } = await import('../src/components/InstallSection.vue');
-    const dialog = mount(AcquireDialog, { props: { modelValue: true } });
-    const section = mount(InstallSection);
+    const dialog = mount(AcquireDialog, {
+      props: { modelValue: true },
+      global: { stubs: { RouterLink: { props: ['to'], template: '<a :href="to"><slot /></a>' } } },
+    });
     vi.doUnmock('../src/data/downloads');
-    return { dialog, section };
+    return { dialog };
   }
 
   it('Mac 已发布：给出下载、SHA256 与首次打开提示；Windows 显示即将发布', async () => {
-    const { dialog, section } = await mountWith(macOnly);
+    const { dialog } = await mountWith(macOnly);
     const mac = dialog.get('[data-platform="mac-arm64"]');
     expect(mac.get('a[download]').attributes('href')).toBe('/downloads/ztsgai-1.0.0-mac-arm64.dmg');
-    expect(mac.get('a[href$=".sha256"]').text()).toContain('SHA256');
+    expect(mac.get('a[href$=".sha256"]').text()).toBe('下载 .sha256 文件');
+    expect(mac.get('.platform-hash-label').text()).toBe('SHA256 校验值');
     expect(mac.text()).toContain('仍要打开');
     expect(mac.text()).toContain(HASH);
     const win = dialog.get('[data-platform="win-x64"]');
@@ -109,8 +111,6 @@ describe('获取安装与配置包弹层', () => {
     expect(dialog.text()).toContain('v1.0.0');
     expect(dialog.text()).toContain('2026-10-20 发布');
     expect(dialog.text()).toContain('配置包由服务方单独交付');
-    expect(section.findAll('.install-downloads a')).toHaveLength(1);
-    expect(section.get('.install-downloads').text()).toContain('即将发布');
   });
 
   it('两个平台都已发布时 Windows 提示 SmartScreen', async () => {
@@ -127,10 +127,9 @@ describe('获取安装与配置包弹层', () => {
   });
 
   it('没有任何安装包时只显示即将发布，没有下载链接', async () => {
-    const { dialog, section } = await mountWith(manifest({}, { date: null }));
+    const { dialog } = await mountWith(manifest({}, { date: null }));
     expect(dialog.findAll('a[download]')).toHaveLength(0);
     expect(dialog.findAll('.package-download-upcoming')).toHaveLength(2);
     expect(dialog.text()).toContain('发布日期待定');
-    expect(section.findAll('.install-downloads a')).toHaveLength(0);
   });
 });

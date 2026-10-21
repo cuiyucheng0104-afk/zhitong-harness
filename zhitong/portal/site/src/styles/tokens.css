@@ -19,4 +19,61 @@
   --font-body: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
   --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
   --shadow-workbench: 0 24px 64px rgba(11, 52, 125, 0.1), 0 4px 16px rgba(11, 52, 125, 0.05);
+
+  /* v1.1 颜色增量（00 章 §4.2） */
+  --navy-900: #082457;
+  --blue-600: #0558d6;
+  --blue-050: #f2f7ff;
+  --grid-line: #dce8f4;
+  --grid-line-strong: #c5d6ea;
+  --danger-bg: #fff0ea;
+  --danger-text: #b4400f;
+  --reduce-text: #0b5cd5;
+  --code-bg: #0f1e33;
+  --focus-ring: 0 0 0 3px rgba(6, 102, 245, 0.35);
+  --focus-ring-dark: 0 0 0 3px rgba(255, 255, 255, 0.55);
+  --nav-text: #44546b;
+
+  /* 动效变量（00 章 §5.2，与 lib/motion-tokens.ts 同名） */
+  --dur-micro: 160ms;
+  --dur-short: 280ms;
+  --dur-base: 450ms;
+  --dur-long: 800ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* 字号（00 章 §4.3，桌面值；手机值见下方媒体查询） */
+  --fs-h1: 64px;
+  --fs-h2: 44px;
+  --fs-h3: 24px;
+  --fs-body: 17px;
+  --fs-note: 14px;
+  --fs-label: 13px;
+  --fs-demo: 14px;
+
+  /* 栅格（00 章 §4.4） */
+  --content-max: 1248px;
+  --gutter: 96px;
+  --col-gap: 24px;
+  --section-pad: 128px;
+
+  /* 顶栏（01 章 §1） */
+  --header-h: 72px;
+}
+@media (max-width: 1023px) {
+  :root {
+    --gutter: 48px;
+  }
+}
+@media (max-width: 767px) {
+  :root {
+    --fs-h1: 40px;
+    --fs-h2: 30px;
+    --fs-h3: 20px;
+    --fs-body: 16px;
+    --gutter: 20px;
+    --section-pad: 80px;
+    --header-h: 64px;
+  }
 }

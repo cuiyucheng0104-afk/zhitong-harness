@@ -17,12 +17,14 @@ npm run dev
 npm test
 npm run typecheck
 npm run build
+node scripts/check-links.mjs   # 构建后：每个路由的 index.html 存在、站内链接与锚点可解析
+node scripts/check-budget.mjs  # 构建后：首包与懒加载块 gzip 体积对照 00 章 §9 预算（--report 只打印）
 npm run preview
 ```
 
 生产预览：<http://127.0.0.1:5328/>。`npm run build` 依次运行 TypeScript 检查、Vite 客户端构建、Vue 服务端渲染构建与首页预渲染，产出 `dist/`。SSR 临时构建目录在预渲染后自动清理。
 
-`dist/` 可部署到普通静态托管，不需要 Node.js 后端。资源使用相对路径，支持目录部署。请通过 HTTP 服务访问；构建后的 ES 模块不支持直接双击 HTML 的 `file://` 访问。
+`dist/` 可部署到普通静态托管，不需要 Node.js 后端。站点只部署在域名根（`base: '/'`），每个路由预渲染为 `dist/<路径>/index.html`，另有 `dist/404.html`。请通过 HTTP 服务访问；构建后的 ES 模块不支持直接双击 HTML 的 `file://` 访问。
 
 ## 工程结构
 
@@ -49,8 +51,10 @@ src/
 │   └── demo.ts                虚构示例数据、金额格式与房间条目
 ├── lib/                       页签键盘、锚点导航、动效加载
 ├── styles/                    设计变量 / 基础 / 章节 / 响应式
-└── types/portal.ts            场景、能力、角色与动作类型
+└── types/portal.ts            场景与动作类型（能力类型转发自 data/capabilities.ts）
 scripts/prerender.mjs          构建后输出完整 HTML
+scripts/check-links.mjs        构建后死链检查
+scripts/check-budget.mjs       构建后 JS 体积预算检查
 assets/                       品牌 SVG（来源副本在 zhitong/brand/brand-mark.svg）
 public/                       favicon、apple-touch-icon（由 zhitong/scripts/brand-icons 生成）
 public/downloads/releases.json 安装包清单：版本、日期、各平台文件名、SHA256、大小
@@ -79,6 +83,8 @@ tests/fixtures/prototype-v0.1.html  v0.1 原型首页，内容测试的对照基
 ## 产品边界与上线前事项
 
 工作台为交互演示，未接真实模型、TOS、DWG 解析、文件上传、报告生成或云运维，没有收集访客资料的表单。安装包从 `/downloads/` 直接下载（nginx 配置与发布流程见 `zhitong/portal/deploy/runbook.md`）。
+
+填写 `src/site.config.ts` 的服务方联系方式（以及法律信息），否则 `ZT_LAUNCH=1 npm run build` 的上线检查失败（结果写在 `dist/.launch-check.json`）。按 01 章 §8.4 / 06 章 §3.7，`deploy.sh` 应改为 `ZT_LAUNCH=1` 构建、上传前读取 `.launch-check.json`、`--skip-build` 时拒绝上传，nginx 加 `error_page 404 /404.html`；这些改动在 `zhitong/portal/deploy/` 下，**尚未落地**，上线前须先完成。
 
 公开上线前仍需补充：品牌方确认的正式品牌 SVG、法律主体、服务联系方式、隐私与备案文案，并复核最终产品能力说明。
 

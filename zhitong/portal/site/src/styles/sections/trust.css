@@ -1,0 +1,272 @@
+/* 数据与复核 #trust（05 章 §2.3）。 */
+.trust-section {
+  background: var(--canvas);
+  border-block: 1px solid #ecf1f8;
+}
+.trust-heading {
+  max-width: calc((100% - 11 * var(--col-gap)) / 12 * 7 + 6 * var(--col-gap));
+}
+.trust-figure {
+  margin: 56px auto 0;
+  max-width: 1120px;
+}
+.trust-diagram {
+  position: relative;
+}
+.trust-geo {
+  position: relative;
+}
+.trust-geo.is-narrow {
+  display: none;
+}
+.trust-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  font-family: var(--font-body);
+}
+
+/* 图元（描边与底色对比 ≥ 3:1，WCAG 1.4.11） */
+.trust-frame rect {
+  fill: rgba(255, 255, 255, 0.6);
+  stroke: #7f93ab;
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+}
+.trust-node-box {
+  fill: #fff;
+  stroke: #6f87a6;
+  stroke-width: 1.5;
+}
+.trust-node.node-tos .trust-node-box,
+.trust-node.node-model .trust-node-box {
+  stroke: var(--brand-navy);
+}
+.trust-node.node-review .trust-node-box {
+  stroke: var(--success-text);
+}
+.trust-path path {
+  fill: none;
+  stroke: rgba(22, 41, 67, 0.4);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.trust-path.line-dashed path {
+  stroke-dasharray: 7 5;
+}
+.trust-path.line-dotted path {
+  stroke-dasharray: 1 5;
+  stroke-width: 2.4;
+}
+.trust-label text {
+  font-size: var(--fs-body);
+  fill: var(--ink);
+}
+.trust-label.is-title text {
+  font-size: var(--fs-title);
+  font-weight: 600;
+  fill: var(--brand-navy);
+}
+.trust-label.is-mono text {
+  font-family: var(--font-mono);
+  fill: var(--brand-navy);
+}
+.trust-lock-body {
+  fill: var(--ink);
+}
+.trust-lock-shackle {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+.trust-keys circle,
+.trust-keys path {
+  fill: none;
+  stroke: var(--warning-text);
+  stroke-width: 1.6;
+}
+.trust-tos-check {
+  opacity: 0;
+}
+.trust-tos-check circle {
+  fill: var(--success-text);
+}
+.trust-tos-check path {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 数据包 */
+.shape-file rect {
+  fill: var(--brand-blue);
+}
+.shape-amount circle {
+  fill: var(--success-text);
+}
+.shape-amount .trust-shape-glyph {
+  fill: #fff;
+}
+.shape-amountEcho circle {
+  fill: #fff;
+  stroke: var(--success-text);
+  stroke-width: 1.6;
+  stroke-dasharray: 3 2;
+}
+.shape-amountEcho .trust-shape-glyph {
+  fill: var(--success-text);
+}
+.trust-shape-glyph {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+}
+.shape-credential .trust-key-ring,
+.shape-credential .trust-key-bar {
+  fill: none;
+  stroke: var(--warning-text);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.shape-reply rect {
+  fill: var(--brand-navy);
+}
+.shape-result rect {
+  fill: var(--blue-600);
+}
+.trust-shape-line {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 聚焦模式 */
+.trust-svg .is-dim {
+  opacity: 0.28;
+}
+.trust-svg .trust-frame,
+.trust-svg .trust-node,
+.trust-svg .trust-path,
+.trust-svg .trust-label,
+.trust-svg .trust-lock,
+.trust-svg .trust-keys,
+.trust-svg .trust-packet-wrap {
+  transition: opacity var(--dur-short) var(--ease-out);
+}
+
+/* 节点覆盖按钮（百分比定位，与 SVG 同比例缩放） */
+.trust-hit {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.trust-hit:hover {
+  background: rgba(6, 102, 245, 0.04);
+}
+.trust-hit:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+/* 四条原则 */
+.trust-principles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--col-gap);
+  margin: 64px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.trust-principles > li {
+  display: flex;
+}
+.trust-principle {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 24px;
+  text-align: left;
+  color: var(--ink);
+  cursor: default;
+}
+.trust-principle[aria-pressed='true'] {
+  border-color: rgba(6, 102, 245, 0.35);
+}
+.trust-principle-no {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-blue);
+}
+.trust-principle-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.trust-principle-body {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+.trust-principle-hint {
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: 13px;
+  color: var(--brand-blue);
+}
+
+/* 说明卡内的等宽片段 */
+.zt-popover-rows code,
+.zt-popover-sheet code {
+  font-size: 13px;
+  color: var(--brand-navy);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1023px) {
+  .trust-heading {
+    max-width: none;
+  }
+  .trust-geo.is-wide {
+    display: none;
+  }
+  .trust-geo.is-narrow {
+    display: block;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+
+  .trust-principles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 767px) {
+  .trust-figure {
+    margin-top: 40px;
+  }
+  .trust-geo.is-narrow {
+    max-width: none;
+  }
+
+  .trust-principles {
+    grid-template-columns: 1fr;
+    margin-top: 40px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .trust-svg * {
+    transition: none !important;
+  }
+}
+@media print {
+  .trust-hit {
+    display: none;
+  }
+}

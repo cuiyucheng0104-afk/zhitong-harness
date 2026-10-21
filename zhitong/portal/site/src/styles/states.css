@@ -1,0 +1,252 @@
+/*
+ * 全局交互状态（01 章 §9）：悬停、按下、聚焦、禁用。在各章样式之后加载。
+ * 按下缩放：精确指针由 v-magnetic（GSAP，0.12s）完成；触屏由下方 :active 规则完成，二者不同时生效。
+ */
+.button,
+.icon-button,
+.text-link,
+[role='tab'],
+.zt-card {
+  transition:
+    color var(--dur-micro) var(--ease-out),
+    background-color var(--dur-micro) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-out),
+    background-size var(--dur-short) var(--ease-out),
+    box-shadow var(--dur-short) var(--ease-out),
+    transform var(--dur-short) var(--ease-out);
+}
+
+/* 块级控件的聚焦环用 box-shadow，outline 透明（强制色彩模式下可见） */
+button:focus-visible,
+summary:focus-visible,
+.button:focus-visible,
+.icon-button:focus-visible,
+[tabindex]:not([tabindex='-1']):focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: var(--focus-ring);
+}
+a:focus-visible {
+  outline: 2px solid var(--brand-blue);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+a.button:focus-visible {
+  outline: 2px solid transparent;
+  border-radius: 8px;
+  box-shadow: var(--focus-ring);
+}
+[tabindex='-1']:focus-visible {
+  outline: none;
+}
+
+/* 主按钮 */
+.button-primary {
+  color: #fff;
+  background-color: var(--brand-blue);
+}
+.button-primary .icon {
+  transition: transform var(--dur-short) var(--ease-out);
+}
+@media (hover: hover) {
+  .button-primary:hover {
+    background-color: #0560ea;
+    box-shadow: 0 8px 20px rgba(6, 102, 245, 0.24);
+  }
+  .button-primary:hover .icon {
+    transform: translateX(4px);
+  }
+  .button-primary:hover:focus-visible {
+    box-shadow:
+      0 8px 20px rgba(6, 102, 245, 0.24),
+      var(--focus-ring);
+  }
+}
+.button-primary:active {
+  background-color: var(--blue-600);
+  box-shadow: 0 2px 6px rgba(6, 102, 245, 0.2);
+}
+.button-primary:disabled,
+.button-primary[aria-disabled='true'] {
+  background-color: #b8cff3;
+  color: #fff;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* 次按钮 */
+.button-outline {
+  color: var(--ink);
+  background-color: #fff;
+  border-color: var(--line);
+}
+@media (hover: hover) {
+  .button-outline:hover {
+    background-color: var(--blue-050);
+    border-color: #9bbdf3;
+    color: var(--brand-navy);
+  }
+}
+.button-outline:active {
+  background-color: var(--blue-tint);
+  border-color: var(--brand-blue);
+}
+.button-outline:disabled,
+.button-outline[aria-disabled='true'] {
+  background-color: #fafcff;
+  border-color: #e3eaf3;
+  color: #9aa8b8;
+  cursor: not-allowed;
+}
+
+/* 白按钮（深色区） */
+.button-white {
+  background-color: #fff;
+  color: var(--brand-navy);
+}
+@media (hover: hover) {
+  .button-white:hover {
+    background-color: #dbebff;
+  }
+}
+.button-white:active {
+  background-color: #c7defc;
+}
+.button-white:focus-visible,
+a.button-white:focus-visible {
+  box-shadow: var(--focus-ring-dark);
+}
+.button-white:disabled,
+.button-white[aria-disabled='true'] {
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+}
+
+/* 深色区描边按钮（404 页“查看文档”，01 章 §12） */
+.button-dark-outline {
+  color: #fff;
+  background-color: transparent;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+@media (hover: hover) {
+  .button-dark-outline:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.7);
+  }
+}
+.button-dark-outline:focus-visible,
+a.button-dark-outline:focus-visible {
+  box-shadow: var(--focus-ring-dark);
+}
+
+/* 文字链接：下划线自左画出，离开时向右收回 */
+.text-link {
+  color: var(--brand-blue);
+  background: linear-gradient(currentColor, currentColor) 100% 100% / 0 1px no-repeat;
+}
+.text-link .icon {
+  transition: transform var(--dur-short) var(--ease-out);
+}
+@media (hover: hover) {
+  .text-link:hover {
+    background-size: 100% 1px;
+    background-position: 0 100%;
+  }
+  .text-link:hover .icon {
+    transform: translateX(4px);
+  }
+}
+.text-link:active {
+  color: var(--blue-600);
+}
+.text-link:disabled,
+.text-link[aria-disabled='true'] {
+  color: #9aa8b8;
+  background-size: 0 1px;
+  cursor: not-allowed;
+}
+button.text-link:focus-visible {
+  outline: 2px solid var(--brand-blue);
+  outline-offset: 2px;
+  border-radius: 2px;
+  box-shadow: none;
+}
+
+/* 图标按钮 */
+.icon-button {
+  background-color: transparent;
+}
+@media (hover: hover) {
+  .icon-button:hover {
+    background-color: var(--blue-050);
+    color: var(--brand-blue);
+  }
+}
+.icon-button:active {
+  background-color: var(--blue-tint);
+}
+.icon-button:disabled {
+  color: #9aa8b8;
+}
+
+/* 页签 */
+[role='tab'] {
+  color: var(--text-muted);
+}
+@media (hover: hover) {
+  [role='tab']:hover {
+    color: var(--brand-blue);
+  }
+}
+[role='tab']:active {
+  color: var(--brand-blue);
+}
+[role='tab']:focus-visible {
+  border-radius: 6px;
+  box-shadow: var(--focus-ring);
+}
+
+/* 卡片 */
+.zt-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+@media (hover: hover) {
+  .zt-card:hover {
+    border-color: rgba(6, 102, 245, 0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(11, 52, 125, 0.08);
+  }
+}
+.zt-card:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 16px rgba(11, 52, 125, 0.04);
+}
+.zt-card:has(:focus-visible) {
+  box-shadow: var(--focus-ring);
+}
+
+/* 深色区聚焦环 */
+.on-dark :focus-visible,
+.on-dark a.button:focus-visible {
+  box-shadow: var(--focus-ring-dark);
+  outline-color: #fff;
+}
+
+/* 触屏按下：CSS 缩放（精确指针下由 v-magnetic 写 transform） */
+@media (hover: none) {
+  .button:active,
+  .icon-button:active,
+  .text-link:active,
+  [role='tab']:active {
+    transform: scale(0.97);
+    transition-duration: 120ms;
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid CanvasText;
+    box-shadow: none;
+  }
+}

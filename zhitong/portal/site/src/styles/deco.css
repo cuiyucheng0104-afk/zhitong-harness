@@ -1,0 +1,490 @@
+/*
+ * 装饰动效（07 章）：D6 深色区底纹 `.deco-navy-grid`、D1–D5 装饰的布局与静态底、D5 的 CSS 动画、打印规则。
+ * 装饰根元素都是 aria-hidden、pointer-events: none；基础样式即终态，动画只写在 no-preference 之下。
+ */
+
+/* ———————— D6 深色区底纹（§10）：白色细线网格，小格 24px（α 0.035）、大格 120px（α 0.075） ———————— */
+.deco-navy-grid {
+  /* 一条大格竖线落在内容容器左缘（断点值写在 CSS 里，不用 JS） */
+  --gx: 96px;
+  --gx-s: 96px;
+  background-color: var(--navy-900);
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.075) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.075) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size:
+    120px 120px,
+    120px 120px,
+    24px 24px,
+    24px 24px;
+  background-position:
+    var(--gx) 0,
+    0 0,
+    var(--gx-s) 0,
+    0 0;
+}
+/* 可选底边比例尺刻度：每 24px 一短刻、每 120px 一长刻 */
+.deco-navy-grid[data-ruler] {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.32) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.2) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.075) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.075) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size:
+    120px 12px,
+    24px 6px,
+    120px 120px,
+    120px 120px,
+    24px 24px,
+    24px 24px;
+  background-position:
+    var(--gx) 100%,
+    var(--gx-s) 100%,
+    var(--gx) 0,
+    0 0,
+    var(--gx-s) 0,
+    0 0;
+  background-repeat: repeat-x, repeat-x, repeat, repeat, repeat, repeat;
+}
+@media (min-width: 1440px) {
+  /* 背景百分比相对于“元素宽 − 图块宽”，所以各加半个图块：W/2 − 624 = 50% − 564px（120 格）/ 50% − 612px（24 格） */
+  .deco-navy-grid {
+    --gx: calc(50% - 564px);
+    --gx-s: calc(50% - 612px);
+  }
+}
+@media (max-width: 1023px) {
+  .deco-navy-grid {
+    --gx: 48px;
+    --gx-s: 48px;
+  }
+}
+@media (max-width: 767px) {
+  .deco-navy-grid {
+    --gx: 20px;
+    --gx-s: 20px;
+  }
+}
+/* 安装面板本身就是内容容器宽：左缘即容器左缘；手机面板通栏，容器左缘在 20px */
+.install-panel.deco-navy-grid {
+  --gx: 0px;
+  --gx-s: 0px;
+}
+@media (max-width: 767px) {
+  .install-panel.deco-navy-grid {
+    --gx: 20px;
+    --gx-s: 20px;
+  }
+}
+
+/* ———————— D1 首屏底稿网格（§5） ———————— */
+.deco-hero {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.deco-hero .bp-paper,
+.deco-hero .bp-layers,
+.deco-hero canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.deco-hero .bp-paper {
+  background-image:
+    linear-gradient(to right, rgba(220, 232, 244, 0.72) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(220, 232, 244, 0.72) 1px, transparent 1px);
+  background-size: 24px 24px;
+  /* (x0 mod 24, originTop mod 24)；水合后按实测值写入 */
+  background-position: var(--gutter) 56px;
+}
+.deco-hero .bp-paper,
+.deco-hero .bp-static {
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent);
+  mask-image: linear-gradient(to bottom, #000 62%, transparent);
+}
+@media (min-width: 1440px) {
+  .deco-hero .bp-paper {
+    background-position: calc(50% - 612px) 56px;
+  }
+}
+
+/* ———————— D2 清单编码字符场（§6；05 §3.3 插槽） ———————— */
+.deco-install {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.deco-install .deco-install-box {
+  position: absolute;
+  inset: 0;
+}
+.deco-install .deco-install-canvas {
+  position: absolute;
+  display: block;
+}
+
+/* ———————— D3 页脚楼群（替代 §7 单栋透视楼：铺满一排、无轴号与标高） ———————— */
+.deco-footer {
+  display: block;
+  width: 100%;
+  margin-top: 32px;
+  pointer-events: none;
+}
+.deco-skyline {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.sk-body {
+  fill: rgba(242, 247, 255, 0.85);
+  stroke: var(--brand-blue);
+  stroke-opacity: 0.55;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.sk-grid {
+  fill: none;
+  stroke: var(--brand-blue);
+  stroke-opacity: 0.16;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.sk-ground {
+  stroke: var(--brand-blue);
+  stroke-opacity: 0.45;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.sk-tower {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.deco-footer[data-state='armed'] .sk-tower {
+  transform: scaleY(0);
+  opacity: 0;
+}
+.deco-footer[data-state='in'] .sk-tower {
+  transform: scaleY(1);
+  opacity: 1;
+  transition:
+    transform 0.8s var(--ease-out) calc(var(--i) * 40ms),
+    opacity 0.45s var(--ease-out) calc(var(--i) * 40ms);
+}
+@media (max-width: 767px) {
+  .deco-footer {
+    margin-top: 24px;
+  }
+}
+
+/* ———————— D4 尺寸线分隔（§8） ———————— */
+.deco-dimension {
+  position: relative;
+  pointer-events: none;
+}
+.deco-dimension[data-variant='divider'] {
+  width: calc(100% - 2 * var(--gutter));
+  max-width: var(--content-max);
+  height: 56px;
+  margin-inline: auto;
+}
+.deco-dimension[data-variant='inline'] {
+  width: 100%;
+  height: 24px;
+}
+.deco-dimension .dd-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+}
+.deco-dimension .dd-ext {
+  stroke: #c5d6ea;
+  stroke-width: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scaleY(var(--dd-ext, 1));
+}
+.deco-dimension .dd-line {
+  stroke: #9db4d3;
+  stroke-width: 1;
+}
+.deco-dimension .dd-tick {
+  stroke: var(--brand-navy);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.deco-dimension .dd-col {
+  stroke: #a9bfdc;
+  stroke-width: 1;
+}
+.deco-dimension .dd-num {
+  fill: var(--brand-navy);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.deco-dimension .dd-label {
+  fill: var(--text-muted);
+  font-size: 13px;
+}
+.deco-dimension .dd-label-bg {
+  fill: var(--canvas);
+}
+.deco-dimension .dd-bubbles circle {
+  fill: #fff;
+  stroke: #bfd0e6;
+  stroke-width: 1;
+}
+.deco-dimension .dd-bubbles text {
+  fill: #7189a8;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+@media (max-width: 767px) {
+  .deco-dimension[data-variant='divider'] {
+    height: 44px;
+  }
+}
+
+/* ———————— D5 404 图纸缺页（§9） ———————— */
+.deco-missing {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  fill: none;
+  stroke-linecap: butt;
+}
+.deco-missing text {
+  fill: #cfe0ff;
+  stroke: none;
+  font-family: var(--font-body);
+  font-size: 4.2px;
+}
+.deco-missing .ms-mono {
+  font-family: var(--font-mono);
+}
+.deco-missing .ms-draw {
+  stroke-dasharray: 1 1;
+}
+.deco-missing .ms-ink {
+  stroke: #cfe0ff;
+}
+.deco-missing .ms-w035 {
+  stroke-width: 0.35;
+}
+.deco-missing .ms-w05 {
+  stroke-width: 0.5;
+}
+.deco-missing .ms-w07 {
+  stroke-width: 0.7;
+}
+.deco-missing .ms-w1 {
+  stroke-width: 1;
+}
+.deco-missing .ms-w12 {
+  stroke-width: 1.2;
+}
+.deco-missing .ms-label {
+  opacity: 0.7;
+}
+.deco-missing .ms-axis {
+  stroke: #cfe0ff;
+  stroke-width: 0.3;
+  stroke-dasharray: 8 2 1.5 2;
+  opacity: 0.55;
+}
+.deco-missing .ms-axis.ms-faint {
+  opacity: 0.22;
+}
+.deco-missing .ms-bubble {
+  fill: #082457;
+  stroke: #cfe0ff;
+  stroke-width: 0.35;
+}
+.deco-missing .ms-faint {
+  opacity: 0.4;
+}
+.deco-missing .ms-btxt {
+  font-size: 4px;
+  text-anchor: middle;
+}
+.deco-missing .ms-dim {
+  font-size: 3.6px;
+  text-anchor: middle;
+}
+.deco-missing .ms-wall-o {
+  stroke: #cfe0ff;
+  stroke-width: 2.6;
+}
+.deco-missing .ms-wall-i {
+  stroke: #082457;
+  stroke-width: 1.5;
+}
+.deco-missing .ms-col {
+  fill: #cfe0ff;
+}
+.deco-missing .ms-room {
+  font-size: 4px;
+  opacity: 0.8;
+}
+.deco-missing .ms-match {
+  stroke: #cfe0ff;
+  stroke-width: 0.6;
+  stroke-dasharray: 10 2 2 2;
+}
+.deco-missing .ms-warm {
+  stroke: #ffb48a;
+}
+.deco-missing text.ms-warmtxt {
+  fill: #ffb48a;
+}
+.deco-missing .ms-idx {
+  font-size: 3.2px;
+}
+.deco-missing .ms-note {
+  font-size: 4.4px;
+}
+.deco-missing .ms-stampTxt {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+.deco-missing .ms-cross {
+  transform: translate(310px, 92px);
+}
+.deco-missing .ms-crossline,
+.deco-missing .ms-crossbox {
+  stroke: #8fc0ff;
+  stroke-width: 0.4;
+}
+.deco-missing .ms-readbg {
+  fill: #082457;
+  stroke: #8fc0ff;
+  stroke-width: 0.3;
+}
+.deco-missing text.ms-readtxt {
+  fill: #8fc0ff;
+  font-size: 3.6px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .deco-missing .ms-draw {
+    animation: ms-draw var(--t) var(--ease-out) var(--d) both;
+  }
+  .deco-missing .ms-fade {
+    animation: ms-fade var(--t) var(--ease-out) var(--d) both;
+  }
+  .deco-missing .ms-pop {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: ms-pop var(--t) var(--ease-out) var(--d) both;
+  }
+  .deco-missing .ms-stamp {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: ms-stamp var(--t) cubic-bezier(0.3, 1.6, 0.5, 1) var(--d) both;
+  }
+  .deco-missing .ms-cross {
+    animation:
+      ms-fade 0.3s var(--ease-out) 4.1s both,
+      ms-roam 15s var(--ease-in-out) 4.4s infinite;
+  }
+  .deco-missing.paused,
+  .deco-missing.paused * {
+    animation-play-state: paused !important;
+  }
+}
+@keyframes ms-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes ms-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ms-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+@keyframes ms-stamp {
+  from {
+    opacity: 0;
+    transform: scale(1.6) rotate(-6deg);
+  }
+}
+/* 5 个点之间“移动 1.2 s – 停留 1.8 s”，15 s 一圈 */
+@keyframes ms-roam {
+  0%,
+  12% {
+    transform: translate(310px, 92px);
+  }
+  20%,
+  32% {
+    transform: translate(378px, 98px);
+  }
+  40%,
+  52% {
+    transform: translate(370px, 204px);
+  }
+  60%,
+  72% {
+    transform: translate(302px, 208px);
+  }
+  80%,
+  92% {
+    transform: translate(322px, 128px);
+  }
+  100% {
+    transform: translate(310px, 92px);
+  }
+}
+/* 手机：裁切版，只露出接合线、云线与审核章（00 §14 裁定 3） */
+@media (max-width: 767px) {
+  .notfound-deco {
+    overflow: hidden;
+  }
+  .notfound-deco .deco-missing {
+    width: 172%;
+    margin-left: -70%;
+  }
+}
+
+/* ———————— 打印（AC-07-09）：画布装饰隐藏，SVG 装饰为终帧 ———————— */
+@media print {
+  .deco-hero canvas,
+  .deco-install,
+  .deco-footer {
+    display: none !important;
+  }
+  .deco-missing,
+  .deco-missing * {
+    animation: none !important;
+  }
+  .deco-dimension .dd-line {
+    transform: none !important;
+  }
+  .deco-dimension .dd-ends,
+  .deco-dimension .dd-bubbles,
+  .deco-dimension .dd-num,
+  .deco-dimension .dd-col {
+    opacity: 1 !important;
+    --dd-ext: 1;
+  }
+}

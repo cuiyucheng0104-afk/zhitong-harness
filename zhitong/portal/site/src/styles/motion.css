@@ -1,0 +1,32 @@
+/*
+ * 动效降级（00 章 §5.5、§5.6）。预渲染 HTML 全部是终态；初始隐藏态一律写在 `.motion-ready` 之下
+ * （由 GSAP 在入场前以内联样式设置）。打印时强制终态。
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+@media print {
+  .container {
+    width: 100%;
+    max-width: none;
+  }
+  .section-space {
+    padding-block: 30px;
+  }
+  body {
+    padding-top: 0;
+  }
+  .motion-ready [data-reveal],
+  .motion-ready [data-reveal] *,
+  .reveal {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+}

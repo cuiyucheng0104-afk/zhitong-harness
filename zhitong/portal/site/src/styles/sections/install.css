@@ -1,0 +1,224 @@
+/* 安装与交付 #install（05 章 §3.3）：深色面板，左 5 列文字、右 7 列版本行与平台卡；平板与手机单列。 */
+.install-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 72px 64px;
+  border-radius: 24px;
+  /* 只写 background-color：底纹由 D6 .deco-navy-grid 的 background-image 提供（07 章）。 */
+  background-color: var(--navy-900);
+  color: #fff;
+}
+.install-panel > .deco-install {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.install-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--col-gap);
+  align-content: start;
+}
+.install-content > * {
+  grid-column: 1 / span 5;
+}
+.install-content > .install-release {
+  grid-column: 7 / span 6;
+  grid-row: 1 / span 7;
+  align-self: start;
+}
+.install-head .eyebrow {
+  color: #b5d8ff;
+}
+.install-head h2 {
+  margin-top: 16px;
+  color: #fff;
+}
+.install-lead {
+  margin-top: 16px;
+  color: rgba(255, 255, 255, 0.76);
+}
+.install-block {
+  margin-top: 40px;
+}
+.install-block h3 {
+  font-size: 20px;
+  color: #fff;
+}
+.install-block p,
+.install-block li {
+  font-size: 15px;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.76);
+}
+.install-block p {
+  margin-top: 10px;
+}
+.install-block code {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 14px;
+}
+.install-config-items {
+  margin: 10px 0 0;
+  padding-left: 1.2em;
+}
+.install-warning {
+  padding: 10px 12px;
+  border-left: 2px solid #ffd27a;
+  border-radius: 0 8px 8px 0;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+.install-panel .text-link {
+  color: #b5d8ff;
+}
+.install-doc {
+  margin-top: 24px;
+  justify-self: start;
+}
+.install-version {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.76);
+}
+.install-version .mono {
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 600;
+}
+.install-base {
+  margin-top: 4px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.76);
+}
+.install-mobile-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.92);
+}
+.install-platforms {
+  display: grid;
+  gap: 16px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.install-help {
+  margin-top: 16px;
+}
+.install-contact .contact-list {
+  margin-top: 12px;
+}
+
+/* 平台卡深色面（05 章 §3.3；弹层内的 light 面不受影响） */
+.platform-card.on-dark {
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  transition: border-color var(--dur-short) var(--ease-out);
+}
+.platform-card.on-dark.is-matched {
+  border-color: var(--brand-cyan);
+}
+.platform-card.on-dark.is-upcoming {
+  border: 1px dashed rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.04);
+}
+.platform-card.on-dark .platform-card-icon,
+.platform-card.on-dark .platform-card-name,
+.platform-card.on-dark .platform-file {
+  color: #fff;
+}
+.platform-card.on-dark .platform-arch {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+.platform-card.on-dark .platform-fits,
+.platform-card.on-dark .platform-upcoming-text,
+.platform-card.on-dark .platform-first-body,
+.platform-card.on-dark .platform-hash-label {
+  color: rgba(255, 255, 255, 0.76);
+}
+.platform-card.on-dark .platform-hash,
+.platform-card.on-dark .platform-command {
+  background: rgba(255, 255, 255, 0.08);
+}
+.platform-card.on-dark .platform-hash-value,
+.platform-card.on-dark .platform-command code {
+  color: rgba(255, 255, 255, 0.92);
+}
+.platform-card.on-dark .platform-match {
+  background: rgba(0, 179, 236, 0.28);
+  color: #fff;
+  animation: install-match var(--dur-short) var(--ease-out);
+}
+.platform-card.on-dark .platform-copy {
+  color: #fff;
+}
+.platform-card.on-dark .platform-first > summary {
+  color: #fff;
+}
+.platform-card.on-dark .text-link {
+  color: #b5d8ff;
+}
+.platform-card.on-dark .platform-upcoming-badge {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+@keyframes install-match {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 1023px) {
+  .install-panel {
+    padding: 56px 48px;
+  }
+  .install-content > *,
+  .install-content > .install-release {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  .install-release {
+    margin-top: 32px;
+  }
+}
+@media (max-width: 767px) {
+  .install-section > .container {
+    width: 100%;
+  }
+  .install-panel {
+    padding: 56px 20px;
+    border-radius: 0;
+  }
+  .platform-card.on-dark {
+    padding: 20px;
+  }
+  .platform-card.on-dark .platform-download {
+    width: 100%;
+  }
+}
+@media print {
+  .install-panel {
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--line);
+  }
+  .install-panel * {
+    color: var(--ink) !important;
+  }
+}

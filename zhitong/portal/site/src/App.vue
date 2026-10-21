@@ -1,107 +1,71 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+/**
+ * 应用外壳（01 章 §13）：跳到正文、顶栏、AcquireDialog、ZtToast、朗读区在 RouterView 之外常驻；
+ * RouterView 外包页面切换过渡（key = route.meta.layout；文档页之间不触发，由 06 章在 .docs-main 内处理）。
+ */
+import { computed, nextTick } from 'vue';
+import { useRoute } from 'vue-router';
 import SiteHeader from './components/SiteHeader.vue';
-import HeroSection from './components/HeroSection.vue';
-import WorkDemo from './components/WorkDemo.vue';
-import RolesSection from './components/RolesSection.vue';
-import CapabilitiesSection from './components/CapabilitiesSection.vue';
-import WorkflowSection from './components/WorkflowSection.vue';
-import TrustSection from './components/TrustSection.vue';
-import InstallSection from './components/InstallSection.vue';
-import FaqSection from './components/FaqSection.vue';
-import SiteFooter from './components/SiteFooter.vue';
 import AcquireDialog from './components/AcquireDialog.vue';
-import { scrollToSection } from './lib/navigation';
+import ZtToast from './components/ui/ZtToast.vue';
+import SiteFooter from './components/SiteFooter.vue';
+import { acquireState, openAcquire, setAcquireOpen } from './composables/useAcquire';
+import { announce } from './composables/useToast';
+import { goToSection } from './lib/home-state';
 import { refreshMotionLayout } from './lib/motion';
-import { usePageMotion } from './composables/usePageMotion';
-import type { PortalAction, SceneId } from './types/portal';
+import type { PageLayout } from './composables/useHeaderState';
 
-const root = ref<HTMLElement | null>(null);
-const demo = ref<InstanceType<typeof WorkDemo> | null>(null);
-const capabilities = ref<InstanceType<typeof CapabilitiesSection> | null>(null);
-const activeSection = ref('');
-const acquireOpen = ref(false);
-const acquireTrigger = ref<HTMLElement | null>(null);
-const status = ref('');
-let observer: IntersectionObserver | undefined;
-usePageMotion(root);
+const route = useRoute();
+const layout = computed<PageLayout>(() => route.meta.layout ?? 'home');
 
-function acquire(event: MouseEvent) {
-  acquireTrigger.value = event.currentTarget as HTMLElement;
-  acquireOpen.value = true;
-}
-
-function navigate(id: string) {
-  if (id === 'demo') demo.value?.settle();
-  const node = document.getElementById(id);
-  const title = id === 'main' || id === 'demo' ? null : node?.querySelector<HTMLElement>('h2');
-  scrollToSection(title?.id || id);
-  if (['capabilities', 'workflow', 'trust', 'faq'].includes(id)) activeSection.value = id;
-}
-
-async function showScene(id: SceneId, source = false) {
-  const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-  await demo.value?.showScene(id);
-  scrollToSection('demo', true, source);
-  if (source) await demo.value?.showScene(id, true, trigger);
-}
-
-async function act(action: PortalAction) {
-  if (action.type === 'feature') {
-    await capabilities.value?.selectFeature(action.id);
-    await nextTick();
-    const target = window.matchMedia('(max-width: 767px)').matches
-      ? `feature-${action.id}-title`
-      : 'capabilities-title';
-    scrollToSection(target, false);
-    document.getElementById(`feature-${action.id}-title`)?.focus({ preventScroll: true });
-    status.value = `已打开：${document.querySelector(`[data-feature="${action.id}"] summary span`)?.textContent ?? ''}`;
-    refreshMotionLayout();
-  } else if (action.type === 'scene') await showScene(action.id);
-  else if (action.type === 'source') await showScene('check', true);
-  else navigate(action.id);
-}
-
-onMounted(() => {
-  if ('IntersectionObserver' in window) {
-    const visible = new Map<string, number>();
-    observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) visible.set(entry.target.id, entry.boundingClientRect.top);
-          else visible.delete(entry.target.id);
-        }
-        const first = [...visible].sort((a, b) => a[1] - b[1])[0];
-        activeSection.value = first?.[0] ?? '';
-      },
-      { rootMargin: '-15% 0px -58% 0px', threshold: 0 },
-    );
-    for (const id of ['capabilities', 'workflow', 'trust', 'faq']) {
-      const section = document.getElementById(id);
-      if (section) observer.observe(section);
-    }
+function skip(event: MouseEvent) {
+  event.preventDefault();
+  const main = document.getElementById('main');
+  if (!main) return;
+  if (layout.value === 'home') void goToSection('main', true);
+  else {
+    main.focus({ preventScroll: true });
+    main.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
-  const hash = decodeURIComponent(window.location.hash.slice(1));
-  if (hash && document.getElementById(hash)) void nextTick(() => navigate(hash));
-});
-onBeforeUnmount(() => observer?.disconnect());
+}
+
+function onAfterLeave() {
+  const saved = (history.state as { scroll?: { left: number; top: number } } | null)?.scroll;
+  window.scrollTo({ top: saved?.top ?? 0, left: saved?.left ?? 0, behavior: 'instant' });
+}
+
+async function onAfterEnter() {
+  await nextTick();
+  const hash = decodeURIComponent(route.hash.slice(1));
+  if (layout.value === 'home') {
+    refreshMotionLayout();
+    await new Promise((r) => requestAnimationFrame(r));
+    if (hash && document.getElementById(hash)) await goToSection(hash, true);
+    else document.getElementById('main')?.focus({ preventScroll: true });
+  } else {
+    const target = hash ? document.getElementById(hash) : null;
+    if (target) target.scrollIntoView({ block: 'start', behavior: 'instant' });
+    document.getElementById('main')?.focus({ preventScroll: true });
+  }
+  announce(`已打开：${document.title}`);
+}
 </script>
 
 <template>
-  <div ref="root">
-    <a class="skip-link" href="#main" @click.prevent="navigate('main')">跳到正文</a>
-    <SiteHeader :active-section="activeSection" @acquire="acquire" @navigate="navigate" />
-    <main id="main" tabindex="-1">
-      <HeroSection @acquire="acquire" @navigate="navigate"><WorkDemo ref="demo" /></HeroSection>
-      <RolesSection @action="act" />
-      <CapabilitiesSection ref="capabilities" @scene="showScene" />
-      <WorkflowSection />
-      <TrustSection />
-      <InstallSection @acquire="acquire" />
-      <FaqSection />
-    </main>
-    <SiteFooter @acquire="acquire" @navigate="navigate" />
-    <AcquireDialog v-model="acquireOpen" :trigger="acquireTrigger" />
-    <div id="page-status" class="sr-only" role="status" aria-live="polite">{{ status }}</div>
-  </div>
+  <a class="skip-link" href="#main" @click="skip">跳到正文</a>
+  <SiteHeader :layout="layout" @acquire="openAcquire" />
+  <RouterView v-slot="{ Component, route: current }">
+    <Transition name="page" mode="out-in" :appear="false" @after-leave="onAfterLeave" @after-enter="onAfterEnter">
+      <component :is="Component" :key="current.meta.layout" />
+    </Transition>
+  </RouterView>
+  <!-- /privacy/ 的页面根元素是 <main id="main">，页脚由外壳补上（05 章反馈）。 -->
+  <SiteFooter v-if="route.name === 'privacy'" context="docs" @acquire="openAcquire" />
+  <AcquireDialog
+    :model-value="acquireState.open"
+    :trigger="acquireState.trigger"
+    @update:model-value="setAcquireOpen"
+  />
+  <ZtToast />
+  <div id="page-status" class="sr-only" role="status" aria-live="polite"></div>
 </template>

@@ -1,0 +1,299 @@
+/* 页脚 footer.site-footer（05 章 §5.3；00 章 §14 裁定 4：末行 DecoFooterMark）。 */
+.site-footer {
+  padding: 80px 0 32px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--col-gap);
+  align-items: start;
+}
+.footer-brand {
+  grid-column: 1 / span 4;
+}
+.footer-brand > .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.footer-brand .brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+}
+.footer-tagline {
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--ink);
+}
+.footer-site {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.footer-site .mono {
+  font-size: 13px;
+}
+.footer-acquire {
+  margin-top: 20px;
+}
+.footer-cols {
+  grid-column: 5 / -1;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  column-gap: var(--col-gap);
+}
+.footer-product {
+  grid-column: span 2;
+}
+.footer-docs {
+  grid-column: span 6;
+}
+.site-footer.has-contact .footer-docs,
+.footer-contact {
+  grid-column: span 3;
+}
+.footer-col-title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 36px;
+  color: var(--text-muted);
+}
+.footer-col ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.footer-col li {
+  line-height: 36px;
+}
+.footer-link {
+  display: inline;
+  color: var(--ink);
+  font-size: 15px;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition:
+    background-size var(--dur-short) var(--ease-out),
+    color var(--dur-micro) var(--ease-out);
+}
+@media (hover: hover) {
+  .footer-link:hover {
+    color: var(--brand-blue);
+    background-size: 100% 1px;
+  }
+}
+.footer-ext {
+  width: 12px;
+  height: 12px;
+  margin-left: 4px;
+  vertical-align: -1px;
+}
+.contact-list {
+  margin: 0;
+  font-size: 15px;
+}
+.contact-list > div {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 8px;
+  line-height: 36px;
+}
+.contact-list dt {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.contact-list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.contact-list a {
+  color: inherit;
+}
+.on-dark .contact-list dt {
+  color: rgba(255, 255, 255, 0.76);
+}
+.on-dark .contact-list dd,
+.on-dark .contact-list a {
+  color: #fff;
+}
+.footer-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 24px;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 0;
+  font-size: 14px;
+  color: var(--ink);
+}
+.footer-legal .footer-link {
+  font-size: 14px;
+}
+.footer-legal-item + .footer-legal-item::before {
+  content: '·';
+  margin: 0 8px;
+  color: var(--text-muted);
+}
+.footer-top {
+  grid-column: 2;
+  grid-row: 1;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 14px;
+}
+.footer-top-icon {
+  transform: rotate(-90deg);
+}
+.footer-note {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.footer-deco-row {
+  margin-bottom: -32px;
+}
+
+@media (max-width: 1023px) {
+  .footer-brand,
+  .footer-cols {
+    grid-column: 1 / -1;
+  }
+  .footer-cols {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    margin-top: 40px;
+  }
+  .footer-product,
+  .footer-docs,
+  .site-footer.has-contact .footer-docs,
+  .footer-contact {
+    grid-column: span 4;
+  }
+}
+@media (max-width: 767px) {
+  .site-footer {
+    padding: 56px 0 24px;
+  }
+  .footer-cols {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .footer-product,
+  .footer-docs,
+  .site-footer.has-contact .footer-docs,
+  .footer-contact {
+    grid-column: 1 / -1;
+  }
+  .footer-product ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .footer-bottom {
+    grid-template-columns: 1fr;
+  }
+  .footer-legal {
+    flex-direction: column;
+  }
+  .footer-legal-item + .footer-legal-item::before {
+    content: none;
+  }
+  .footer-top {
+    grid-column: 1;
+    grid-row: auto;
+    order: 3;
+    width: 100%;
+  }
+  .footer-deco-row {
+    margin-bottom: -24px;
+  }
+}
+@media print {
+  .site-footer {
+    display: none;
+  }
+}
+
+/* 隐私说明页 /privacy/（05 章；正文出处见 components/sections05/privacy-policy.ts） */
+.privacy-page {
+  padding-block: 56px 96px;
+}
+.privacy-container {
+  max-width: 880px;
+}
+.privacy-doc-title {
+  margin-top: 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+.privacy-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.privacy-body {
+  margin-top: 32px;
+  font-size: var(--fs-body);
+  line-height: 1.8;
+}
+.privacy-body p {
+  margin-top: 10px;
+}
+.privacy-body h2 {
+  margin-top: 40px;
+  font-size: 24px;
+}
+.privacy-body h3 {
+  margin-top: 24px;
+  font-size: 19px;
+}
+.privacy-body h4 {
+  margin-top: 18px;
+  font-size: 17px;
+  font-weight: 600;
+}
+.privacy-toc {
+  margin: 10px 0 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+/* 出处连线（02 章，自 v1.0 sections.css 拆入本文件，保留原位置） */
+.source-connector {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+  overflow: visible;
+}
+.source-connector path {
+  fill: none;
+  stroke: var(--brand-cyan);
+  stroke-width: 1.6;
+}
+.source-connector circle {
+  fill: var(--brand-cyan);
+  stroke: white;
+  stroke-width: 2;
+}
+@media (max-width: 767px) {
+  .source-connector {
+    display: none !important;
+  }
+}

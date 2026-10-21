@@ -78,5 +78,17 @@ defineProps<{
       />
     </g>
     <g v-else-if="name === 'alert'"><path d="m12 3 10 18H2zM12 9v5m0 3v1" /></g>
+    <g v-else-if="name === 'book'">
+      <path
+        d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5z"
+      />
+    </g>
+    <g v-else-if="name === 'copy'">
+      <rect x="8" y="8" width="12" height="12" rx="2" />
+      <path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" />
+    </g>
+    <g v-else-if="name === 'pause'" class="icon-bold"><path d="M9 5v14M15 5v14" /></g>
+    <g v-else-if="name === 'play'" class="icon-bold"><path d="M8 5v14l11-7z" /></g>
+    <g v-else-if="name === 'external'"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></g>
   </svg>
 </template>
