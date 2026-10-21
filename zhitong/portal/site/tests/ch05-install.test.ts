@@ -86,6 +86,7 @@ describe('05 §3 安装与交付', () => {
       '安装包',
       '配置包',
       '首次使用',
+      '联系服务方',
     ]);
     expect(w.text()).toContain(
       '提供 Mac（.dmg，Apple 芯片）和 Windows（.exe，x64）安装包。安装包内含 Python 运行时、脚本依赖库和 DWG 转换组件，无需另行安装 Python。',

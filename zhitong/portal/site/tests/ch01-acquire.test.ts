@@ -55,8 +55,9 @@ describe('01 §7 获取安装包弹层', () => {
     expect(w.text()).toContain('① 安装并打开');
     expect(w.get('dialog').attributes('aria-labelledby')).toBe('acquire-title');
     expect(w.find('a[href="/docs/config-package/"], routerlink').exists() || w.text().includes('读文档：导入配置包')).toBe(true);
-    // site.config 的电话与邮箱按用户要求暂留空：联系区不渲染，且无占位字样。
-    expect(w.text()).not.toContain('联系服务方');
+    // site.config 已填电话：联系区渲染，且无占位字样。
+    expect(w.text()).toContain('联系服务方');
+    expect(w.text()).toContain('13355715800');
     expect(w.text()).not.toContain('联系方式待配置');
     expect(w.find('[data-dialog-status]').exists()).toBe(true);
   });

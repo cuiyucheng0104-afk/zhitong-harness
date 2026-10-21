@@ -19,11 +19,11 @@ describe('静态预渲染', () => {
     expect(document.querySelector('.site-header')?.getAttribute('data-state')).toBe('top');
   });
 
-  it('AC-01-23：联系方式留空时首页不输出联系渠道，也无任何占位字样', async () => {
+  it('AC-01-23：首页只输出已填的电话，无任何占位字样', async () => {
     const { html } = await render('/');
     expect(html).not.toContain('联系方式待配置');
     expect(html).not.toContain('18201566868');
-    expect(html).not.toContain('联系服务方');
+    expect(html).toContain('13355715800');
   });
 
   it('入口保留无脚本可读样式、预渲染插入点与 head 占位', () => {
@@ -35,9 +35,9 @@ describe('静态预渲染', () => {
     expect(template).toContain('启用 JavaScript 后');
   });
 
-  it('上线检查：当前配置只缺联系方式（用户要求暂留空）', () => {
+  it('上线检查：当前配置无阻断项', () => {
     const issues = launchIssues();
-    expect(issues).toEqual(['site.config.ts：contact 至少需要电话、邮箱或微信之一']);
+    expect(issues).toEqual([]);
     expect(routes).toContain('/privacy/');
   });
 });

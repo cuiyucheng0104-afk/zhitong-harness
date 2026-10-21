@@ -39,18 +39,18 @@ export interface SiteConfig {
 
 /**
  * 取值来源（05 章按 00 章 §15.4 于 2026-10-21 在用户本机查得；未查到的项保持空串）：
- * - contact.phone、contact.email：用户 2026-10-21 要求暂时留空。
+ * - contact.phone：用户 2026-10-21 指定；contact.email 按用户要求暂留空。
  * - legal.company：用户 2026-10-21 指定。
  * - legal.privacyHref：`/privacy/`，正文转录自同一份隐私政策（`components/sections05/privacy-policy.ts`）。
  * - legal.icp：用户 2026-10-21 提供。
  * - legal.psbText、legal.psbHref、contact.provider / person / wechat / hours：本机未查到，留空；
- *   联系方式全空时 `ZT_LAUNCH=1` 构建按设计失败（上线阻断项）。
+ *   联系方式全空时 `ZT_LAUNCH=1` 构建按设计失败（上线阻断项）；当前已有电话，检查通过。
  */
 export const siteConfig: SiteConfig = {
   contact: {
     provider: '',
     person: '',
-    phone: '',
+    phone: '13355715800',
     email: '',
     wechat: '',
     hours: '',
