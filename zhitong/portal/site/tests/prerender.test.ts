@@ -35,9 +35,9 @@ describe('静态预渲染', () => {
     expect(template).toContain('启用 JavaScript 后');
   });
 
-  it('上线检查：当前配置缺联系方式（用户要求暂留空）与 ICP 备案号', () => {
+  it('上线检查：当前配置只缺联系方式（用户要求暂留空）', () => {
     const issues = launchIssues();
-    expect(issues).toEqual(['site.config.ts：contact 至少需要电话、邮箱或微信之一', 'site.config.ts：legal.icp 未填写']);
+    expect(issues).toEqual(['site.config.ts：contact 至少需要电话、邮箱或微信之一']);
     expect(routes).toContain('/privacy/');
   });
 });

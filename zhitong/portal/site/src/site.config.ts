@@ -42,8 +42,9 @@ export interface SiteConfig {
  * - contact.phone、contact.email：用户 2026-10-21 要求暂时留空。
  * - legal.company：用户 2026-10-21 指定。
  * - legal.privacyHref：`/privacy/`，正文转录自同一份隐私政策（`components/sections05/privacy-policy.ts`）。
- * - legal.icp、legal.psbText、legal.psbHref、contact.provider / person / wechat / hours：本机未查到，留空；
- *   ICP 备案号缺失时 `ZT_LAUNCH=1` 构建按设计失败（上线阻断项）。
+ * - legal.icp：用户 2026-10-21 提供。
+ * - legal.psbText、legal.psbHref、contact.provider / person / wechat / hours：本机未查到，留空；
+ *   联系方式全空时 `ZT_LAUNCH=1` 构建按设计失败（上线阻断项）。
  */
 export const siteConfig: SiteConfig = {
   contact: {
@@ -56,7 +57,7 @@ export const siteConfig: SiteConfig = {
   },
   legal: {
     company: '杭州智通数工科技有限公司',
-    icp: '',
+    icp: '浙ICP备2026074211号',
     psbText: '',
     psbHref: '',
     privacyHref: '/privacy/',

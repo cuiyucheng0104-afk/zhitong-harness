@@ -185,7 +185,7 @@ describe('05 §5 页脚', () => {
     expect(legalLaunchIssues({ ...ok, icp: 'TODO' }, routes)).toEqual([
       'site.config.ts：legal.icp 含占位文字',
     ]);
-    expect(launchIssues()).toEqual(['site.config.ts：contact 至少需要电话、邮箱或微信之一', 'site.config.ts：legal.icp 未填写']);
+    expect(launchIssues()).toEqual(['site.config.ts：contact 至少需要电话、邮箱或微信之一']);
   });
 
   it('AC-05-80：SUPPORT_CONTACT 等于 contactChannels(siteConfig.contact)[0]', () => {
@@ -223,10 +223,10 @@ describe('05 §5 页脚', () => {
 });
 
 describe('§15.4 上线信息与 /privacy/', () => {
-  it('site.config.ts：公司主体与隐私说明路径已填；电话、邮箱、ICP 与公安备案留空', () => {
+  it('site.config.ts：公司主体与隐私说明路径已填；ICP 已填；电话、邮箱与公安备案留空', () => {
     expect(siteConfig.legal.company).toBe('杭州智通数工科技有限公司');
     expect(siteConfig.legal.privacyHref).toBe('/privacy/');
-    expect(siteConfig.legal.icp).toBe('');
+    expect(siteConfig.legal.icp).toBe('浙ICP备2026074211号');
     expect(siteConfig.legal.psbText).toBe('');
     expect(contactChannels(siteConfig.contact)).toEqual([]);
     expect(routes).toContain(siteConfig.legal.privacyHref);
